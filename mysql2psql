@@ -133,7 +133,7 @@ EOF
       if column[:primary_key]
         if column[:name] == "id"
           primary_key = column[:name]
-          maxval = column[:maxval] < 1 ? 1 : column[:maxval]
+          maxval = column[:maxval] < 1 ? 1 : column[:maxval] + 1
         end
         primary_keys << column[:name]
       end
