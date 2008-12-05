@@ -49,6 +49,9 @@ class MysqlReader
             desc[:maxval] = res.fetch_row[0].to_i
           end
         end
+        if desc[:type] == "blob" && field.flags & Mysql::Field::BINARY_FLAG == 0
+          desc[:type] = "text"
+        end
         desc
       end
       result.free
@@ -227,6 +230,8 @@ EOF
         end
         "boolean"
       when "blob"
+        "bytea"
+      when "text"
         "text"
       when "float"
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
@@ -258,7 +263,13 @@ EOF
         if column[:type] == "char"
           row[index] = row[index] == 1 ? 't' : row[index] == 0 ? 'f' : row[index]
         end
-        row[index] = row[index].gsub(/\\/, '\\\\\\').gsub(/\n/,'\n').gsub(/\t/,'\t').gsub(/\r/,'\r') if row[index].is_a?(String)
+        if row[index].is_a?(String)
+          if column[:type] == "bytea"
+            row[index] = PGconn.quote(row[index])
+          else
+            row[index] = row[index].gsub(/\\/, '\\\\\\').gsub(/\n/,'\n').gsub(/\t/,'\t').gsub(/\r/,'\r') 
+          end
+        end
         row[index] = '\N' if !row[index]
         row[index]
       end
