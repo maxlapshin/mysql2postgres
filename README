@@ -1,1 +1,10 @@
-It can translate now most data types and indexes.
+Tool for converting mysql database to postgresql.
+It can create postgresql dump from mysql database or directly load data from mysql to
+postgresql (at about 100 000 records per minute).
+
+It can translate now most data types and indexes, but if you experience some problems, feel free
+to contact me, I'll help you.
+
+
+Stronly required help to make params of databases not hardcoded.
+
