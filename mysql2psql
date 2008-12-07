@@ -84,6 +84,21 @@ class MysqlReader
       indexes
     end
     
+    def has_id?
+      !!columns.find {|col| col[:name] == "id"} 
+    end
+    
+    def count_for_pager
+      query = has_id? ? 'MAX(id)' : 'COUNT(*)'
+      @mysql.query("SELECT #{query} FROM #{name}") do |res|
+        return res.fetch_row[0].to_i
+      end
+    end
+
+    def query_for_pager
+      query = has_id? ? 'WHERE id >= ? AND id < ?' : 'LIMIT ?,?'
+      "SELECT #{columns.map{|c| "`"+c[:name]+"`"}.join(", ")} FROM `#{name}` #{query}"
+    end
   end
   
   def initialize(host = nil, user = nil, passwd = nil, db = nil, sock = nil, flag = nil)
@@ -97,15 +112,12 @@ class MysqlReader
   end
   
   def paginated_read(table, page_size)
-    count = nil
-    @mysql.query("SELECT count(*) FROM #{table.name}") do |res|
-      count = res.fetch_row[0].to_i
-    end
+    count = table.count_for_pager
     return if count < 1
-    statement = @mysql.prepare("SELECT #{table.columns.map{|c| "`"+c[:name]+"`"}.join(", ")} FROM `#{table.name}` LIMIT ?,?")
+    statement = @mysql.prepare(table.query_for_pager)
     counter = 0
     0.upto((count + page_size)/page_size) do |i|
-      statement.execute(i*page_size, page_size)
+      statement.execute(i*page_size, table.has_id? ? (i+1)*page_size : page_size)
       while row = statement.fetch
         counter += 1
         yield(row, counter)
