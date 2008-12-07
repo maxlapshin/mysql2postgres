@@ -123,6 +123,7 @@ class MysqlReader
         yield(row, counter)
       end
     end
+    counter
   end
 end
 
@@ -211,6 +212,9 @@ EOF
 
   end
   
+  def write_indexes(table)
+  end
+  
   def column_description(column)
     "#{PGconn.quote_ident(column[:name])} #{column_type(column)}"
   end
@@ -289,7 +293,8 @@ EOF
       end
       @f << row.join("\t") + "\n"
     end
-    @f << "\\.\n\n\n"
+    @f << "\\.\n\n"
+    @f << "VACUUM FULL ANALYZE #{PGconn.quote_ident(table.name)};\n\n"
   end
   
   def close
@@ -337,23 +342,24 @@ class PostgresDbWriter < Writer
     end
     
     @conn.exec "DROP TABLE IF EXISTS #{PGconn.quote_ident(table.name)} CASCADE;"
-    table_sql = "CREATE TABLE #{PGconn.quote_ident(table.name)} (\n" + columns
-  
-    if primary_index = table.indexes.find {|index| index[:primary]}
-      table_sql << ",\n  CONSTRAINT #{table.name}_pkey PRIMARY KEY(#{primary_index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")})"
-    end
-    
-    table_sql << "\n)\nWITH (OIDS=FALSE);"
-    @conn.exec(table_sql)
+    @conn.exec("CREATE TABLE #{PGconn.quote_ident(table.name)} (\n" + columns + "\n)\nWITH (OIDS=FALSE);")
     puts "Created table #{table.name}"
 
+  end
+  
+  def write_indexes(table)
+    if primary_index = table.indexes.find {|index| index[:primary]}
+      @conn.exec("ALTER TABLE #{PGconn.quote_ident(table.name)} ADD CONSTRAINT #{table.name}_pkey PRIMARY KEY(#{primary_index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")})")
+    end
+    
     table.indexes.each do |index|
       next if index[:primary]
       unique = index[:unique] ? "UNIQUE " : nil
       @conn.exec("DROP INDEX IF EXISTS #{PGconn.quote_ident(index[:name])} CASCADE;")
       @conn.exec("CREATE #{unique}INDEX #{PGconn.quote_ident(index[:name])} ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});")
     end
-
+    @conn.exec("VACUUM FULL ANALYZE #{PGconn.quote_ident(table.name)}")
+    puts "Indexed table #{table.name}"
   end
   
   def column_description(column)
@@ -413,7 +419,7 @@ class PostgresDbWriter < Writer
     @conn.exec(copy_line)
     print "Loading #{table.name}: "
     STDOUT.flush
-    reader.paginated_read(table, 1000) do |row, counter|
+    _counter = reader.paginated_read(table, 1000) do |row, counter|
       line = []
       table.columns.each_with_index do |column, index|
         row[index] = row[index].to_s if row[index].is_a?(Mysql::Time)
@@ -437,7 +443,7 @@ class PostgresDbWriter < Writer
       end
     end
     _time2 = Time.now
-    puts " #{counter} (#{((_time2 - _time1) / 60).round}min #{((_time2 - _time1) % 60).round}s)"
+    puts " #{_counter} (#{((_time2 - _time1) / 60).round}min #{((_time2 - _time1) % 60).round}s)"
 #    @conn.putline(".\n")
     @conn.endcopy
   end
@@ -460,23 +466,29 @@ class Converter
   
   def convert
     _time1 = Time.now
-    reader.tables.
+    
+    tables = reader.tables.
       reject {|table| @exclude_tables.include?(table.name)}.
-      select {|table| @only_tables ? @only_tables.include?(table.name) : true}.
-      each do |table|
+      select {|table| @only_tables ? @only_tables.include?(table.name) : true}
+    
+    tables.each do |table|
       writer.write_table(table)
     end
 
     _time2 = Time.now
-    reader.tables.
-      reject {|table| @exclude_tables.include?(table.name)}.
-      select {|table| @only_tables ? @only_tables.include?(table.name) : true}.
-      each do |table|
+    tables.each do |table|
       writer.write_contents(table, reader)
     end
-    writer.close
+
     _time3 = Time.now
-    puts "Table creation #{((_time2 - _time1) / 60).round} min, total #{((_time3 - _time1) / 60).round} min"
+    tables.each do |table|
+      writer.write_indexes(table)
+    end
+
+
+    writer.close
+    _time4 = Time.now
+    puts "Table creation #{((_time2 - _time1) / 60).round} min, loading #{((_time3 - _time2) / 60).round} min, indexing #{((_time4 - _time3) / 60).round} min, total #{((_time4 - _time1) / 60).round} min"
   end
 end
 
