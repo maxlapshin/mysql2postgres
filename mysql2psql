@@ -88,7 +88,8 @@ class MysqlReader
   
   def initialize(host = nil, user = nil, passwd = nil, db = nil, sock = nil, flag = nil)
     @mysql = Mysql.connect(host, user, passwd, db, sock, flag)
-    @mysql.query "SET NAMES utf8"
+    @mysql.query("SET NAMES utf8")
+    @mysql.query("SET SESSION query_cache_type = OFF")
   end
   
   def tables
@@ -102,10 +103,12 @@ class MysqlReader
     end
     return if count < 1
     statement = @mysql.prepare("SELECT #{table.columns.map{|c| "`"+c[:name]+"`"}.join(", ")} FROM `#{table.name}` LIMIT ?,?")
+    counter = 0
     0.upto((count + page_size)/page_size) do |i|
       statement.execute(i*page_size, page_size)
       while row = statement.fetch
-        yield(row)
+        counter += 1
+        yield(row, counter)
       end
     end
   end
@@ -256,7 +259,7 @@ EOF
 COPY #{table.name} (#{table.columns.map {|column| PGconn.quote_ident(column[:name])}.join(", ")}) FROM stdin;
 EOF
     
-    reader.paginated_read(table, 1000) do |row|
+    reader.paginated_read(table, 1000) do |row, counter|
       line = []
       table.columns.each_with_index do |column, index|
         row[index] = row[index].to_s if row[index].is_a?(Mysql::Time)
@@ -271,7 +274,6 @@ EOF
           end
         end
         row[index] = '\N' if !row[index]
-        row[index]
       end
       @f << row.join("\t") + "\n"
     end
@@ -376,6 +378,8 @@ class PostgresDbWriter < Writer
         end
         "boolean"
       when "blob"
+        "bytea"
+      when "text"
         "text"
       when "float"
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
@@ -393,11 +397,11 @@ class PostgresDbWriter < Writer
   
   def write_contents(table, reader)
     _time1 = Time.now
-    @conn.exec("COPY #{table.name} (#{table.columns.map {|column| PGconn.quote_ident(column[:name])}.join(", ")}) FROM stdin;")
+    copy_line = "COPY #{table.name} (#{table.columns.map {|column| PGconn.quote_ident(column[:name])}.join(", ")}) FROM stdin;"
+    @conn.exec(copy_line)
     print "Loading #{table.name}: "
     STDOUT.flush
-    counter = 0
-    reader.paginated_read(table, 1000) do |row|
+    reader.paginated_read(table, 1000) do |row, counter|
       line = []
       table.columns.each_with_index do |column, index|
         row[index] = row[index].to_s if row[index].is_a?(Mysql::Time)
@@ -409,15 +413,21 @@ class PostgresDbWriter < Writer
         row[index]
       end
       @conn.putline row.join("\t") + "\n"
-      counter += 1
-      if counter % 1000 == 0
+      
+      if counter % 5000 == 0
+        print "*"
+        STDOUT.flush
+        @conn.endcopy
+        @conn.exec(copy_line)
+      elsif counter % 1000 == 0
         print "."
         STDOUT.flush
       end
     end
     _time2 = Time.now
     puts " #{counter} (#{((_time2 - _time1) / 60).round}min #{((_time2 - _time1) % 60).round}s)"
-    @conn.putline(".\n")
+#    @conn.putline(".\n")
+    @conn.endcopy
   end
   
   def close
@@ -429,19 +439,27 @@ end
 class Converter
   attr_reader :reader, :writer
   
-  def initialize(reader, writer)
+  def initialize(reader, writer, options = {})
     @reader = reader
     @writer = writer
+    @exclude_tables = options[:exclude_tables] || []
+    @only_tables = options[:only_tables] ? Array(options[:only_tables]) : nil
   end
   
   def convert
     _time1 = Time.now
-    reader.tables.each do |table|
+    reader.tables.
+      reject {|table| @exclude_tables.include?(table.name)}.
+      select {|table| @only_tables ? @only_tables.include?(table.name) : true}.
+      each do |table|
       writer.write_table(table)
     end
 
     _time2 = Time.now
-    reader.tables.each do |table|
+    reader.tables.
+      reject {|table| @exclude_tables.include?(table.name)}.
+      select {|table| @only_tables ? @only_tables.include?(table.name) : true}.
+      each do |table|
       writer.write_contents(table, reader)
     end
     writer.close
@@ -453,6 +471,6 @@ end
 reader = MysqlReader.new('localhost', 'root', nil, 'lookatme_development')
 #writer = PostgresFileWriter.new($ARGV[2] || "output.sql")
 writer = PostgresDbWriter.new('localhost', 'lookatme', '123', 'lookatme_development')
-converter = Converter.new(reader, writer)
+converter = Converter.new(reader, writer, :only_tables => %w(messages))
 converter.convert
 
