@@ -60,28 +60,42 @@ class MysqlReader
     
     
     def indexes
-      @indexes ||= load_indexes
+      load_indexes unless @indexes
+      @indexes 
+    end
+
+    def foreign_keys
+      load_indexes unless @foreign_keys
+      @foreign_keys
     end
     
     def load_indexes
-      indexes = []
+      @indexes = []
+      @foreign_keys = []
+      
       @mysql.query("SHOW CREATE TABLE `#{name}`") do |result|
         explain = result.fetch_row[1]
         explain.split(/\n/).each do |line|
           next unless line =~ / KEY /
           index = {}
-          if match_data = /KEY `(\w+)` \((.*)\)/.match(line)
+          if match_data = /CONSTRAINT `(\w+)` FOREIGN KEY \(`(\w+)`\) REFERENCES `(\w+)` \(`(\w+)`\)/.match(line)
+            index[:name] = match_data[1]
+            index[:column] = match_data[2]
+            index[:ref_table] = match_data[3]
+            index[:ref_column] = match_data[4]
+            @foreign_keys << index
+          elsif match_data = /KEY `(\w+)` \((.*)\)/.match(line)
             index[:name] = match_data[1]
             index[:columns] = match_data[2].split(",").map {|col| col.strip.gsub(/`/, "")}
             index[:unique] = true if line =~ /UNIQUE/
+            @indexes << index
           elsif match_data = /PRIMARY KEY .*\((.*)\)/.match(line)
             index[:primary] = true
             index[:columns] = match_data[1].split(",").map {|col| col.strip.gsub(/`/, "")}
+            @indexes << index
           end
-          indexes << index
         end
       end
-      indexes
     end
     
     def has_id?
@@ -214,6 +228,13 @@ EOF
   
   def write_indexes(table)
   end
+  
+  def write_constraints(table)
+    table.foreign_keys.each do |key|
+      @f << "ALTER TABLE #{PGconn.quote_ident(table.name)} ADD FOREIGN KEY (#{PGconn.quote_ident(key[:column])}) REFERENCES #{PGconn.quote_ident(key[:ref_table])}(#{PGconn.quote_ident(key[:ref_column])});\n"
+    end
+  end
+  
   
   def column_description(column)
     "#{PGconn.quote_ident(column[:name])} #{column_type(column)}"
@@ -358,8 +379,16 @@ class PostgresDbWriter < Writer
       @conn.exec("DROP INDEX IF EXISTS #{PGconn.quote_ident(index[:name])} CASCADE;")
       @conn.exec("CREATE #{unique}INDEX #{PGconn.quote_ident(index[:name])} ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});")
     end
+    
+    
     @conn.exec("VACUUM FULL ANALYZE #{PGconn.quote_ident(table.name)}")
     puts "Indexed table #{table.name}"
+  end
+  
+  def write_constraints(table)
+    table.foreign_keys.each do |key|
+      @conn.exec("ALTER TABLE #{PGconn.quote_ident(table.name)} ADD FOREIGN KEY (#{PGconn.quote_ident(key[:column])}) REFERENCES #{PGconn.quote_ident(key[:ref_table])}(#{PGconn.quote_ident(key[:ref_column])})")
+    end
   end
   
   def column_description(column)
@@ -405,6 +434,9 @@ class PostgresDbWriter < Writer
       when "decimal"
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
         "numeric(#{column[:length] + column[:decimals]}, #{column[:decimals]})"
+      when "int24"
+        default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+        "int"
       else
         puts column.inspect
         column[:type].inspect
@@ -484,6 +516,9 @@ class Converter
     tables.each do |table|
       writer.write_indexes(table)
     end
+    tables.each do |table|
+      writer.write_constraints(table)
+    end
 
 
     writer.close
@@ -492,9 +527,9 @@ class Converter
   end
 end
 
-reader = MysqlReader.new('localhost', 'root', nil, 'lookatme_development')
+reader = MysqlReader.new('localhost', 'root', nil, 'mtv_development')
 #writer = PostgresFileWriter.new($ARGV[2] || "output.sql")
-writer = PostgresDbWriter.new('localhost', 'lookatme', '123', 'lookatme_development')
-converter = Converter.new(reader, writer, :exclude_tables => %w(old_messages battles sessions performances))
+writer = PostgresDbWriter.new('localhost', 'mtv', '123', 'mtv_development')
+converter = Converter.new(reader, writer)
 converter.convert
 
