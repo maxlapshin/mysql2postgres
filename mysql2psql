@@ -38,6 +38,8 @@ class MysqlReader
         "integer"
       when /varchar/
         "varchar"
+      when /decimal/
+        "decimal"
       else
         type
       end 
@@ -50,14 +52,15 @@ class MysqlReader
       fields = []
       @reader.mysql.query("EXPLAIN `#{name}`") do |res|
         while field = res.fetch_row do
-          length = field[1][/\((\d+)\)/, 1]
+          length = field[1][/\((\d+)\)/, 1] if field[1] =~ /\((\d+)\)/
+          length = field[1][/\((\d+),(\d+)\)/, 1] if field[1] =~ /\((\d+),(\d+)\)/
           desc = {
             :name => field[0],
             :table_name => name,
             :default => field[4],
             :type => convert_type(field[1]),
             :length => length && length.to_i,
-            :decimals => 12,
+            :decimals => field[1][/\((\d+),(\d+)\)/, 2],
             :null => field[2] == "YES",
             :primary_key => field[3] == "PRI"
             }
@@ -218,7 +221,7 @@ class PostgresWriter < Writer
       "real"
     when "decimal"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
-      "numeric(#{column[:length] + column[:decimals]}, #{column[:decimals]})"
+      "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
     else
       puts "Unknown #{column.inspect}"
       column[:type].inspect
@@ -525,9 +528,9 @@ class Converter
   end
 end
 
-reader = MysqlReader.new('localhost', 'root', nil, 'mtv_development')
+reader = MysqlReader.new('localhost', 'root', nil, 'lookatme_development')
 #writer = PostgresFileWriter.new($ARGV[2] || "output.sql")
-writer = PostgresDbWriter.new('localhost', 'mtv', '123', 'mtv_development')
-converter = Converter.new(reader, writer)
+writer = PostgresDbWriter.new('localhost', 'lookatme', '123', 'lookatme_development')
+converter = Converter.new(reader, writer, :exclude_tables => %w(messages old_messages comments votes))
 converter.convert
 
