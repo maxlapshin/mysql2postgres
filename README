@@ -8,3 +8,17 @@ to contact me, I'll help you.
 
 Stronly required help to make params of databases not hardcoded.
 
+
+
+After launching tool, You can see something like..
+
+Loading invites: ....*.. 7046 (0min 1s)
+Loading looks: . 1455 (0min 1s)
+Loading message_stats: ....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*... 113627 (0min 10s)
+Loading messages: ....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*....*.. 472456 (2min 25s)
+Loading metadata: ....*...
+
+
+
+Point (.) means, that 1000 of records have been read from MySQL. 
+Star (*) means, that 5000 of records have been dumped into PostgreSQL (closeinput has been called).
