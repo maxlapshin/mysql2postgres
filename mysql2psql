@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'mysql'
+gem "postgres"
 require 'postgres'
 
 
@@ -57,13 +58,13 @@ class MysqlReader
           desc = {
             :name => field[0],
             :table_name => name,
-            :default => field[4],
             :type => convert_type(field[1]),
             :length => length && length.to_i,
             :decimals => field[1][/\((\d+),(\d+)\)/, 2],
             :null => field[2] == "YES",
             :primary_key => field[3] == "PRI"
             }
+          desc[:default] = field[4] unless field[4].nil? || field[4].empty?
           fields << desc
         end
       end
@@ -104,7 +105,7 @@ class MysqlReader
             @foreign_keys << index
           elsif match_data = /KEY `(\w+)` \((.*)\)/.match(line)
             index[:name] = match_data[1]
-            index[:columns] = match_data[2].split(",").map {|col| col.strip.gsub(/`/, "")}
+            index[:columns] = match_data[2].split(",").map {|col| col[/`(\w+)`/, 1]}
             index[:unique] = true if line =~ /UNIQUE/
             @indexes << index
           elsif match_data = /PRIMARY KEY .*\((.*)\)/.match(line)
@@ -222,6 +223,9 @@ class PostgresWriter < Writer
     when "decimal"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
       "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
+    when "time"
+      default = " DEFAULT now" if default
+      "time without time zone"
     else
       puts "Unknown #{column.inspect}"
       column[:type].inspect
@@ -361,13 +365,12 @@ EOF
 end
 
 class PostgresDbWriter < PostgresWriter
-  def connection(hostname, login, password, database)
-    require 'postgres'
-    @conn = PGconn.open('host' => hostname, 'user' => login, 'password' => password, 'dbname' => database)
+  def connection(hostname, login, password, database, port)
+    @conn = PGconn.open('host' => hostname, 'user' => login, 'password' => password, 'dbname' => database, 'port' => port.to_s)
   end
   
-  def initialize(hostname, login, password, database)
-    @conn = connection(hostname, login, password, database)
+  def initialize(hostname, login, password, database, port = 5432)
+    @conn = connection(hostname, login, password, database, port)
     @conn.exec("SET client_encoding = 'UTF8'")
     @conn.exec("SET standard_conforming_strings = off")
     @conn.exec("SET check_function_bodies = false")
@@ -424,6 +427,10 @@ class PostgresDbWriter < PostgresWriter
     
     @conn.exec("VACUUM FULL ANALYZE #{PGconn.quote_ident(table.name)}")
     puts "Indexed table #{table.name}"
+  rescue Exception => e
+    puts "Couldn't create indexes on #{table} (#{table.indexes.inspect})"
+    puts e
+    puts e.backtrace[0,3].join("\n")
   end
   
   def write_constraints(table)
@@ -446,7 +453,7 @@ class PostgresDbWriter < PostgresWriter
           next
         end
         if row[index].is_a?(Mysql::Time)
-          row[index] = row[index].to_s.gsub('0000-00-00 00:00', '1970-01-01 00:00') 
+          row[index] = "%02d:%02d:%02d" % [row[index].hour, row[index].minute, row[index].second]
           next
         end
         
@@ -495,6 +502,7 @@ class Converter
     @writer = writer
     @exclude_tables = options[:exclude_tables] || []
     @only_tables = options[:only_tables] ? Array(options[:only_tables]) : nil
+    @supress_data = options[:supress_data]
   end
   
   def convert
@@ -511,7 +519,7 @@ class Converter
     _time2 = Time.now
     tables.each do |table|
       writer.write_contents(table, reader)
-    end
+    end unless @supress_data
 
     _time3 = Time.now
     tables.each do |table|
@@ -528,9 +536,9 @@ class Converter
   end
 end
 
-reader = MysqlReader.new('localhost', 'root', nil, 'lookatme_development')
+reader = MysqlReader.new('localhost', 'root', nil, 'test')
 #writer = PostgresFileWriter.new($ARGV[2] || "output.sql")
-writer = PostgresDbWriter.new('localhost', 'lookatme', '123', 'lookatme_development')
-converter = Converter.new(reader, writer, :exclude_tables => %w(messages old_messages comments votes))
+writer = PostgresDbWriter.new('localhost', 'postgres', '', 'test')
+converter = Converter.new(reader, writer, :only_tables => %w(time_test))
 converter.convert
 
