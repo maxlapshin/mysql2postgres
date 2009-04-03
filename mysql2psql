@@ -190,7 +190,7 @@ class PostgresWriter < Writer
       return "integer DEFAULT nextval('#{column[:table_name]}_#{column[:name]}_seq'::regclass) NOT NULL"
     end
     
-    default = column[:default] ? " DEFAULT #{column[:default] == nil ? 'NULL' : "'"+column[:default]+"'"}" : nil
+    default = column[:default] ? " DEFAULT #{column[:default] == nil ? 'NULL' : "'"+PGconn.escape(column[:default])+"'"}" : nil
     null = column[:null] ? "" : " NOT NULL"
     type = 
     case column[:type]
@@ -215,6 +215,10 @@ class PostgresWriter < Writer
       "boolean"
     when "blob"
       "bytea"
+    when "mediumtext"
+      "text"
+    when "longtext"
+      "text"
     when "text"
       "text"
     when "float"
@@ -223,6 +227,9 @@ class PostgresWriter < Writer
     when "decimal"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
       "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
+    when "timestamp"
+      default = " DEFAULT CURRENT_TIMESTAMP" if column[:default] == "CURRENT_TIMESTAMP"
+      "timestamp without time zone"
     when "time"
       default = " DEFAULT now" if default
       "time without time zone"
@@ -366,11 +373,13 @@ end
 
 class PostgresDbWriter < PostgresWriter
   def connection(hostname, login, password, database, port)
+    database, schema = database.split(":")
     @conn = PGconn.open('host' => hostname, 'user' => login, 'password' => password, 'dbname' => database, 'port' => port.to_s)
+    @conn.exec("SET search_path TO #{PGconn.quote_ident(schema)}") if schema
   end
   
   def initialize(hostname, login, password, database, port = 5432)
-    @conn = connection(hostname, login, password, database, port)
+    connection(hostname, login, password, database, port)
     @conn.exec("SET client_encoding = 'UTF8'")
     @conn.exec("SET standard_conforming_strings = off")
     @conn.exec("SET check_function_bodies = false")
@@ -407,7 +416,13 @@ class PostgresDbWriter < PostgresWriter
     end
     
     @conn.exec "DROP TABLE IF EXISTS #{PGconn.quote_ident(table.name)} CASCADE;"
-    @conn.exec("CREATE TABLE #{PGconn.quote_ident(table.name)} (\n" + columns + "\n)\nWITH (OIDS=FALSE);")
+    create_sql = "CREATE TABLE #{PGconn.quote_ident(table.name)} (\n" + columns + "\n)\nWITH (OIDS=FALSE);"
+    begin
+      @conn.exec(create_sql)
+    rescue Exception => e
+      puts "Error: \n#{create_sql}"
+      raise
+    end
     puts "Created table #{table.name}"
 
   end
@@ -435,13 +450,18 @@ class PostgresDbWriter < PostgresWriter
   
   def write_constraints(table)
     table.foreign_keys.each do |key|
-      @conn.exec("ALTER TABLE #{PGconn.quote_ident(table.name)} ADD FOREIGN KEY (#{PGconn.quote_ident(key[:column])}) REFERENCES #{PGconn.quote_ident(key[:ref_table])}(#{PGconn.quote_ident(key[:ref_column])})")
+      key_sql = "ALTER TABLE #{PGconn.quote_ident(table.name)} ADD FOREIGN KEY (#{PGconn.quote_ident(key[:column])}) REFERENCES #{PGconn.quote_ident(key[:ref_table])}(#{PGconn.quote_ident(key[:ref_column])})"
+      begin
+        @conn.exec(key_sql)
+      rescue Exception => e
+        puts "Error: \n#{key_sql}\n#{e}"
+      end
     end
   end
   
   def write_contents(table, reader)
     _time1 = Time.now
-    copy_line = "COPY #{table.name} (#{table.columns.map {|column| PGconn.quote_ident(column[:name])}.join(", ")}) FROM stdin;"
+    copy_line = "COPY #{PGconn.quote_ident(table.name)} (#{table.columns.map {|column| PGconn.quote_ident(column[:name])}.join(", ")}) FROM stdin;"
     @conn.exec(copy_line)
     print "Loading #{table.name}: "
     STDOUT.flush
@@ -540,9 +560,9 @@ class Converter
   end
 end
 
-reader = MysqlReader.new('localhost', 'root', nil, 'lookatme_development')
+reader = MysqlReader.new('localhost', 'root', nil, 'prophotos')
 #writer = PostgresFileWriter.new($ARGV[2] || "output.sql")
-writer = PostgresDbWriter.new('localhost', 'lookatme', '123', 'lookatme_development')
-converter = Converter.new(reader, writer, :only_tables => "abuses")
+writer = PostgresDbWriter.new('localhost', 'prophotos', '123', 'prophotos_development:old')
+converter = Converter.new(reader, writer, :only_tables => %w(articles images))
 converter.convert
 
