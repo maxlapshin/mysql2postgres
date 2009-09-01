@@ -5,7 +5,6 @@ require 'mysql'
 gem "postgres"
 require 'postgres'
 
-
 class MysqlReader
   class Field
   end
@@ -68,7 +67,7 @@ class MysqlReader
           fields << desc
         end
       end
-
+ 
       fields.select {|field| field[:primary_key]}.each do |field|
         @reader.mysql.query("SELECT max(`#{field[:name]}`) + 1 FROM `#{name}`") do |res|
           field[:maxval] = res.fetch_row[0].to_i
@@ -82,7 +81,7 @@ class MysqlReader
       load_indexes unless @indexes
       @indexes 
     end
-
+ 
     def foreign_keys
       load_indexes unless @foreign_keys
       @foreign_keys
@@ -127,7 +126,7 @@ class MysqlReader
         return res.fetch_row[0].to_i
       end
     end
-
+ 
     def query_for_pager
       query = has_id? ? 'WHERE id >= ? AND id < ?' : 'LIMIT ?,?'
       "SELECT #{columns.map{|c| "`"+c[:name]+"`"}.join(", ")} FROM `#{name}` #{query}"
@@ -171,11 +170,11 @@ class MysqlReader
     counter
   end
 end
-
+ 
 class Writer
 end
-
-
+ 
+ 
 class PostgresWriter < Writer
   def column_description(column)
     "#{PGconn.quote_ident(column[:name])} #{column_type_info(column)}"
@@ -221,6 +220,14 @@ class PostgresWriter < Writer
       "text"
     when "text"
       "text"
+    when "double"
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+      "double precision"
+    when /^enum/
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+      enum = column[:type].gsub(/enum|\(|\)/, '')
+      max_enum_size = enum.split(',').map{ |check| check.size() -2}.sort[-1]
+      "character varying(#{max_enum_size}), check( #{column[:name]} in (#{enum}))"
     when "float"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
       "real"
@@ -242,7 +249,7 @@ class PostgresWriter < Writer
   end
   
 end
-
+ 
 class PostgresFileWriter < PostgresWriter
   def initialize(file)
     @f = File.open(file, "w+")
@@ -252,7 +259,7 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = off;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
-
+ 
 EOF
   end
   
@@ -278,9 +285,9 @@ EOF
 --
 -- Name: #{table.name}_#{primary_key}_seq; Type: SEQUENCE; Schema: public
 --
-
+ 
 DROP SEQUENCE IF EXISTS #{table.name}_#{primary_key}_seq CASCADE;
-
+ 
 CREATE SEQUENCE #{table.name}_#{primary_key}_seq
     INCREMENT BY 1
     NO MAXVALUE
@@ -289,21 +296,21 @@ CREATE SEQUENCE #{table.name}_#{primary_key}_seq
     
     
 SELECT pg_catalog.setval('#{table.name}_#{primary_key}_seq', #{maxval}, true);
-
+ 
       EOF
     end
     
     @f << <<-EOF
 -- Table: #{table.name}
-
+ 
 -- DROP TABLE #{table.name};
 DROP TABLE IF EXISTS #{PGconn.quote_ident(table.name)} CASCADE;
-
+ 
 CREATE TABLE #{PGconn.quote_ident(table.name)} (
 EOF
   
     @f << columns
-
+ 
     if primary_index = table.indexes.find {|index| index[:primary]}
       @f << ",\n  CONSTRAINT #{table.name}_pkey PRIMARY KEY(#{primary_index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")})"
     end
@@ -311,7 +318,7 @@ EOF
     @f << <<-EOF
 \n)
 WITH (OIDS=FALSE);
-
+ 
 EOF
   
     table.indexes.each do |index|
@@ -322,7 +329,7 @@ DROP INDEX IF EXISTS #{PGconn.quote_ident(index[:name])} CASCADE;
 CREATE #{unique}INDEX #{PGconn.quote_ident(index[:name])} ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});
 EOF
     end
-
+ 
   end
   
   def write_indexes(table)
@@ -341,7 +348,7 @@ EOF
 -- Data for Name: #{table.name}; Type: TABLE DATA; Schema: public
 --
 
-COPY #{table.name} (#{table.columns.map {|column| PGconn.quote_ident(column[:name])}.join(", ")}) FROM stdin;
+COPY "#{table.name}" (#{table.columns.map {|column| PGconn.quote_ident(column[:name])}.join(", ")}) FROM stdin;
 EOF
     
     reader.paginated_read(table, 1000) do |row, counter|
@@ -370,7 +377,7 @@ EOF
     @f.close
   end
 end
-
+ 
 class PostgresDbWriter < PostgresWriter
   def connection(hostname, login, password, database, port)
     database, schema = database.split(":")
@@ -424,7 +431,7 @@ class PostgresDbWriter < PostgresWriter
       raise
     end
     puts "Created table #{table.name}"
-
+ 
   end
   
   def write_indexes(table)
@@ -516,8 +523,8 @@ class PostgresDbWriter < PostgresWriter
     @conn.close
   end
 end
-
-
+ 
+ 
 class Converter
   attr_reader :reader, :writer
   
@@ -539,12 +546,12 @@ class Converter
     tables.each do |table|
       writer.write_table(table)
     end
-
+ 
     _time2 = Time.now
     tables.each do |table|
       writer.write_contents(table, reader)
     end unless @supress_data
-
+ 
     _time3 = Time.now
     tables.each do |table|
       writer.write_indexes(table)
@@ -552,13 +559,14 @@ class Converter
     tables.each do |table|
       writer.write_constraints(table)
     end
-
-
+ 
+ 
     writer.close
     _time4 = Time.now
     puts "Table creation #{((_time2 - _time1) / 60).round} min, loading #{((_time3 - _time2) / 60).round} min, indexing #{((_time4 - _time3) / 60).round} min, total #{((_time4 - _time1) / 60).round} min"
   end
 end
+
 
 reader = MysqlReader.new('localhost', 'root', nil, 'prophotos')
 #writer = PostgresFileWriter.new($ARGV[2] || "output.sql")
