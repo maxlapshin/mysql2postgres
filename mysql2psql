@@ -198,10 +198,10 @@ class PostgresWriter < Writer
 #      puts "VARCHAR: #{column.inspect}"
       "character varying(#{column[:length]})"
     when "integer"
-      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
       "integer"
     when "tinyint"
-      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
       "smallint"
     when "datetime"
       default = nil
@@ -229,7 +229,7 @@ class PostgresWriter < Writer
       max_enum_size = enum.split(',').map{ |check| check.size() -2}.sort[-1]
       "character varying(#{max_enum_size}), check( #{column[:name]} in (#{enum}))"
     when "float"
-      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
       "real"
     when "decimal"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
@@ -317,8 +317,7 @@ EOF
     
     @f << <<-EOF
 \n)
-WITH (OIDS=FALSE);
- 
+WITHOUT OIDS;
 EOF
   
     table.indexes.each do |index|
@@ -388,9 +387,14 @@ class PostgresDbWriter < PostgresWriter
   def initialize(hostname, login, password, database, port = 5432)
     connection(hostname, login, password, database, port)
     @conn.exec("SET client_encoding = 'UTF8'")
-    @conn.exec("SET standard_conforming_strings = off")
+    @conn.exec("SET standard_conforming_strings = off") if @conn.server_version >= 80200
     @conn.exec("SET check_function_bodies = false")
     @conn.exec("SET client_min_messages = warning")
+  end
+
+  def exists?(relname)
+    rc = @conn.select_one("SELECT COUNT(*) FROM pg_class WHERE relname = #{PGconn.quote(relname)}")
+    (!rc.nil?) && (!rc.empty?) && (rc.first.to_i > 0)
   end
   
   def write_table(table)
@@ -410,7 +414,12 @@ class PostgresDbWriter < PostgresWriter
     end.join(",\n")
     
     if primary_key
-      @conn.exec("DROP SEQUENCE IF EXISTS #{table.name}_#{primary_key}_seq CASCADE")
+      if @conn.server_version < 80200
+        primary_key_seq = "#{table.name}_#{primary_key}_seq"
+        @conn.exec("DROP SEQUENCE #{primary_key_seq} CASCADE") if exists?(primary_key_seq)
+      else
+        @conn.exec("DROP SEQUENCE IF EXISTS #{table.name}_#{primary_key}_seq CASCADE")
+      end
       @conn.exec <<-EOF
         CREATE SEQUENCE #{table.name}_#{primary_key}_seq
         INCREMENT BY 1
@@ -422,8 +431,12 @@ class PostgresDbWriter < PostgresWriter
       @conn.exec "SELECT pg_catalog.setval('#{table.name}_#{primary_key}_seq', #{maxval}, true)"
     end
     
-    @conn.exec "DROP TABLE IF EXISTS #{PGconn.quote_ident(table.name)} CASCADE;"
-    create_sql = "CREATE TABLE #{PGconn.quote_ident(table.name)} (\n" + columns + "\n)\nWITH (OIDS=FALSE);"
+    if @conn.server_version < 80200
+      @conn.exec "DROP TABLE #{PGconn.quote_ident(table.name)} CASCADE;" if exists?(table.name)
+    else
+      @conn.exec "DROP TABLE IF EXISTS #{PGconn.quote_ident(table.name)} CASCADE;"
+    end
+    create_sql = "CREATE TABLE #{PGconn.quote_ident(table.name)} (\n" + columns + "\n)\nWITHOUT OIDS;"
     begin
       @conn.exec(create_sql)
     rescue Exception => e
@@ -442,7 +455,11 @@ class PostgresDbWriter < PostgresWriter
     table.indexes.each do |index|
       next if index[:primary]
       unique = index[:unique] ? "UNIQUE " : nil
-      @conn.exec("DROP INDEX IF EXISTS #{PGconn.quote_ident(index[:name])} CASCADE;")
+      if @conn.server_version < 80200
+        @conn.exec("DROP INDEX #{PGconn.quote_ident(index[:name])} CASCADE;") if exists?(index[:name])
+      else
+        @conn.exec("DROP INDEX IF EXISTS #{PGconn.quote_ident(index[:name])} CASCADE;")
+      end
       @conn.exec("CREATE #{unique}INDEX #{PGconn.quote_ident(index[:name])} ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});")
     end
     
