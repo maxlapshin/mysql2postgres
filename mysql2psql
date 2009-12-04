@@ -38,6 +38,8 @@ class MysqlReader
         "integer"
       when /varchar/
         "varchar"
+      when /char/
+        "char"
       when /decimal/
         "decimal"
       else
@@ -193,6 +195,9 @@ class PostgresWriter < Writer
     null = column[:null] ? "" : " NOT NULL"
     type = 
     case column[:type]
+    when "char"
+      default = default + "::char" if default
+      "character(#{column[:length]})"
     when "varchar"
       default = default + "::character varying" if default
 #      puts "VARCHAR: #{column.inspect}"
