@@ -124,7 +124,7 @@ class MysqlReader
     
     def count_for_pager
       query = has_id? ? 'MAX(id)' : 'COUNT(*)'
-      @reader.mysql.query("SELECT #{query} FROM #{name}") do |res|
+      @reader.mysql.query("SELECT #{query} FROM `#{name}`") do |res|
         return res.fetch_row[0].to_i
       end
     end
@@ -454,7 +454,7 @@ class PostgresDbWriter < PostgresWriter
   
   def write_indexes(table)
     if primary_index = table.indexes.find {|index| index[:primary]}
-      @conn.exec("ALTER TABLE #{PGconn.quote_ident(table.name)} ADD CONSTRAINT #{table.name}_pkey PRIMARY KEY(#{primary_index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")})")
+      @conn.exec("ALTER TABLE #{PGconn.quote_ident(table.name)} ADD CONSTRAINT \"#{table.name}_pkey\" PRIMARY KEY(#{primary_index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")})")
     end
     
     table.indexes.each do |index|
