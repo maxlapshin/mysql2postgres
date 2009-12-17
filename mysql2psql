@@ -219,6 +219,8 @@ class PostgresWriter < Writer
       "boolean"
     when "blob"
       "bytea"
+    when "tinytext"
+      "text"
     when "mediumtext"
       "text"
     when "longtext"
