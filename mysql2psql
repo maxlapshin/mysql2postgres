@@ -238,6 +238,9 @@ class PostgresWriter < Writer
     when "float"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
       "real"
+    when "float unsigned"
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
+      "real"
     when "decimal"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
       "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
