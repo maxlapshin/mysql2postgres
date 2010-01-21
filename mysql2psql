@@ -473,12 +473,21 @@ class PostgresDbWriter < PostgresWriter
     table.indexes.each do |index|
       next if index[:primary]
       unique = index[:unique] ? "UNIQUE " : nil
-      if @conn.server_version < 80200
-        @conn.exec("DROP INDEX #{PGconn.quote_ident(index[:name])} CASCADE;") if exists?(index[:name])
-      else
-        @conn.exec("DROP INDEX IF EXISTS #{PGconn.quote_ident(index[:name])} CASCADE;")
+      
+      #MySQL allows an index name which could be equal to a table name, Postgres doesn't
+      indexname = index[:name]
+      if indexname.eql?(table.name)
+        indexnamenew = "#{indexname}_index"
+        puts "WARNING: index \"#{indexname}\" equals table name. This is not allowed by postgres and will be renamed to \"#{indexnamenew}\""
+        indexname = indexnamenew
       end
-      @conn.exec("CREATE #{unique}INDEX #{PGconn.quote_ident(index[:name])} ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});")
+      
+      if @conn.server_version < 80200
+        @conn.exec("DROP INDEX #{PGconn.quote_ident(indexname)} CASCADE;") if exists?(indexname)
+      else
+        @conn.exec("DROP INDEX IF EXISTS #{PGconn.quote_ident(indexname)} CASCADE;")
+      end
+      @conn.exec("CREATE #{unique}INDEX #{PGconn.quote_ident(indexname)} ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});")
     end
     
     
@@ -517,7 +526,7 @@ class PostgresDbWriter < PostgresWriter
     STDOUT.flush
     puts "Rows counted"
     rowcount = table.count_rows
-    puts "Loading #{table.name}"
+    puts "Loading #{table.name}..."
     STDOUT.flush
     _counter = reader.paginated_read(table, 1000) do |row, counter|
       line = []
@@ -626,4 +635,3 @@ reader = MysqlReader.new('127.0.0.1', 'mysql_user', 'secretpassword', 'sourcedat
 writer = PostgresDbWriter.new('127.0.0.1', 'postgres_user', 'secretpassword', 'destdatabasename')
 converter = Converter.new(reader, writer, :only_tables => %w(users messages))
 converter.convert
-
