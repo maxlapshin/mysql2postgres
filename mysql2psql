@@ -517,7 +517,7 @@ class PostgresDbWriter < PostgresWriter
     STDOUT.flush
     puts "Rows counted"
     rowcount = table.count_rows
-    puts "Loading #{table.name...}"
+    puts "Loading #{table.name}"
     STDOUT.flush
     _counter = reader.paginated_read(table, 1000) do |row, counter|
       line = []
