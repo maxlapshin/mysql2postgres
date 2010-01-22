@@ -6,11 +6,7 @@ It can translate now most data types and indexes, but if you experience some pro
 to contact me, I'll help you.
 
 
-Strongly required help to make params of databases not hardcoded.
-
-
-
-After launching tool, You can see something like..
+After editing config.yml and launching tool, You can see something like..
 
 Creating table friendships...
 Created table friendships
