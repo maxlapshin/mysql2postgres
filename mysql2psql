@@ -4,6 +4,7 @@ require 'rubygems'
 require 'mysql'
 gem "postgres"
 require 'postgres'
+require 'yaml'
 
 class MysqlReader
   class Field
@@ -634,9 +635,40 @@ class Converter
   end
 end
 
+def parse_configtablesnames(tables)
+	list = Array.new
+	tables.each do |table|
+		t = table.strip
+		if t !~ /^#/
+			list.push t
+		end
+	end
+	list
+end
 
-reader = MysqlReader.new('127.0.0.1', 'mysql_user', 'secretpassword', 'sourcedatabasename', 3306)
+config = YAML::load(File.read("config.yml"))
+mysqluser = config["mysql"]["username"] ? config["mysql"]["username"] : ''
+mysqlpass = config["mysql"]["password"] ? config["mysql"]["password"] : ''
+mysqlhost = config["mysql"]["hostname"] ? config["mysql"]["hostname"] : 'localhost'
+mysqlport = config["mysql"]["port"] ? config["mysql"]["port"].to_i : 3306
+mysqldb = config["mysql"]["databasename"] 
+
+pguser = config["postgres"]["username"] ? config["postgres"]["username"] : ''
+pgpass = config["postgres"]["password"] ? config["postgres"]["password"] : ''
+pghost = config["postgres"]["hostname"] ? config["postgres"]["hostname"] : 'localhost'
+pgport = config["postgres"]["port"] ? config["postgres"]["port"].to_i : 5432
+pgdb = config["postgres"]["databasename"] 
+
+tables = config["tables"] ? config["tables"].split(',') : nil
+
+if tables.nil?
+  puts "No tables given."
+  exit 1
+end
+
+
+reader = MysqlReader.new(mysqlhost, mysqluser, mysqlpass, mysqldb, mysqlport)
 #writer = PostgresFileWriter.new(ARGV[0] || "users.sql")
-writer = PostgresDbWriter.new('127.0.0.1', 'postgres_user', 'secretpassword', 'destdatabasename')
-converter = Converter.new(reader, writer, :only_tables => %w(users messages))
+writer = PostgresDbWriter.new(pghost, pguser, pgpass, pgdb)
+converter = Converter.new(reader, writer, :only_tables => parse_configtablesnames(tables))
 converter.convert
