@@ -1,16 +1,20 @@
 mysql:
  hostname: localhost
  port: 3306
+ socket: /tmp/mysql.sock
  username: somename
  password: secretpassword
  databasename: somename 
 
-postgres:
- hostname: localhost
- port: 5432
- username: somename
- password: secretpassword
- databasename: somename
+destination:
+ # if file is given, output goes to file, else postgres
+ file:
+ postgres:
+  hostname: localhost
+  port: 5432
+  username: somename
+  password: secretpassword
+  databasename: somename
 
 tables:
  table1,

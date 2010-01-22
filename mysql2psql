@@ -653,20 +653,20 @@ def parse_tablenames(tables)
 	list
 end
 
-def read_config(file)
-  config = YAML::load(File.read(file))
+def read_config(filepath)
+  config = YAML::load(File.read(filepath))
   @mysqluser = config["mysql"]["username"] ? config["mysql"]["username"] : ''
   @mysqlpass = config["mysql"]["password"] ? config["mysql"]["password"] : ''
   @mysqlhost = config["mysql"]["hostname"] ? config["mysql"]["hostname"] : 'localhost'
-  @mysqlport = config["mysql"]["port"] ? config["mysql"]["port"].to_i : nil
-  @mysqlsock = config["mysql"]["socket"] ? config["mysql"]["socket"] : nil
-  @mysqldb = config["mysql"]["databasename"] 
+  @mysqlport = config["mysql"]["port"]
+  @mysqlsock = config["mysql"]["socket"]
+  @mysqldb = config["mysql"]["databasename"]
 
-  @file = config["destination"]["file"] ? config["destination"]["file"] : ''
-  @pguser = config["destination"]["postgres"]["username"] ? config["postgres"]["username"] : ''
-  @pgpass = config["destination"]["postgres"]["password"] ? config["postgres"]["password"] : ''
-  @pghost = config["destination"]["postgres"]["hostname"] ? config["postgres"]["hostname"] : 'localhost'
-  @pgport = config["destination"]["postgres"]["port"] ? config["postgres"]["port"].to_i : 5432
+  @destfile = config["destination"]["file"]
+  @pguser = config["destination"]["postgres"]["username"] ? config["destination"]["postgres"]["username"] : ''
+  @pgpass = config["destination"]["postgres"]["password"] ? config["destination"]["postgres"]["password"] : ''
+  @pghost = config["destination"]["postgres"]["hostname"] ? config["destination"]["postgres"]["hostname"] : 'localhost'
+  @pgport = config["destination"]["postgres"]["port"] ? config["destination"]["postgres"]["port"].to_i : 5432
   @pgdb = config["destination"]["postgres"]["databasename"] 
 
   @tables = config["tables"] ? config["tables"].split(',') : nil
@@ -678,12 +678,13 @@ if @tables.nil?
   exit 1
 end
 
-reader = MysqlReader.new(mysqlhost, mysqluser, mysqlpass, mysqldb, mysqlport, mysqlsock)
+reader = MysqlReader.new(@mysqlhost, @mysqluser, @mysqlpass, @mysqldb, @mysqlport, @mysqlsock)
 
-if @file.eql?('')
-  writer = PostgresDbWriter.new(pghost, pguser, pgpass, pgdb, pgport)
+if @destfile.nil?
+  writer = PostgresDbWriter.new(@pghost, @pguser, @pgpass, @pgdb, @pgport)
 else
   writer = PostgresFileWriter.new(@file)
 end
-converter = Converter.new(reader, writer, :only_tables => parse_tablenames(tables))
+
+converter = Converter.new(reader, writer, :only_tables => parse_tablenames(@tables))
 converter.convert
