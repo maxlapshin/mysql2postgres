@@ -229,6 +229,8 @@ class PostgresWriter < Writer
     when "boolean"
       default = " DEFAULT #{column[:default].to_i == 1 ? 'true' : 'false'}" if default
       "boolean"
+    when "tinyblob"
+      "bytea"
     when "blob"
       "bytea"
     when "tinytext"
@@ -530,8 +532,8 @@ class PostgresDbWriter < PostgresWriter
     @conn.exec(copy_line)
     puts "Counting rows of #{table.name}... "
     STDOUT.flush
-    puts "Rows counted"
     rowcount = table.count_rows
+    puts "Rows counted"
     puts "Loading #{table.name}..."
     STDOUT.flush
     _counter = reader.paginated_read(table, 1000) do |row, counter|
@@ -557,7 +559,7 @@ class PostgresDbWriter < PostgresWriter
         
         if row[index].is_a?(String)
           if column_type(column) == "bytea"
-            row[index] = PGconn.quote(row[index])
+            row[index] = PGconn.escape_bytea(row[index])
           else
             row[index] = row[index].gsub(/\\/, '\\\\\\').gsub(/\n/,'\n').gsub(/\t/,'\t').gsub(/\r/,'\r').gsub(/\0/, '')
           end
@@ -635,7 +637,12 @@ class Converter
   end
 end
 
-def parse_configtablesnames(tables)
+
+
+
+
+
+def parse_tablenames(tables)
 	list = Array.new
 	tables.each do |table|
 		t = table.strip
@@ -646,29 +653,37 @@ def parse_configtablesnames(tables)
 	list
 end
 
-config = YAML::load(File.read("config.yml"))
-mysqluser = config["mysql"]["username"] ? config["mysql"]["username"] : ''
-mysqlpass = config["mysql"]["password"] ? config["mysql"]["password"] : ''
-mysqlhost = config["mysql"]["hostname"] ? config["mysql"]["hostname"] : 'localhost'
-mysqlport = config["mysql"]["port"] ? config["mysql"]["port"].to_i : 3306
-mysqldb = config["mysql"]["databasename"] 
+def read_config(file)
+  config = YAML::load(File.read(file))
+  @mysqluser = config["mysql"]["username"] ? config["mysql"]["username"] : ''
+  @mysqlpass = config["mysql"]["password"] ? config["mysql"]["password"] : ''
+  @mysqlhost = config["mysql"]["hostname"] ? config["mysql"]["hostname"] : 'localhost'
+  @mysqlport = config["mysql"]["port"] ? config["mysql"]["port"].to_i : nil
+  @mysqlsock = config["mysql"]["socket"] ? config["mysql"]["socket"] : nil
+  @mysqldb = config["mysql"]["databasename"] 
 
-pguser = config["postgres"]["username"] ? config["postgres"]["username"] : ''
-pgpass = config["postgres"]["password"] ? config["postgres"]["password"] : ''
-pghost = config["postgres"]["hostname"] ? config["postgres"]["hostname"] : 'localhost'
-pgport = config["postgres"]["port"] ? config["postgres"]["port"].to_i : 5432
-pgdb = config["postgres"]["databasename"] 
+  @file = config["destination"]["file"] ? config["destination"]["file"] : ''
+  @pguser = config["destination"]["postgres"]["username"] ? config["postgres"]["username"] : ''
+  @pgpass = config["destination"]["postgres"]["password"] ? config["postgres"]["password"] : ''
+  @pghost = config["destination"]["postgres"]["hostname"] ? config["postgres"]["hostname"] : 'localhost'
+  @pgport = config["destination"]["postgres"]["port"] ? config["postgres"]["port"].to_i : 5432
+  @pgdb = config["destination"]["postgres"]["databasename"] 
 
-tables = config["tables"] ? config["tables"].split(',') : nil
+  @tables = config["tables"] ? config["tables"].split(',') : nil
+end
 
-if tables.nil?
+read_config("config.yml")
+if @tables.nil?
   puts "No tables given."
   exit 1
 end
 
+reader = MysqlReader.new(mysqlhost, mysqluser, mysqlpass, mysqldb, mysqlport, mysqlsock)
 
-reader = MysqlReader.new(mysqlhost, mysqluser, mysqlpass, mysqldb, mysqlport)
-#writer = PostgresFileWriter.new(ARGV[0] || "users.sql")
-writer = PostgresDbWriter.new(pghost, pguser, pgpass, pgdb)
-converter = Converter.new(reader, writer, :only_tables => parse_configtablesnames(tables))
+if @file.eql?('')
+  writer = PostgresDbWriter.new(pghost, pguser, pgpass, pgdb, pgport)
+else
+  writer = PostgresFileWriter.new(@file)
+end
+converter = Converter.new(reader, writer, :only_tables => parse_tablenames(tables))
 converter.convert
