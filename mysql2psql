@@ -30,6 +30,8 @@ class MysqlReader
     
     def convert_type(type)
       case type
+      when /bigint/
+        "bigint"
       when "tinyint(1)"
         "boolean"
       when /tinyint/
@@ -211,6 +213,9 @@ class PostgresWriter < Writer
     when "integer"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
       "integer"
+    when "bigint"
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
+      "bigint"
     when "tinyint"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
       "smallint"
