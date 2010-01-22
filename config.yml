@@ -1,0 +1,19 @@
+mysql:
+ hostname: localhost
+ port: 3306
+ username: somename
+ password: secretpassword
+ databasename: somename 
+
+postgres:
+ hostname: localhost
+ port: 5432
+ username: somename
+ password: secretpassword
+ databasename: somename
+
+tables:
+ table1,
+ table2,
+ #table3,
+ table4
