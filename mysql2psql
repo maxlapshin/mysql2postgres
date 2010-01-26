@@ -641,16 +641,8 @@ end
 
 
 
-
 def parse_tablenames(tables)
-	list = Array.new
-	tables.each do |table|
-		t = table.strip
-		if t !~ /^#/
-			list.push t
-		end
-	end
-	list
+  tables.map {|table| table.strip}.reject {|t| t =~ /^#/}
 end
 
 def read_config(filepath)
