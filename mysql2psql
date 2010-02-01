@@ -675,7 +675,7 @@ reader = MysqlReader.new(@mysqlhost, @mysqluser, @mysqlpass, @mysqldb, @mysqlpor
 if @destfile.nil?
   writer = PostgresDbWriter.new(@pghost, @pguser, @pgpass, @pgdb, @pgport)
 else
-  writer = PostgresFileWriter.new(@file)
+  writer = PostgresFileWriter.new(@destfile)
 end
 
 converter = Converter.new(reader, writer, :only_tables => parse_tablenames(@tables))
