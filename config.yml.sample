@@ -17,7 +17,11 @@ destination:
   databasename: somename
 
 tables:
- table1,
- table2,
- #table3,
- table4
+- table1
+- table2
+#- table3
+- table4
+
+exclude_tables:
+- table5
+- table6

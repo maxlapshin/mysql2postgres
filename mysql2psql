@@ -2,8 +2,8 @@
 
 require 'rubygems'
 require 'mysql'
-gem "postgres"
-require 'postgres'
+gem "pg"
+require 'pg'
 require 'yaml'
 
 class MysqlReader
@@ -404,7 +404,7 @@ end
 class PostgresDbWriter < PostgresWriter
   def connection(hostname, login, password, database, port)
     database, schema = database.split(":")
-    @conn = PGconn.open('host' => hostname, 'user' => login, 'password' => password, 'dbname' => database, 'port' => port.to_s)
+    @conn = PGconn.open(hostname, port.to_s, '', '', database, login, password)
     @conn.exec("SET search_path TO #{PGconn.quote_ident(schema)}") if schema
   end
   
@@ -640,11 +640,6 @@ end
 
 
 
-
-def parse_tablenames(tables)
-  tables.map {|table| table.strip}.reject {|t| t =~ /^#/}
-end
-
 def read_config(filepath)
   config = YAML::load(File.read(filepath))
   @mysqluser = config["mysql"]["username"] ? config["mysql"]["username"] : ''
@@ -652,23 +647,20 @@ def read_config(filepath)
   @mysqlhost = config["mysql"]["hostname"] ? config["mysql"]["hostname"] : 'localhost'
   @mysqlport = config["mysql"]["port"]
   @mysqlsock = config["mysql"]["socket"]
-  @mysqldb = config["mysql"]["databasename"]
+  @mysqldb   = config["mysql"]["database"]
 
   @destfile = config["destination"]["file"]
   @pguser = config["destination"]["postgres"]["username"] ? config["destination"]["postgres"]["username"] : ''
   @pgpass = config["destination"]["postgres"]["password"] ? config["destination"]["postgres"]["password"] : ''
   @pghost = config["destination"]["postgres"]["hostname"] ? config["destination"]["postgres"]["hostname"] : 'localhost'
   @pgport = config["destination"]["postgres"]["port"] ? config["destination"]["postgres"]["port"].to_i : 5432
-  @pgdb = config["destination"]["postgres"]["databasename"] 
+  @pgdb   = config["destination"]["postgres"]["database"] 
 
-  @tables = config["tables"] ? config["tables"].split(',') : nil
+  @tables = config["tables"]
+  @exclude_tables = config["exclude_tables"]
 end
 
 read_config("config.yml")
-if @tables.nil?
-  puts "No tables given."
-  exit 1
-end
 
 reader = MysqlReader.new(@mysqlhost, @mysqluser, @mysqlpass, @mysqldb, @mysqlport, @mysqlsock)
 
@@ -678,5 +670,8 @@ else
   writer = PostgresFileWriter.new(@destfile)
 end
 
-converter = Converter.new(reader, writer, :only_tables => parse_tablenames(@tables))
+options = {}
+options[:only_tables] = @tables if @tables
+options[:exclude_tables] = @exclude_tables if @exclude_tables
+converter = Converter.new(reader, writer, options)
 converter.convert
