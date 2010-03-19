@@ -4,7 +4,7 @@ mysql:
  socket: /tmp/mysql.sock
  username: somename
  password: secretpassword
- databasename: somename 
+ database: somename 
 
 destination:
  # if file is given, output goes to file, else postgres
@@ -14,7 +14,7 @@ destination:
   port: 5432
   username: somename
   password: secretpassword
-  databasename: somename
+  database: somename
 
 tables:
 - table1
