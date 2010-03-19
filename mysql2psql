@@ -33,6 +33,8 @@ class MysqlReader
       case type
       when /bigint/
         "bigint"
+      when "bit(1)"
+        "boolean"
       when "tinyint(1)"
         "boolean"
       when /tinyint/
