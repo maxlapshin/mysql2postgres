@@ -385,6 +385,10 @@ EOF
         if column[:type] == "char"
           row[index] = row[index] == 1 ? 't' : row[index] == 0 ? 'f' : row[index]
         end
+        # give a default for zeroed datetimes
+        if column[:type] == "datetime" and row[index] == '0000-00-00 00:00:00'
+          row[index] = 'epoch'
+        end
         if row[index].is_a?(String)
           if column[:type] == "bytea"
             row[index] = PGconn.quote(row[index])
