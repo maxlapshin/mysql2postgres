@@ -16,3 +16,18 @@ Loading friendships...
 Indexing table friendships...
 Indexed table friendships
 Table creation 0 min, loading 1 min, indexing 0 min, total 1 min
+
+# note from mgkimsal
+I'm still having trouble with bit(1)/boolean fields
+workaround I've found is to put output in file
+then in VIM on file, search/replace the true/false binary fields with t/f
+specifically
+
+(reversed on 3/23 - should be ^A gets f)
+:%s/^@/t/g
+:%s/^A/f/g
+keystrokes are ctrl-v ctrl-shift-@ to get the 'true' binary field
+keystrokes are ctrl-v ctrl-shift-A to get the 'false' binary field
+
+ 
+
