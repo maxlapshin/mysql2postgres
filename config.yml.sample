@@ -16,12 +16,14 @@ destination:
   password: secretpassword
   database: somename
 
-tables:
-- table1
-- table2
+# if tables is given, only the listed tables will be converted.  leave empty to convert all tables.
+#tables:
+#- table1
+#- table2
 #- table3
-- table4
+#- table4
 
-exclude_tables:
-- table5
-- table6
+# if exclude_tables is given, exclude the listed tables from the conversion.
+#exclude_tables:
+#- table5
+#- table6
