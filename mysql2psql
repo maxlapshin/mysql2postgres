@@ -68,15 +68,16 @@ class MysqlReader
             :length => length && length.to_i,
             :decimals => field[1][/\((\d+),(\d+)\)/, 2],
             :null => field[2] == "YES",
-            :primary_key => field[3] == "PRI"
+            :primary_key => field[3] == "PRI",
+            :auto_increment => field[5] == "auto_increment"
             }
           desc[:default] = field[4] unless field[4].nil? || field[4].empty?
           fields << desc
         end
       end
  
-      fields.select {|field| field[:primary_key]}.each do |field|
-        @reader.mysql.query("SELECT max(`#{field[:name]}`) + 1 FROM `#{name}`") do |res|
+      fields.select {|field| field[:auto_increment]}.each do |field|
+        @reader.mysql.query("SELECT max(`#{field[:name]}`) FROM `#{name}`") do |res|
           field[:maxval] = res.fetch_row[0].to_i
         end
       end
@@ -198,7 +199,7 @@ class PostgresWriter < Writer
   end
   
   def column_type_info(column)
-    if column[:primary_key] && column[:name] == "id"
+    if column[:auto_increment]
       return "integer DEFAULT nextval('#{column[:table_name]}_#{column[:name]}_seq'::regclass) NOT NULL"
     end
     
@@ -293,37 +294,37 @@ EOF
   
   def write_table(table)
     primary_keys = []
-    primary_key = nil
+    serial_key = nil
     maxval = nil
     
     columns = table.columns.map do |column|
+      if column[:auto_increment]
+        serial_key = column[:name]
+        maxval = column[:maxval].to_i < 1 ? 1 : column[:maxval] + 1
+      end
       if column[:primary_key]
-        if column[:name] == "id"
-          primary_key = column[:name]
-          maxval = column[:maxval] < 1 ? 1 : column[:maxval] + 1
-        end
         primary_keys << column[:name]
       end
       "  " + column_description(column)
     end.join(",\n")
     
-    if primary_key
+    if serial_key
       
       @f << <<-EOF
 --
--- Name: #{table.name}_#{primary_key}_seq; Type: SEQUENCE; Schema: public
+-- Name: #{table.name}_#{serial_key}_seq; Type: SEQUENCE; Schema: public
 --
  
-DROP SEQUENCE IF EXISTS #{table.name}_#{primary_key}_seq CASCADE;
+DROP SEQUENCE IF EXISTS #{table.name}_#{serial_key}_seq CASCADE;
  
-CREATE SEQUENCE #{table.name}_#{primary_key}_seq
+CREATE SEQUENCE #{table.name}_#{serial_key}_seq
     INCREMENT BY 1
     NO MAXVALUE
     NO MINVALUE
     CACHE 1;
     
     
-SELECT pg_catalog.setval('#{table.name}_#{primary_key}_seq', #{maxval}, true);
+SELECT pg_catalog.setval('#{table.name}_#{serial_key}_seq', #{maxval}, true);
  
       EOF
     end
@@ -432,36 +433,36 @@ class PostgresDbWriter < PostgresWriter
   def write_table(table)
     puts "Creating table #{table.name}..."
     primary_keys = []
-    primary_key = nil
+    serial_key = nil
     maxval = nil
     
     columns = table.columns.map do |column|
+      if column[:auto_increment]
+        serial_key = column[:name]
+        maxval = column[:maxval].to_i < 1 ? 1 : column[:maxval] + 1
+      end
       if column[:primary_key]
-        if column[:name] == "id"
-          primary_key = column[:name]
-          maxval = column[:maxval] < 1 ? 1 : column[:maxval] + 1
-        end
         primary_keys << column[:name]
       end
       "  " + column_description(column)
     end.join(",\n")
     
-    if primary_key
+    if serial_key
       if @conn.server_version < 80200
-        primary_key_seq = "#{table.name}_#{primary_key}_seq"
-        @conn.exec("DROP SEQUENCE #{primary_key_seq} CASCADE") if exists?(primary_key_seq)
+        serial_key_seq = "#{table.name}_#{serial_key}_seq"
+        @conn.exec("DROP SEQUENCE #{serial_key_seq} CASCADE") if exists?(serial_key_seq)
       else
-        @conn.exec("DROP SEQUENCE IF EXISTS #{table.name}_#{primary_key}_seq CASCADE")
+        @conn.exec("DROP SEQUENCE IF EXISTS #{table.name}_#{serial_key}_seq CASCADE")
       end
       @conn.exec <<-EOF
-        CREATE SEQUENCE #{table.name}_#{primary_key}_seq
+        CREATE SEQUENCE #{table.name}_#{serial_key}_seq
         INCREMENT BY 1
         NO MAXVALUE
         NO MINVALUE
         CACHE 1
       EOF
     
-      @conn.exec "SELECT pg_catalog.setval('#{table.name}_#{primary_key}_seq', #{maxval}, true)"
+      @conn.exec "SELECT pg_catalog.setval('#{table.name}_#{serial_key}_seq', #{maxval}, true)"
     end
     
     if @conn.server_version < 80200
