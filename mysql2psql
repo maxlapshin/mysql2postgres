@@ -1,4 +1,62 @@
 #!/usr/bin/env ruby
+#
+# This tool converts mysql database to posgresql.
+# Main repository is http://github.com/maxlapshin/mysql2postgres 
+# Copyright 2009-2010 Max Lapshin <max@maxidoors.ru>
+#
+# Other contributors (in git log order):
+# Anton Ageev <anton@ageev.name>
+# Samuel Tribehou <cracoucax@gmail.com>
+# Marco Nenciarini <marco.nenciarini@devise.it>
+# James Nobis <jnobis@jnobis.controldocs.com>
+# quel <github@quelrod.net>
+# Holger Amann <keeney@fehu.org>
+# Maxim Dobriakov <closer.main@gmail.com>
+# Michael Kimsal <mgkimsal@gmail.com>
+# Jacob Coby <jcoby@portallabs.com>
+# Neszt Tibor <neszt@tvnetwork.hu>
+#
+#
+# I copy here config.yml.sample if you've got this file alone
+#
+# -----------------------
+# mysql:
+#  hostname: localhost
+#  port: 3306
+#  socket: /tmp/mysql.sock
+#  username: somename
+#  password: secretpassword
+#  database: somename 
+# 
+# destination:
+#  # if file is given, output goes to file, else postgres
+#  file:
+#  postgres:
+#   hostname: localhost
+#   port: 5432
+#   username: somename
+#   password: secretpassword
+#   database: somename
+# 
+# # if tables is given, only the listed tables will be converted.  leave empty to convert all tables.
+# #tables:
+# #- table1
+# #- table2
+# #- table3
+# #- table4
+# 
+# # if exclude_tables is given, exclude the listed tables from the conversion.
+# #exclude_tables:
+# #- table5
+# #- table6
+#
+# -----------------------
+#
+#
+# Copy contents between lines into config.yml, edit it according to your settings
+# and run mysql2psql. It will load mysql database directly into postgres, autoconverting all
+
+
 
 require 'rubygems'
 require 'mysql'
