@@ -105,6 +105,8 @@ class MysqlReader
         "char"
       when /decimal/
         "decimal"
+      when /double/
+         "double precision"
       else
         type
       end 
@@ -304,7 +306,7 @@ class PostgresWriter < Writer
       "text"
     when "text"
       "text"
-    when "double"
+    when "double precision"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
       "double precision"
     when /^enum/
