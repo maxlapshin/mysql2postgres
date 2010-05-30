@@ -267,6 +267,8 @@ class PostgresWriter < Writer
     null = column[:null] ? "" : " NOT NULL"
     type = 
     case column[:type]
+    
+    # String types
     when "char"
       default = default + "::char" if default
       "character(#{column[:length]})"
@@ -274,6 +276,8 @@ class PostgresWriter < Writer
       default = default + "::character varying" if default
 #      puts "VARCHAR: #{column.inspect}"
       "character varying(#{column[:length]})"
+      
+    # Integer and numeric types
     when "integer"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
       "integer"
@@ -283,15 +287,38 @@ class PostgresWriter < Writer
     when "tinyint"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
       "smallint"
+    
+    when "boolean"
+      default = " DEFAULT #{column[:default].to_i == 1 ? 'true' : 'false'}" if default
+      "boolean"
+    when "float"
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
+      "real"
+    when "float unsigned"
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
+      "real"
+    when "decimal"
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+      "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
+
+    when "double precision"
+      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+      "double precision"
+
+    # Mysql datetime fields
     when "datetime"
       default = nil
       "timestamp without time zone"
     when "date"
       default = nil
       "date"
-    when "boolean"
-      default = " DEFAULT #{column[:default].to_i == 1 ? 'true' : 'false'}" if default
-      "boolean"
+    when "timestamp"
+      default = " DEFAULT CURRENT_TIMESTAMP" if column[:default] == "CURRENT_TIMESTAMP"
+      "timestamp without time zone"
+    when "time"
+      default = " DEFAULT now" if default
+      "time without time zone"
+
     when "tinyblob"
       "bytea"
     when "mediumblob"
@@ -308,29 +335,11 @@ class PostgresWriter < Writer
       "text"
     when "text"
       "text"
-    when "double precision"
-      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
-      "double precision"
     when /^enum/
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
       enum = column[:type].gsub(/enum|\(|\)/, '')
       max_enum_size = enum.split(',').map{ |check| check.size() -2}.sort[-1]
       "character varying(#{max_enum_size}), check( #{column[:name]} in (#{enum}))"
-    when "float"
-      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
-      "real"
-    when "float unsigned"
-      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
-      "real"
-    when "decimal"
-      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
-      "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
-    when "timestamp"
-      default = " DEFAULT CURRENT_TIMESTAMP" if column[:default] == "CURRENT_TIMESTAMP"
-      "timestamp without time zone"
-    when "time"
-      default = " DEFAULT now" if default
-      "time without time zone"
     else
       puts "Unknown #{column.inspect}"
       column[:type].inspect
