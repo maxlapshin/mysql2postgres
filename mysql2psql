@@ -15,7 +15,7 @@
 # Michael Kimsal <mgkimsal@gmail.com>
 # Jacob Coby <jcoby@portallabs.com>
 # Neszt Tibor <neszt@tvnetwork.hu>
-#
+# Miroslav Kratochvil <exa.exa@gmail.com>
 #
 # I copy here config.yml.sample if you've got this file alone
 #
@@ -293,6 +293,8 @@ class PostgresWriter < Writer
       default = " DEFAULT #{column[:default].to_i == 1 ? 'true' : 'false'}" if default
       "boolean"
     when "tinyblob"
+      "bytea"
+    when "mediumblob"
       "bytea"
     when "longblob"
       "bytea"
