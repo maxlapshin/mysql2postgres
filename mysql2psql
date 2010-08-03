@@ -103,7 +103,7 @@ class MysqlReader
         "varchar"
       when /char/
         "char"
-      when /decimal/
+      when /(float|decimal)/
         "decimal"
       when /double/
          "double precision"
