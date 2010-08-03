@@ -318,7 +318,7 @@ class PostgresWriter < Writer
       default = " DEFAULT '1970-01-01 00:00:00'" if column[:default] == "0000-00-00 00:00:00"
       "timestamp without time zone"
     when "time"
-      default = " DEFAULT now" if default
+      default = " DEFAULT NOW()" if default
       "time without time zone"
 
     when "tinyblob"
