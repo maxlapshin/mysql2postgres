@@ -314,6 +314,7 @@ class PostgresWriter < Writer
       "date"
     when "timestamp"
       default = " DEFAULT CURRENT_TIMESTAMP" if column[:default] == "CURRENT_TIMESTAMP"
+      default = " DEFAULT CURRENT_TIMESTAMP" if column[:default] == "0000:00:00 00:00:00"
       "timestamp without time zone"
     when "time"
       default = " DEFAULT now" if default
