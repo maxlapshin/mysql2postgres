@@ -89,6 +89,8 @@ class MysqlReader
     
     def convert_type(type)
       case type
+      when /int.* unsigned/
+        "bigint"
       when /bigint/
         "bigint"
       when "bit(1)"
