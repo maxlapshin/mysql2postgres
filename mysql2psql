@@ -327,6 +327,8 @@ class PostgresWriter < Writer
       "bytea"
     when "blob"
       "bytea"
+    when "varbinary"
+      "bytea"
     when "tinytext"
       "text"
     when "mediumtext"
