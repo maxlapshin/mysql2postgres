@@ -27,3 +27,6 @@ destination:
 #exclude_tables:
 #- table5
 #- table6
+
+# if supress_data is true, only the schema definition will be exported/migrated, and not the data
+#supress_data: true

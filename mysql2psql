@@ -338,10 +338,11 @@ class PostgresWriter < Writer
     when "text"
       "text"
     when /^enum/
-      default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+      #default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
+      default = default + "::character varying" if default
       enum = column[:type].gsub(/enum|\(|\)/, '')
       max_enum_size = enum.split(',').map{ |check| check.size() -2}.sort[-1]
-      "character varying(#{max_enum_size}), check( #{column[:name]} in (#{enum}))"
+      "character varying(#{max_enum_size}) check( #{column[:name]} in (#{enum}))"
     else
       puts "Unknown #{column.inspect}"
       column[:type].inspect
@@ -740,6 +741,8 @@ def read_config(filepath)
 
   @tables = config["tables"]
   @exclude_tables = config["exclude_tables"]
+  @tables = config["tables"]
+  @supress_data = config["supress_data"]
 end
 
 read_config("config.yml")
@@ -755,5 +758,6 @@ end
 options = {}
 options[:only_tables] = @tables if @tables
 options[:exclude_tables] = @exclude_tables if @exclude_tables
+options[:supress_data] = @supress_data if @supress_data
 converter = Converter.new(reader, writer, options)
 converter.convert
