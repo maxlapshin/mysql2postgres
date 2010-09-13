@@ -381,6 +381,9 @@ class PostgresWriter < Writer
       end
   end
   
+  def truncate(table)
+  end
+  
 end
  
 class PostgresFileWriter < PostgresWriter
@@ -394,6 +397,29 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
  
 EOF
+  end
+  
+  def truncate(table)
+    serial_key = nil
+    maxval = nil
+    
+    table.columns.map do |column|
+      if column[:auto_increment]
+        serial_key = column[:name]
+        maxval = column[:maxval].to_i < 1 ? 1 : column[:maxval] + 1
+      end
+    end
+
+    @f << <<-EOF
+-- TRUNCATE #{table.name};
+TRUNCATE #{PGconn.quote_ident(table.name)} CASCADE;
+
+EOF
+    if serial_key
+    @f << <<-EOF
+SELECT pg_catalog.setval(pg_get_serial_sequence(#{table.name}, #{serial_key}), #{maxval}, true);
+EOF
+    end
   end
   
   def write_table(table)
@@ -674,6 +700,8 @@ class Converter
     @exclude_tables = options[:exclude_tables] || []
     @only_tables = options[:only_tables] ? Array(options[:only_tables]) : nil
     @supress_data = options[:supress_data]
+    @supress_ddl = options[:supress_ddl]
+    @force_truncate = options[:force_truncate]
   end
   
   def convert
@@ -685,20 +713,21 @@ class Converter
     
     tables.each do |table|
       writer.write_table(table)
-    end
+    end unless @supress_ddl
  
     _time2 = Time.now
     tables.each do |table|
+      writer.truncate(table) if @force_truncate
       writer.write_contents(table, reader)
     end unless @supress_data
  
     _time3 = Time.now
     tables.each do |table|
       writer.write_indexes(table)
-    end
+    end unless @supress_ddl
     tables.each do |table|
       writer.write_constraints(table)
-    end
+    end unless @supress_ddl
  
  
     writer.close
@@ -730,6 +759,9 @@ def read_config(filepath)
   @exclude_tables = config["exclude_tables"]
   @tables = config["tables"]
   @supress_data = config["supress_data"]
+  @supress_ddl = config["supress_ddl"]
+  @force_truncate = config["force_truncate"]
+  
 end
 
 read_config("config.yml")
@@ -746,5 +778,8 @@ options = {}
 options[:only_tables] = @tables if @tables
 options[:exclude_tables] = @exclude_tables if @exclude_tables
 options[:supress_data] = @supress_data if @supress_data
+options[:supress_ddl] = @supress_ddl if @supress_ddl
+options[:force_truncate] = @force_truncate if @force_truncate
+
 converter = Converter.new(reader, writer, options)
 converter.convert
