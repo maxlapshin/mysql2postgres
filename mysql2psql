@@ -418,7 +418,7 @@ TRUNCATE #{PGconn.quote_ident(table.name)} CASCADE;
 EOF
     if serial_key
     @f << <<-EOF
-SELECT pg_catalog.setval(pg_get_serial_sequence(#{table.name}, #{serial_key}), #{maxval}, true);
+SELECT pg_catalog.setval(pg_get_serial_sequence('#{table.name}', '#{serial_key}'), #{maxval}, true);
 EOF
     end
   end
@@ -765,7 +765,7 @@ def read_config(filepath)
   
 end
 
-read_config("config.yml")
+read_config("#{File.dirname(__FILE__)}/config.yml")
 
 reader = MysqlReader.new(@mysqlhost, @mysqluser, @mysqlpass, @mysqldb, @mysqlport, @mysqlsock)
 
