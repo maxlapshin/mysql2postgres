@@ -690,16 +690,17 @@ class PostgresDbWriter < PostgresWriter
   end
 
 end
- 
+
  
 class Converter
-  attr_reader :reader, :writer
+  attr_reader :reader, :writer, :options
   
   def initialize(reader, writer, options = {})
     @reader = reader
     @writer = writer
-    @exclude_tables = options[:exclude_tables] || []
-    @only_tables = options[:only_tables] ? Array(options[:only_tables]) : nil
+    @options = options
+    @exclude_tables = options.exclude_tables([])
+    @only_tables = options.only_tables(nil)
     @supress_data = options[:supress_data]
     @supress_ddl = options[:supress_ddl]
     @force_truncate = options[:force_truncate]
@@ -737,50 +738,52 @@ class Converter
   end
 end
 
-
-
-
-def read_config(filepath)
-  config = YAML::load(File.read(filepath))
-  @mysqluser = config["mysql"]["username"] ? config["mysql"]["username"] : ''
-  @mysqlpass = config["mysql"]["password"] ? config["mysql"]["password"] : ''
-  @mysqlhost = config["mysql"]["hostname"] ? config["mysql"]["hostname"] : 'localhost'
-  @mysqlport = config["mysql"]["port"]
-  @mysqlsock = config["mysql"]["socket"]
-  @mysqldb   = config["mysql"]["database"]
-
-  @destfile = config["destination"]["file"]
-  @pguser = config["destination"]["postgres"]["username"] ? config["destination"]["postgres"]["username"] : ''
-  @pgpass = config["destination"]["postgres"]["password"] ? config["destination"]["postgres"]["password"] : ''
-  @pghost = config["destination"]["postgres"]["hostname"] ? config["destination"]["postgres"]["hostname"] : 'localhost'
-  @pgport = config["destination"]["postgres"]["port"] ? config["destination"]["postgres"]["port"].to_i : 5432
-  @pgdb   = config["destination"]["postgres"]["database"] 
-
-  @tables = config["tables"]
-  @exclude_tables = config["exclude_tables"]
-  @tables = config["tables"]
-  @supress_data = config["supress_data"]
-  @supress_ddl = config["supress_ddl"]
-  @force_truncate = config["force_truncate"]
+class YamlConfig
+  attr_accessor :config
+  class UninitializedValueError < StandardError
+	end
+  def initialize(filepath)
+    @config = YAML::load(File.read(filepath))
+  end
+  def [](key)
+    self.send( key )
+  end
+  def method_missing(name, *args)
+    token=name.to_s
+    default = args[0] ? args[0] : ''
+    must_be_defined = default == :none
+    case token
+    when /mysql/i
+      key=token.sub( /^mysql/, '' )
+      value=@config["mysql"][key]
+    when /pg/i
+      key=token.sub( /^pg/, '' )
+      value=@config["destination"]["postgres"][key]
+    when /dest/i
+      key=token.sub( /^dest/, '' )
+      value=@config["destination"][key]
+    when /only_tables/i
+      value=@config["tables"] 
+    else
+      value=@config[token]
+    end
+    value || ( must_be_defined ? (raise UninitializedValueError.new) : default )
+  end
   
 end
 
-read_config("#{File.dirname(__FILE__)}/config.yml")
+options = YamlConfig.new(ARGV[0] || "#{File.dirname(__FILE__)}/config.yml")
 
-reader = MysqlReader.new(@mysqlhost, @mysqluser, @mysqlpass, @mysqldb, @mysqlport, @mysqlsock)
+reader = MysqlReader.new(
+  options.mysqlhostname('localhost'), options.mysqlusername, options.mysqlpassword, 
+  options.mysqldatabase, options.mysqlport, options.mysqlsocket )
 
-if @destfile.nil?
-  writer = PostgresDbWriter.new(@pghost, @pguser, @pgpass, @pgdb, @pgport)
+if options.destfile(nil)
+  writer = PostgresFileWriter.new(options.destfile)
 else
-  writer = PostgresFileWriter.new(@destfile)
+  writer = PostgresDbWriter.new(
+    options.pghostname('localhost'), options.pgusername, options.pgpassword, 
+    options.pgdatabase, options.pgport(5432).to_i )
 end
 
-options = {}
-options[:only_tables] = @tables if @tables
-options[:exclude_tables] = @exclude_tables if @exclude_tables
-options[:supress_data] = @supress_data if @supress_data
-options[:supress_ddl] = @supress_ddl if @supress_ddl
-options[:force_truncate] = @force_truncate if @force_truncate
-
-converter = Converter.new(reader, writer, options)
-converter.convert
+Converter.new(reader, writer, options).convert
