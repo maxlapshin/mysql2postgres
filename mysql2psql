@@ -133,7 +133,7 @@ class MysqlReader
             :primary_key => field[3] == "PRI",
             :auto_increment => field[5] == "auto_increment"
             }
-          desc[:default] = field[4] unless field[4].nil? || field[4].empty?
+          desc[:default] = field[4] unless field[4].nil?
           fields << desc
         end
       end
