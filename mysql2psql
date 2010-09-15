@@ -708,11 +708,12 @@ class Converter
   
   def convert
     _time1 = Time.now
-    
+
     tables = reader.tables.
       reject {|table| @exclude_tables.include?(table.name)}.
       select {|table| @only_tables ? @only_tables.include?(table.name) : true}
-    
+
+
     tables.each do |table|
       writer.write_table(table)
     end unless @supress_ddl
@@ -750,7 +751,7 @@ class YamlConfig
   end
   def method_missing(name, *args)
     token=name.to_s
-    default = args[0] ? args[0] : ''
+    default = args.length>0 ? args[0] : ''
     must_be_defined = default == :none
     case token
     when /mysql/i
@@ -767,12 +768,12 @@ class YamlConfig
     else
       value=@config[token]
     end
-    value || ( must_be_defined ? (raise UninitializedValueError.new) : default )
+    value.nil? ? ( must_be_defined ? (raise UninitializedValueError.new) : default ) : value
   end
   
 end
 
-options = YamlConfig.new(ARGV[0] || "#{File.dirname(__FILE__)}/config.yml")
+options = YamlConfig.new( ARGV[0] || "#{File.dirname(__FILE__)}/config.yml" )
 
 reader = MysqlReader.new(
   options.mysqlhostname('localhost'), options.mysqlusername, options.mysqlpassword, 
