@@ -1,3 +1,5 @@
+class Mysql2psql
+
 class PostgresWriter < Writer
   def column_description(column)
     "#{PGconn.quote_ident(column[:name])} #{column_type_info(column)}"
@@ -132,4 +134,6 @@ class PostgresWriter < Writer
   def truncate(table)
   end
   
+end
+
 end

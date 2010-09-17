@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'rake'
+$LOAD_PATH << File.join(File.dirname(__FILE__), 'lib')
+require 'mysql2psql'
 
 begin
   require 'jeweler'

@@ -1,3 +1,7 @@
+require 'mysql'
+
+class Mysql2psql
+
 class MysqlReader
   class Field
   end
@@ -11,7 +15,7 @@ class MysqlReader
     end
     
     @@types = %w(tiny enum decimal short long float double null timestamp longlong int24 date time datetime year set blob string var_string char).inject({}) do |list, type|
-      list[eval("Mysql::Field::TYPE_#{type.upcase}")] = type
+      list[eval("::Mysql::Field::TYPE_#{type.upcase}")] = type
       list
     end
     
@@ -51,7 +55,7 @@ class MysqlReader
     def load_columns
       @reader.reconnect
       result = @reader.mysql.list_fields(name)
-      mysql_flags = Mysql::Field.constants.select {|c| c =~ /FLAG/}
+      mysql_flags = ::Mysql::Field.constants.select {|c| c =~ /FLAG/}
       fields = []
       @reader.mysql.query("EXPLAIN `#{name}`") do |res|
         while field = res.fetch_row do
@@ -144,7 +148,7 @@ class MysqlReader
   end
   
   def connect
-    @mysql = Mysql.connect(@host, @user, @passwd, @db, @port, @sock, @flag)
+    @mysql = ::Mysql.connect(@host, @user, @passwd, @db, @port, @sock, @flag)
     @mysql.query("SET NAMES utf8")
     @mysql.query("SET SESSION query_cache_type = OFF")
   end
@@ -179,4 +183,6 @@ class MysqlReader
     end
     counter
   end
+end
+
 end

@@ -3,4 +3,5 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'mysql2psql'
 
-Mysql2plsql.new(ARGV).convert
+Mysql2psql.new(ARGV)
+#.convert
