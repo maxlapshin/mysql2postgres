@@ -1,5 +1,7 @@
 require 'pg'
 
+require 'mysql2psql/writer'
+
 class Mysql2psql
 
   class PostgresWriter < Writer

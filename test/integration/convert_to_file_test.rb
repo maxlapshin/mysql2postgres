@@ -3,17 +3,17 @@ require 'test_helper'
 require 'mysql2psql'
 
 class ConvertToFileTest < Test::Unit::TestCase
-  
+
   class << self
     def startup
-      configfile = "#{File.dirname(__FILE__)}/../fixtures/config_localmysql_to_file_convert_all.yml"
       seed_test_database
-      @@mysql2psql = Mysql2psql.new([configfile])
+      @@options=get_test_config_by_label(:localmysql_to_file_convert_all)
+      @@mysql2psql = Mysql2psql.new([@@options.filepath])
       @@mysql2psql.convert
       @@content = IO.read(@@mysql2psql.options.destfile)
     end
     def shutdown
-      File.delete(@@mysql2psql.options.destfile) if File.exists?(@@mysql2psql.options.destfile)
+      delete_files_for_test_config(@@options)
     end
   end
   def setup

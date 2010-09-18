@@ -1,3 +1,5 @@
+require 'mysql2psql/postgres_writer'
+
 class Mysql2psql
 
 class PostgresFileWriter < PostgresWriter

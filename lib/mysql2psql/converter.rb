@@ -10,9 +10,9 @@ class Mysql2psql
       @options = options
       @exclude_tables = options.exclude_tables([])
       @only_tables = options.only_tables(nil)
-      @supress_data = options.supress_data
-      @supress_ddl = options.supress_ddl
-      @force_truncate = options.force_truncate
+      @supress_data = options.supress_data(false)
+      @supress_ddl = options.supress_ddl(false)
+      @force_truncate = options.force_truncate(false)
     end
   
     def convert

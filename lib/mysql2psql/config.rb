@@ -26,50 +26,75 @@ Please review the configuration and retry..\n\n\n")
       end
       file.close
     end
-  
-    def self.template
-      return <<EOS
+
+    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], supress_data = false, supress_ddl = false, force_truncate = false)
+      configtext = <<EOS
 mysql:
  hostname: localhost
  port: 3306
  socket: /tmp/mysql.sock
- username: somename
- password: secretpassword
- database: somename 
+ username: mysql2psql
+ password: 
+ database: mysql2psql_test
 
 destination:
  # if file is given, output goes to file, else postgres
- file:
+ file: #{ to_filename ? to_filename : ''}
  postgres:
   hostname: localhost
   port: 5432
-  username: somename
-  password: secretpassword
-  database: somename
+  username: mysql2psql
+  password: 
+  database: mysql2psql_test
 
 # if tables is given, only the listed tables will be converted.  leave empty to convert all tables.
 #tables:
 #- table1
 #- table2
+EOS
+      if include_tables.length>0
+        configtext += "\ntables:\n"
+        include_tables.each do |t|
+          configtext += "- #{t}\n"
+        end
+      end
+      configtext += <<EOS
+# if exclude_tables is given, exclude the listed tables from the conversion.
+#exclude_tables:
 #- table3
 #- table4
 
-# if exclude_tables is given, exclude the listed tables from the conversion.
-#exclude_tables:
-#- table5
-#- table6
+EOS
+      if exclude_tables.length>0
+        configtext += "\nexclude_tables:\n"
+        exclude_tables.each do |t|
+          configtext += "- #{t}\n"
+        end
+      end
+      if !supress_data.nil?
+        configtext += <<EOS
 
 # if supress_data is true, only the schema definition will be exported/migrated, and not the data
-#supress_data: true
+supress_data: #{supress_data}
+EOS
+      end
+      if !supress_ddl.nil?
+        configtext += <<EOS
 
 # if supress_ddl is true, only the data will be exported/imported, and not the schema
-#supress_ddl: false
+supress_ddl: #{supress_ddl}
+EOS
+      end
+      if !force_truncate.nil?
+        configtext += <<EOS
 
 # if force_truncate is true, forces a table truncate before table loading
-#force_truncate: false
-
+force_truncate: #{force_truncate}
 EOS
+      end
+      configtext
     end
+    
   end
 
 end

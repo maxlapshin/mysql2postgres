@@ -3,16 +3,18 @@ require 'test_helper'
 require 'mysql2psql'
 
 class ConvertToDbTest < Test::Unit::TestCase
+
   class << self
     def startup
-      configfile = "#{File.dirname(__FILE__)}/../fixtures/config_localmysql_to_db_convert_all.yml"
       seed_test_database
-      @@mysql2psql = Mysql2psql.new([configfile])
+      @@options=get_test_config_by_label(:localmysql_to_db_convert_all)
+      @@mysql2psql = Mysql2psql.new([@@options.filepath])
       @@mysql2psql.convert
       @@mysql2psql.writer.open
     end
     def shutdown
       @@mysql2psql.writer.close
+      delete_files_for_test_config(@@options)
     end
   end
   def setup

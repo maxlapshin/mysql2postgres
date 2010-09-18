@@ -3,13 +3,22 @@ require 'test_helper'
 require 'mysql2psql/converter'
 
 class ConverterTest < Test::Unit::TestCase
-  attr_accessor :options
+
+  class << self
+    def startup
+      seed_test_database
+      @@options=get_test_config_by_label(:localmysql_to_file_convert_nothing)
+    end
+    def shutdown
+      delete_files_for_test_config(@@options)
+    end
+  end
   def setup
-    seed_test_database
-    @options = get_test_config( 'config_localmysql_to_file_convert_nothing.yml' )
   end
   def teardown
-    File.delete(options.destfile) if File.exists?(options.destfile)
+  end
+  def options
+    @@options
   end
   
   def test_new_converter
