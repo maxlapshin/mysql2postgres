@@ -11,7 +11,7 @@ require 'mysql2psql/postgres_file_writer.rb'
 
 class Mysql2psql
   
-  attr_reader :options
+  attr_reader :options, :reader, :writer
   
   def initialize(args)
     help if args.length==1 && args[0] =~ /-.?|-*he?l?p?/i 
@@ -20,14 +20,12 @@ class Mysql2psql
   end
   
   def convert
-    reader = MysqlReader.new( options )
+    @reader = MysqlReader.new( options )
 
     if options.destfile(nil)
-      writer = PostgresFileWriter.new(options.destfile)
+      @writer = PostgresFileWriter.new(options.destfile)
     else
-      writer = PostgresDbWriter.new(
-        options.pghostname('localhost'), options.pgusername, options.pgpassword, 
-        options.pgdatabase, options.pgport(5432).to_i )
+      @writer = PostgresDbWriter.new(options)
     end
 
     Converter.new(reader, writer, options).convert

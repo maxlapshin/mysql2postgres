@@ -3,23 +3,32 @@ require 'pg'
 class Mysql2psql
 
 class PostgresDbWriter < PostgresWriter
-  def connection(hostname, login, password, database, port)
-    database, schema = database.split(":")
-    @conn = PGconn.new(hostname, port.to_s, '', '', database, login, password)
-    @conn.exec("SET search_path TO #{PGconn.quote_ident(schema)}") if schema
-  end
+  attr_reader :conn, :hostname, :login, :password, :database, :schema, :port
   
-  def initialize(hostname, login, password, database, port = 5432)
-    connection(hostname, login, password, database, port)
+  def initialize(options)
+    @hostname, @login, @password, @database, @port =  
+      options.pghostname('localhost'), options.pgusername, 
+      options.pgpassword, options.pgdatabase, options.pgport(5432).to_s
+    @database, @schema = database.split(":")
+    open
+  end
+
+  def open
+    @conn = PGconn.new(hostname, port, '', '', database, login, password)
+    @conn.exec("SET search_path TO #{PGconn.quote_ident(schema)}") if schema
     @conn.exec("SET client_encoding = 'UTF8'")
     @conn.exec("SET standard_conforming_strings = off") if @conn.server_version >= 80200
     @conn.exec("SET check_function_bodies = false")
-    @conn.exec("SET client_min_messages = warning")
+    @conn.exec("SET client_min_messages = warning")    
+  end
+  
+  def close
+    @conn.close
   end
 
   def exists?(relname)
-    rc = @conn.select_one("SELECT COUNT(*) FROM pg_class WHERE relname = #{PGconn.quote(relname)}")
-    (!rc.nil?) && (!rc.empty?) && (rc.first.to_i > 0)
+    rc = @conn.exec("SELECT COUNT(*) FROM pg_class WHERE relname = '#{relname}'")
+    (!rc.nil?) && (rc.to_a.length==1) && (rc.first.count.to_i==1)
   end
   
   def write_table(table)
@@ -163,10 +172,6 @@ class PostgresDbWriter < PostgresWriter
     @conn.put_copy_end
   end
   
-  def close
-    @conn.close
-  end
-
 end
 
 end
