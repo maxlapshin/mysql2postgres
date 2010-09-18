@@ -9,11 +9,26 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "mysql2psql"
     gem.version = Mysql2psql::Version::STRING
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Tool for converting mysql database to postgresql}
+    gem.description = %Q{It can create postgresql dump from mysql database or directly load data from mysql to
+    postgresql (at about 100 000 records per minute). Translates most data types and indexes.}
     gem.email = "gallagher.paul@gmail.com"
     gem.homepage = "http://github.com/tardate/mysql2postgresql"
-    gem.authors = ["Paul Gallagher"]
+    gem.authors = [
+      "Max Lapshin <max@maxidoors.ru>",
+      "Anton Ageev <anton@ageev.name>",
+      "Samuel Tribehou <cracoucax@gmail.com>",
+      "Marco Nenciarini <marco.nenciarini@devise.it>",
+      "James Nobis <jnobis@jnobis.controldocs.com>",
+      "quel <github@quelrod.net>",
+      "Holger Amann <keeney@fehu.org>",
+      "Maxim Dobriakov <closer.main@gmail.com>",
+      "Michael Kimsal <mgkimsal@gmail.com>",
+      "Jacob Coby <jcoby@portallabs.com>",
+      "Neszt Tibor <neszt@tvnetwork.hu>",
+      "Miroslav Kratochvil <exa.exa@gmail.com>",
+      "Paul Gallagher <gallagher.paul@gmail.com>"
+      ]
     gem.add_dependency "mysql", "= 2.8.1"
     gem.add_dependency "pg", "= 0.9.0"
     gem.add_development_dependency "test-unit", ">= 2.1.1"
