@@ -3,24 +3,20 @@ require 'test_helper'
 require 'mysql2psql'
 
 class MysqlreaderTest < Test::Unit::TestCase
-  attr_accessor :options
+  attr_accessor :reader
   def setup
-    begin
-      @reader=get_test_reader('config_localmysql_to_file.yml')
-    rescue => e
-      raise StandardError.new("Failed to initialize integration test db. See README for setup requirements.")
-    end
+    @reader=get_test_reader(get_test_config('config_localmysql_to_file_convert_nothing.yml'))
   end
   def teardown
     
   end
   def test_db_connection
     assert_nothing_raised do
-      @reader.mysql.ping
+      reader.mysql.ping
     end
   end
   def test_tables_collection
-    values = @reader.tables.select{|t| t.name == 'numeric_types_basics'}
+    values = reader.tables.select{|t| t.name == 'numeric_types_basics'}
     assert_true values.length==1
     assert_equal 'numeric_types_basics', values[0].name
   end
@@ -30,8 +26,8 @@ class MysqlreaderTest < Test::Unit::TestCase
     expected_pages=(1.0 * expected_rows / page_size).ceil
     
     row_count=my_row_count=0
-    table = @reader.tables.select{|t| t.name == 'numeric_types_basics'}[0]
-    @reader.paginated_read(table, page_size) do |row,counter|
+    table = reader.tables.select{|t| t.name == 'numeric_types_basics'}[0]
+    reader.paginated_read(table, page_size) do |row,counter|
       row_count=counter
       my_row_count+=1
     end

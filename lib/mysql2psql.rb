@@ -11,18 +11,15 @@ require 'mysql2psql/postgres_file_writer.rb'
 
 class Mysql2psql
   
-  attr_accessor :options
+  attr_reader :options
   
   def initialize(args)
     configfile = args[0] || File.expand_path('config.yml')
-    options = Config.new( configfile, true )
-
+    @options = Config.new( configfile, true )
   end
   
   def convert
-    reader = MysqlReader.new(
-      options.mysqlhostname('localhost'), options.mysqlusername, options.mysqlpassword, 
-      options.mysqldatabase, options.mysqlport, options.mysqlsocket )
+    reader = MysqlReader.new( options )
 
     if options.destfile(nil)
       writer = PostgresFileWriter.new(options.destfile)
