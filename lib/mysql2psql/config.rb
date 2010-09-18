@@ -3,20 +3,20 @@ require 'mysql2psql/config_base'
 class Mysql2psql
   
   class Config < ConfigBase
-
-    def initialize(filepath, generate_default_if_not_found = true)
-      unless File.exists?(filepath)
-        reset_configfile(filepath) if generate_default_if_not_found
-        if File.exists?(filepath) 
+    
+    def initialize(configfilepath, generate_default_if_not_found = true)
+      unless File.exists?(configfilepath)
+        reset_configfile(configfilepath) if generate_default_if_not_found
+        if File.exists?(configfilepath) 
           raise Mysql2psql::ConfigurationFileInitialized.new("\n
 No configuration file found.
 A new file has been initialized at: #{filepath}
 Please review the configuration and retry..\n\n\n")
         else
-          raise Mysql2psql::ConfigurationFileNotFound.new("cannot load config file #{filepath}")
+          raise Mysql2psql::ConfigurationFileNotFound.new("cannot load config file #{configfilepath}")
         end
       end
-      super(filepath)
+      super(configfilepath)
     end
 
     def reset_configfile(filepath)

@@ -25,30 +25,18 @@ end
 
 require 'rake/testtask'
 namespace :test do
-  
-desc "Seed the test database (mysql db=mysql2psql_test user=mysql2psql)"
-task :seed_database do
-begin
-  seedfilepath = "#{File.dirname(__FILE__)}/test/fixtures/seed_integration_tests.sql"
-  rc=system("mysql -umysql2psql mysql2psql_test < #{seedfilepath}")
-  raise StandardError unless rc
-rescue
-  raise StandardError.new("Failed to seed integration test db. See README for setup requirements.")
-end
-end
 
-Rake::TestTask.new(:units) do |test|
-  test.libs << 'lib' << 'test/lib'
-  test.pattern = 'test/units/*test.rb'
-  test.verbose = true
-end
+  Rake::TestTask.new(:units) do |test|
+    test.libs << 'lib' << 'test/lib'
+    test.pattern = 'test/units/*test.rb'
+    test.verbose = true
+  end
 
-Rake::TestTask.new(:integration) do |test|
-  Rake::Task['test:seed_database'].invoke
-  test.libs << 'lib' << 'test/lib'
-  test.pattern = 'test/integration/*test.rb'
-  test.verbose = true
-end
+  Rake::TestTask.new(:integration) do |test|
+    test.libs << 'lib' << 'test/lib'
+    test.pattern = 'test/integration/*test.rb'
+    test.verbose = true
+  end
 end
 
 desc "Run all tests"

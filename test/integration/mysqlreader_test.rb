@@ -5,11 +5,12 @@ require 'mysql2psql'
 class MysqlreaderTest < Test::Unit::TestCase
   attr_accessor :reader
   def setup
+    seed_test_database
     @reader=get_test_reader(get_test_config('config_localmysql_to_file_convert_nothing.yml'))
   end
   def teardown
-    
   end
+  
   def test_db_connection
     assert_nothing_raised do
       reader.mysql.ping
@@ -33,6 +34,5 @@ class MysqlreaderTest < Test::Unit::TestCase
     end
     assert_equal expected_rows, row_count
     assert_equal expected_rows, my_row_count
-    
   end
 end

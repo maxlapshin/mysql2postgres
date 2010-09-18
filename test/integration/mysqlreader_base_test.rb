@@ -5,6 +5,7 @@ require 'mysql2psql'
 class MysqlreaderBaseTest < Test::Unit::TestCase
   attr_accessor :options
   def setup
+    seed_test_database
     @options = get_test_config( 'config_localmysql_to_file_convert_nothing.yml' )
   end
   

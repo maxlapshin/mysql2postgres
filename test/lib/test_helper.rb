@@ -9,6 +9,17 @@ end
 
 require 'ext_test_unit'
 
+def seed_test_database
+  require 'mysql2psql/config'
+  options=get_test_config('config_localmysql_to_file_convert_nothing.yml')
+  seedfilepath = "#{File.dirname(__FILE__)}/../fixtures/seed_integration_tests.sql"
+  rc=system("mysql -u#{options.mysqlusername} #{options.mysqldatabase} < #{seedfilepath}")
+  raise StandardError unless rc
+  return true
+rescue
+  raise StandardError.new("Failed to seed integration test db. See README for setup requirements.")
+end
+
 def get_test_config(configfile)
   Mysql2psql::ConfigBase.new( "#{File.dirname(__FILE__)}/../fixtures/#{configfile}" )
 rescue
