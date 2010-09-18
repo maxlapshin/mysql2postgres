@@ -4,11 +4,20 @@ require 'mysql2psql'
 
 class MysqlreaderTest < Test::Unit::TestCase
   attr_accessor :reader
+  class << self
+    def startup
+      seed_test_database
+      @@reader=get_test_reader(get_test_config('config_localmysql_to_file_convert_nothing.yml'))
+    end
+    def shutdown
+    end
+  end
   def setup
-    seed_test_database
-    @reader=get_test_reader(get_test_config('config_localmysql_to_file_convert_nothing.yml'))
   end
   def teardown
+  end
+  def reader
+    @@reader
   end
   
   def test_db_connection

@@ -9,8 +9,10 @@ class ConvertToDbTest < Test::Unit::TestCase
       seed_test_database
       @@mysql2psql = Mysql2psql.new([configfile])
       @@mysql2psql.convert
+      @@mysql2psql.writer.open
     end
     def shutdown
+      @@mysql2psql.writer.close
     end
   end
   def setup
@@ -18,5 +20,8 @@ class ConvertToDbTest < Test::Unit::TestCase
   def teardown
   end
 
+  def test_table_creation
+    assert_true @@mysql2psql.writer.exists?('numeric_types_basics')
+  end
 
 end
