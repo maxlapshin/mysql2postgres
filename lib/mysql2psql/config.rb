@@ -8,7 +8,10 @@ class Mysql2psql
       unless File.exists?(filepath)
         reset_configfile(filepath) if generate_default_if_not_found
         if File.exists?(filepath) 
-          raise Mysql2psql::ConfigurationFileInitialized.new("initialized config file #{filepath}")
+          raise Mysql2psql::ConfigurationFileInitialized.new("\n
+No configuration file found.
+A new file has been initialized at: #{filepath}
+Please review the configuration and retry..\n\n\n")
         else
           raise Mysql2psql::ConfigurationFileNotFound.new("cannot load config file #{filepath}")
         end
