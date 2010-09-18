@@ -2,16 +2,17 @@ class Mysql2psql
 
   class Converter
     attr_reader :reader, :writer, :options
+    attr_reader :exclude_tables, :only_tables, :supress_data, :supress_ddl, :force_truncate
   
-    def initialize(reader, writer, options = {})
+    def initialize(reader, writer, options)
       @reader = reader
       @writer = writer
       @options = options
       @exclude_tables = options.exclude_tables([])
       @only_tables = options.only_tables(nil)
-      @supress_data = options[:supress_data]
-      @supress_ddl = options[:supress_ddl]
-      @force_truncate = options[:force_truncate]
+      @supress_data = options.supress_data
+      @supress_ddl = options.supress_ddl
+      @force_truncate = options.force_truncate
     end
   
     def convert
@@ -28,7 +29,7 @@ class Mysql2psql
  
       _time2 = Time.now
       tables.each do |table|
-        writer.truncate(table) if @force_truncate
+        writer.truncate(table) if force_truncate && supress_ddl
         writer.write_contents(table, reader)
       end unless @supress_data
  
@@ -44,6 +45,10 @@ class Mysql2psql
       writer.close
       _time4 = Time.now
       puts "Table creation #{((_time2 - _time1) / 60).round} min, loading #{((_time3 - _time2) / 60).round} min, indexing #{((_time4 - _time3) / 60).round} min, total #{((_time4 - _time1) / 60).round} min"
+      return 0
+    rescue => e
+      $stderr.puts "Mysql2psql: conversion failed: #{e.to_s}"
+      return 1
     end
   end
 
