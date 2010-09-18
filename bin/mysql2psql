@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
+require 'rubygems'
 require 'mysql2psql'
 
-Mysql2psql.new(ARGV)
-#.convert
+exit Mysql2psql.new(ARGV).convert
