@@ -14,6 +14,7 @@ class Mysql2psql
   attr_reader :options
   
   def initialize(args)
+    help if args.length==1 && args[0] =~ /-.?|-*he?l?p?/i 
     configfile = args[0] || File.expand_path('config.yml')
     @options = Config.new( configfile, true )
   end
@@ -34,7 +35,9 @@ class Mysql2psql
 
   def help
     puts <<EOS
+MySQL to PostgreSQL Conversion
 
 EOS
+    exit -2
   end
 end
