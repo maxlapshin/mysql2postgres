@@ -158,8 +158,11 @@ class Mysql2psql
       connect
     end
   
-    def initialize(host = nil, user = nil, passwd = nil, db = nil, port = nil, sock = nil, flag = nil)
-      @host, @user, @passwd, @db, @port, @sock, @flag = host, user, passwd, db, port, sock, flag
+    def initialize(options)
+      @host, @user, @passwd, @db, @port, @sock, @flag = 
+        options.mysqlhostname('localhost'), options.mysqlusername, 
+        options.mysqlpassword, options.mysqldatabase, 
+        options.mysqlport, options.mysqlsocket
       connect
     end
   
