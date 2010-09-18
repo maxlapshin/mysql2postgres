@@ -1,24 +1,28 @@
-require 'config_base'
+require 'mysql2psql/config_base'
 
 class Mysql2psql
   
-  class Config
+  class Config < ConfigBase
 
-    class ConfigurationFileNotFound < MigrathorConfigError
+    class ConfigurationFileNotFound < StandardError
   	end
-    class ConfigurationFileInitialized < MigrathorConfigError
+    class ConfigurationFileInitialized < StandardError
   	end
 
     def initialize(filepath, generate_default_if_not_found = true)
-      unless File.exists?(self.class.configfile)
-        reset_configfile
-        raise ( File.exists?(self.class.configfile) ? ConfigurationFileInitialized.new : ConfigurationFileNotFound.new )
+      unless File.exists?(filepath)
+        reset_configfile(filepath) if generate_default_if_not_found
+        if File.exists?(filepath) 
+          raise ConfigurationFileInitialized.new("initialized config file #{filepath}")
+        else
+          raise ConfigurationFileNotFound.new("cannot load config file #{filepath}")
+        end
       end
-      super(self.class.configfile)
+      super(filepath)
     end
 
-    def reset_configfile
-      file = File.new(self.class.configfile,'w')
+    def reset_configfile(filepath)
+      file = File.new(filepath,'w')
       self.class.template.each_line do | line|
         file.puts line
       end
@@ -59,6 +63,12 @@ destination:
 
 # if supress_data is true, only the schema definition will be exported/migrated, and not the data
 #supress_data: true
+
+# if supress_ddl is true, only the data will be exported/imported, and not the schema
+#supress_ddl: false
+
+# if force_truncate is true, forces a table truncate before table loading
+#force_truncate: false
 
 EOS
     end

@@ -1,7 +1,10 @@
 
 class Mysql2psql
   
-  class Mysql2psqlError < StandardError
+  class GeneralError < StandardError
 	end
 
+  class UninitializedValueError < StandardError
+	end
+	
 end

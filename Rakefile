@@ -1,7 +1,8 @@
 require 'rubygems'
 require 'rake'
-$LOAD_PATH << File.join(File.dirname(__FILE__), 'lib')
-require 'mysql2psql'
+
+$LOAD_PATH.unshift('lib')
+require 'mysql2psql/version'
 
 begin
   require 'jeweler'
@@ -24,8 +25,8 @@ end
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
+  test.libs << 'lib' << 'test/lib'
+  test.pattern = 'test/**/*test.rb'
   test.verbose = true
 end
 
@@ -33,7 +34,7 @@ begin
   require 'rcov/rcovtask'
   Rcov::RcovTask.new do |test|
     test.libs << 'test'
-    test.pattern = 'test/**/test_*.rb'
+    test.pattern = 'test/**/*test.rb'
     test.verbose = true
   end
 rescue LoadError
@@ -42,7 +43,6 @@ rescue LoadError
   end
 end
 
-task :test => :check_dependencies
 
 task :default => :test
 

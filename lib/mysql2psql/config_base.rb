@@ -1,11 +1,11 @@
 require 'yaml'
+require 'mysql2psql/errors'
 
 class Mysql2psql
   
   class ConfigBase
     attr_accessor :config
-    class UninitializedValueError < Mysql2psqlError
-  	end
+
     def initialize(filepath)
       @config = YAML::load(File.read(filepath))
     end
@@ -31,7 +31,8 @@ class Mysql2psql
       else
         value=@config[token]
       end
-      value.nil? ? ( must_be_defined ? (raise UninitializedValueError.new) : default ) : value
+      value.nil? ? ( must_be_defined ? (raise Mysql2psql::UninitializedValueError.new("no value and no default for #{name}")) : default ) : value
     end
-
+  end
+  
 end

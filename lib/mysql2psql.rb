@@ -15,7 +15,7 @@ class Mysql2psql
   
   def initialize(args)
     configfile = args[0] || File.expand_path('config.yml')
-    options = Config.new( configfile )
+    options = Config.new( configfile, true )
 
   end
   
