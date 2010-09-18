@@ -21,12 +21,12 @@ class ConfigTest < Test::Unit::TestCase
   end
   
   def test_config_file_not_found
-    assert_raise(Mysql2psql::Config::ConfigurationFileNotFound) do
+    assert_raise(Mysql2psql::ConfigurationFileNotFound) do
       value = Mysql2psql::Config.new(@configfile_not_found, false)
     end
   end
   def test_initialize_new_config_file
-    assert_raise(Mysql2psql::Config::ConfigurationFileInitialized) do
+    assert_raise(Mysql2psql::ConfigurationFileInitialized) do
       value = Mysql2psql::Config.new(@configfile_new, true)
     end
   end

@@ -4,7 +4,13 @@ class Mysql2psql
   class GeneralError < StandardError
 	end
 
-  class UninitializedValueError < StandardError
+  class ConfigurationError < StandardError
 	end
+  class UninitializedValueError < ConfigurationError
+	end
+  class ConfigurationFileNotFound < ConfigurationError
+	end
+  class ConfigurationFileInitialized < ConfigurationError
+	end	
 	
 end
