@@ -24,10 +24,23 @@ rescue LoadError
 end
 
 require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
+namespace :test do
+Rake::TestTask.new(:units) do |test|
   test.libs << 'lib' << 'test/lib'
-  test.pattern = 'test/**/*test.rb'
+  test.pattern = 'test/units/*test.rb'
   test.verbose = true
+end
+Rake::TestTask.new(:integration) do |test|
+  test.libs << 'lib' << 'test/lib'
+  test.pattern = 'test/integration/*test.rb'
+  test.verbose = true
+end
+end
+
+desc "Run all tests"
+task :test do
+  Rake::Task['test:units'].invoke
+  Rake::Task['test:integration'].invoke
 end
 
 begin
