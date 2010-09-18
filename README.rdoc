@@ -1,3 +1,5 @@
+= MYSQL2PSQL - MySQL to PostgreSQL Migration Tool
+
 Tool for converting mysql database to postgresql.
 It can create postgresql dump from mysql database or directly load data from mysql to
 postgresql (at about 100 000 records per minute).
@@ -5,22 +7,73 @@ postgresql (at about 100 000 records per minute).
 It can translate now most data types and indexes, but if you experience some problems, feel free
 to contact me, I'll help you.
 
+== Installation
+Mysql2psql is packaged as a gem. Install as usual (use sudo if required).
 
-After editing config.yml and launching tool, You can see something like..
+  $ gem install mysql2psql
 
-Creating table friendships...
-Created table friendships
-Loading friendships...
-620000 of 638779 rows loaded. [ETA: 2010/01/21 21:32 (00h:00m:01s)]
-638779 rows loaded in 1min 3s
-Indexing table friendships...
-Indexed table friendships
-Table creation 0 min, loading 1 min, indexing 0 min, total 1 min
+After installation, the "mysql2psql" command will be available. 
+When run, it will generate a default configuration file in the current directory if a config
+file is not already found. The default configuration filename is mysql2psql.yml.
+
+  $ mysql2psql
+
+You can use an alternate config file by passing the filename/path as a parameter:
+
+  $ mysql2psql ../another/world.yml
+
+== Running Migrations
+See the configuration file for documentation about settings. Key choices include:
+* whether to dump to a file, or migrate direct to PostgreSQL
+* migrate only the schema definition, only the data, or both schema and data
+
+
+After editing the configuration file and launching tool, you will see something like..
+
+  Creating table friendships...
+  Created table friendships
+  Loading friendships...
+  620000 of 638779 rows loaded. [ETA: 2010/01/21 21:32 (00h:00m:01s)]
+  638779 rows loaded in 1min 3s
+  Indexing table friendships...
+  Indexed table friendships
+  Table creation 0 min, loading 1 min, indexing 0 min, total 1 min
+
+
+== Database driver dependencies
+Mysql2psql uses the 'mysql' and 'pg' gems for database connectivity. 
+Mysql2psql gem installation should automatically install these too.
+
+If you encounter any issues with db connectivity, verify that the 'mysql' and 'pg' gems are installed and working correctly first.
+The 'mysql' gem in particular may need a hint on where to find the mysql headers and libraries:
+
+  $ [sudo] gem install mysql -- --with-mysql-dir=/usr/local/mysql
+  
+NB: With Ruby 1.8.x, the gem install will usually complain about "No definition for ..." errors. These are non-fatal and just affect the documentation install. This doesn't happen with Ruby 1.9.2.
+
+== Getting the source
+Mysql2psql was first produced by Max Lapshin <max@maxidoors.ru> who maintains the master 
+repository at http://github.com/maxlapshin/mysql2postgres
+
+The gem packaged version you are currently looking at has yet to be merged into the master repo.
+The gem bundling and refactoring for testing was done by Paul Gallagher <gallagher.paul@gmail.com> and
+the repository is at http://github.com/tardate/mysql2postgres
+
 
 == Running tests
+If you fork/clone the project, you will want to run the test suite (and add to it if you are developing new features or fixing bugs).
+ 
+A suite of tests are provided and are run using rake (rake -T for more info)
+  rake test:units
+  rake test:integration
+  rake test 
 
+Rake without parameters (or "rake test") will run both the unit and integration tests.
 
-Integration tests require suitable mysql and postgres databases to be setup in advance:
+Unit tests are small standalone tests of the mysql2psql codebase that have no external dependencies (like a database)
+
+Integration tests require suitable mysql and postgres databases to be setup in advance. 
+Running the integration tests *will* rewrite data and schema for the "mysql2psql_test" databases in mysql and postgres. Don't use this database for anything else!
 
 mysql on localhost:3306
 - database created called "mysql2psql_test"
@@ -40,8 +93,9 @@ postgres on localhost:5432
   # verify connection:
   psql mysql2psql_test -U mysql2psql -c "\c"
 
-==
-# note from mgkimsal
+== Notes, Limitations, Outstanding Issues..
+
+=== note from mgkimsal
 I'm still having trouble with bit(1)/boolean fields
 workaround I've found is to put output in file
 then in VIM on file, search/replace the true/false binary fields with t/f
@@ -53,12 +107,10 @@ specifically
 keystrokes are ctrl-v ctrl-shift-@ to get the 'true' binary field
 keystrokes are ctrl-v ctrl-shift-A to get the 'false' binary field
 
+== Contributors
+Project founded by Max Lapshin <max@maxidoors.ru>
 
-# This tool converts mysql database to posgresql.
-# Main repository is http://github.com/maxlapshin/mysql2postgres 
-# Copyright 2009-2010 Max Lapshin <max@maxidoors.ru>
-#
-# Other contributors (in git log order):
+Other contributors (in git log order):
 # Anton Ageev <anton@ageev.name>
 # Samuel Tribehou <cracoucax@gmail.com>
 # Marco Nenciarini <marco.nenciarini@devise.it>
@@ -70,45 +122,8 @@ keystrokes are ctrl-v ctrl-shift-A to get the 'false' binary field
 # Jacob Coby <jcoby@portallabs.com>
 # Neszt Tibor <neszt@tvnetwork.hu>
 # Miroslav Kratochvil <exa.exa@gmail.com>
-#
-# I copy here config.yml.sample if you've got this file alone
-#
-# -----------------------
-# mysql:
-#  hostname: localhost
-#  port: 3306
-#  socket: /tmp/mysql.sock
-#  username: somename
-#  password: secretpassword
-#  database: somename 
-# 
-# destination:
-#  # if file is given, output goes to file, else postgres
-#  file:
-#  postgres:
-#   hostname: localhost
-#   port: 5432
-#   username: somename
-#   password: secretpassword
-#   database: somename
-# 
-# # if tables is given, only the listed tables will be converted.  leave empty to convert all tables.
-# #tables:
-# #- table1
-# #- table2
-# #- table3
-# #- table4
-# 
-# # if exclude_tables is given, exclude the listed tables from the conversion.
-# #exclude_tables:
-# #- table5
-# #- table6
-#
-# -----------------------
-#
-#
-# Copy contents between lines into config.yml, edit it according to your settings
-# and run mysql2psql. It will load mysql database directly into postgres, autoconverting all
+# Paul Gallagher <gallagher.paul@gmail.com>
+
 
  
 
