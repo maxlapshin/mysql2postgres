@@ -16,6 +16,7 @@ begin
     gem.authors = ["Paul Gallagher"]
     gem.add_dependency "mysql", "= 2.8.1"
     gem.add_dependency "pg", "= 0.9.0"
+    gem.add_development_dependency "test-unit", ">= 2.1.1"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
@@ -25,7 +26,6 @@ end
 
 require 'rake/testtask'
 namespace :test do
-
   Rake::TestTask.new(:units) do |test|
     test.libs << 'lib' << 'test/lib'
     test.pattern = 'test/units/*test.rb'

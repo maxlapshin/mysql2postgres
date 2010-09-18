@@ -3,18 +3,64 @@ require 'test_helper'
 require 'mysql2psql'
 
 class ConvertToFileTest < Test::Unit::TestCase
-  attr_reader :configfile, :mysql2psql
+  
+  class << self
+    def startup
+      configfile = "#{File.dirname(__FILE__)}/../fixtures/config_localmysql_to_file_convert_all.yml"
+      seed_test_database
+      @@mysql2psql = Mysql2psql.new([configfile])
+      @@mysql2psql.convert
+      @@content = IO.read(@@mysql2psql.options.destfile)
+    end
+    def shutdown
+      File.delete(@@mysql2psql.options.destfile) if File.exists?(@@mysql2psql.options.destfile)
+    end
+  end
   def setup
-    seed_test_database
-    @configfile = "#{File.dirname(__FILE__)}/../fixtures/config_localmysql_to_file_convert_all.yml"
-    @mysql2psql = Mysql2psql.new([configfile])
-    mysql2psql.convert
   end
   def teardown
-    File.delete(mysql2psql.options.destfile) if File.exists?(mysql2psql.options.destfile)
   end
-  def test_convert
-    #assert_equal 0,mysql2psql
+  def content
+    @@content
+  end
+  
+  def test_table_creation
+    assert_not_nil content.match('DROP TABLE IF EXISTS "numeric_types_basics" CASCADE')
+    assert_not_nil content.match(/CREATE TABLE "numeric_types_basics"/)
+  end
+
+  def test_basic_numerics_tinyint
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_tinyint" smallint,.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_smallint
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_smallint" integer,.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_mediumint
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_mediumint" integer,.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_int
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_int" integer,.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_integer
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_integer" integer,.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_bigint
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_bigint" bigint,.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_real
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_real" double precision,.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_double
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_double" double precision,.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_float
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_float" numeric\(20, 0\),.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_decimal
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_decimal" numeric\(10, 0\),.*\)', Regexp::MULTILINE).match( content )
+  end
+  def test_basic_numerics_numeric
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_numeric" numeric\(10, 0\)[\w\n]*\)', Regexp::MULTILINE).match( content )
   end
 
 end

@@ -3,7 +3,7 @@ require 'test_helper'
 require 'mysql2psql'
 
 class PostgresFileWriterTest < Test::Unit::TestCase
-  attr_accessor :options
+  attr_accessor :destfile
   def setup
     begin
       f = Tempfile.new('mysql2psql_test_destfile')
@@ -14,14 +14,15 @@ class PostgresFileWriterTest < Test::Unit::TestCase
     end
   end
   def teardown
-    File.delete(@destfile) if File.exists?(@destfile)
+    File.delete(destfile) if File.exists?(destfile)
   end
   
   def test_basic_write
-    writer = Mysql2psql::PostgresFileWriter.new(@destfile)
+    writer = Mysql2psql::PostgresFileWriter.new(destfile)
     writer.close
-    assert_true file_contains(@destfile, "SET client_encoding = 'UTF8'")
-    assert_false file_contains(@destfile, "unobtanium")
+    content = IO.read(destfile)
+    assert_not_nil content.match("SET client_encoding = 'UTF8'")
+    assert_nil content.match("unobtanium")
   end
   
 

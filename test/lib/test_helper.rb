@@ -46,14 +46,6 @@ rescue
   raise StandardError.new("Failed to initialize converter from #{options.inspect}. See README for setup requirements.")
 end
 
-def file_contains(filepath,regex)
-  rc=false
-  File.foreach(filepath) do |line|
-    rc = rc || ( line =~ /#{regex}/ ) != nil
-  end
-  rc
-end
-
 def get_temp_file(basename)
   require 'tempfile'
   f = Tempfile.new(basename)
