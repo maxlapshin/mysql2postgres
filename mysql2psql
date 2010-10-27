@@ -103,7 +103,9 @@ class MysqlReader
         "varchar"
       when /char/
         "char"
-      when /(float|decimal)/
+      when /float/
+        "real"
+      when /decimal/
         "decimal"
       when /double/
          "double precision"
@@ -291,7 +293,7 @@ class PostgresWriter < Writer
     when "boolean"
       default = " DEFAULT #{column[:default].to_i == 1 ? 'true' : 'false'}" if default
       "boolean"
-    when "float"
+    when "real"
       default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
       "real"
     when "float unsigned"
