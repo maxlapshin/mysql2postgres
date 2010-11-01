@@ -11,7 +11,8 @@ to contact me, I'll help you.
 Mysql2psql is packaged as a gem. Install as usual (use sudo if required).
 
   $ gem install mysql2psql
-  NB: the gem hasn't been formally released on http://rubygems.org/ yet. For now you need to clone the git repo at http://github.com/tardate/mysql2postgres and 'rake install' 
+
+NB: the gem hasn't been formally released on http://rubygems.org/ yet. For now you need to clone the git repo at http://github.com/tardate/mysql2postgres and 'rake install'.  
 
 After installation, the "mysql2psql" command will be available. 
 When run, it will generate a default configuration file in the current directory if a config
@@ -60,6 +61,7 @@ The gem packaged version you are currently looking at has yet to be merged into 
 The gem bundling and refactoring for testing was done by Paul Gallagher <gallagher.paul@gmail.com> and
 the repository is at http://github.com/tardate/mysql2postgres
 
+Gem packaging is done with Jeweler. Note that on windows this means you must run under mingw or other shell that supports git to do the gem bundling (but you can gem install the built gem in the normal Windows shell). 
 
 == Running tests
 If you fork/clone the project, you will want to run the test suite (and add to it if you are developing new features or fixing bugs).
@@ -80,6 +82,7 @@ mysql on localhost:3306
 - database created called "mysql2psql_test"
 - user setup for "mysql2psql" with no password
 - e.g. 
+
   mysqladmin -uroot -p create mysql2psql_test
   mysql -uroot -p -e "grant all on mysql2psql_test.* to 'mysql2psql'@'localhost';"
   # verify connecction:
@@ -89,6 +92,7 @@ postgres on localhost:5432
 - database created called "mysql2psql_test" 
 - role (user) access setup for "mysql2psql" with no password
 - e.g.
+
   psql postgres -c "create role mysql2psql with login"
   psql postgres -c "create database mysql2psql_test with owner mysql2psql encoding='UTF8'"
   # verify connection:
@@ -96,10 +100,9 @@ postgres on localhost:5432
 
 == Notes, Limitations, Outstanding Issues..
 
-Todo:
+=== Todo
 - more tests
 - release gem
-- a windows cmd shim
 
 === note from mgkimsal
 I'm still having trouble with bit(1)/boolean fields
