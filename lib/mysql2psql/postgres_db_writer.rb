@@ -65,7 +65,7 @@ class PostgresDbWriter < PostgresWriter
         CACHE 1
       EOF
     
-      @conn.exec "SELECT pg_catalog.setval('#{table.name}_#{serial_key}_seq', #{maxval}, true)"
+      @conn.exec sqlfor_set_serial_sequence(table,serial_key,maxval)
     end
     
     if @conn.server_version < 80200

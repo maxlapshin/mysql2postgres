@@ -137,7 +137,14 @@ class Mysql2psql
   
     def truncate(table)
     end
-  
+
+    def sqlfor_set_serial_sequence(table,serial_key,maxval)
+      "SELECT pg_catalog.setval('#{table.name}_#{serial_key}_seq', #{maxval}, true);"
+    end
+    def sqlfor_reset_serial_sequence(table,serial_key,maxval)
+      "SELECT pg_catalog.setval(pg_get_serial_sequence('#{table.name}', '#{serial_key}'), #{maxval}, true);"
+    end
+
   end
 
 end

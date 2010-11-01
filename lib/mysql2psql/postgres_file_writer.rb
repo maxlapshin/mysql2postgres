@@ -33,7 +33,7 @@ TRUNCATE #{PGconn.quote_ident(table.name)} CASCADE;
 EOF
     if serial_key
     @f << <<-EOF
-SELECT pg_catalog.setval(pg_get_serial_sequence('#{table.name}', '#{serial_key}'), #{maxval}, true);
+#{sqlfor_reset_serial_sequence(table,serial_key,maxval)}
 EOF
     end
   end
@@ -69,8 +69,7 @@ CREATE SEQUENCE #{table.name}_#{serial_key}_seq
     NO MINVALUE
     CACHE 1;
     
-    
-SELECT pg_catalog.setval('#{table.name}_#{serial_key}_seq', #{maxval}, true);
+#{sqlfor_set_serial_sequence(table,serial_key,maxval)} 
  
       EOF
     end
