@@ -43,7 +43,9 @@ class Mysql2psql
           "varchar"
         when /char/
           "char"
-        when /(float|decimal)/
+        when /float/
+          "real"
+        when /decimal/
           "decimal"
         when /double/
            "double precision"
@@ -59,6 +61,7 @@ class Mysql2psql
         fields = []
         @reader.mysql.query("EXPLAIN `#{name}`") do |res|
           while field = res.fetch_row do
+            length = -1
             length = field[1][/\((\d+)\)/, 1] if field[1] =~ /\((\d+)\)/
             length = field[1][/\((\d+),(\d+)\)/, 1] if field[1] =~ /\((\d+),(\d+)\)/
             desc = {
