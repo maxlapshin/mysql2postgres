@@ -1,1 +1,4 @@
-config.yml
+*.yml
+configs
+test/fixtures/test*.sql
+pkg
