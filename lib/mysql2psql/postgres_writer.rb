@@ -45,10 +45,10 @@ class Mysql2psql
       when "boolean"
         default = " DEFAULT #{column[:default].to_i == 1 ? 'true' : 'false'}" if default
         "boolean"
-      when "float"
+      when "real"
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
         "double precision"
-      when "float unsigned"
+      when /float/
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
         "double precision"
       when "decimal"
