@@ -110,11 +110,11 @@ workaround I've found is to put output in file
 then in VIM on file, search/replace the true/false binary fields with t/f
 specifically
 
-(reversed on 3/23 - should be ^A gets f)
-:%s/^@/t/g
-:%s/^A/f/g
-keystrokes are ctrl-v ctrl-shift-@ to get the 'true' binary field
-keystrokes are ctrl-v ctrl-shift-A to get the 'false' binary field
+  (reversed on 3/23 - should be ^A gets f)
+  :%s/^@/t/g
+  :%s/^A/f/g
+  keystrokes are ctrl-v ctrl-shift-@ to get the 'true' binary field
+  keystrokes are ctrl-v ctrl-shift-A to get the 'false' binary field
 
 == Contributors
 Project founded by Max Lapshin <max@maxidoors.ru>
