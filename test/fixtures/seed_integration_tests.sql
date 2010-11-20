@@ -22,3 +22,13 @@ INSERT INTO numeric_types_basics VALUES
 (23,23,23,23,23,23,23,23,23,23,23,23);
 
 
+DROP TABLE IF EXISTS basic_autoincrement;
+CREATE TABLE basic_autoincrement (
+  auto_id INT(11) NOT NULL AUTO_INCREMENT,
+	auto_dummy INT,
+	PRIMARY KEY (auto_id)
+);
+
+INSERT INTO basic_autoincrement(auto_dummy) VALUES
+(1),(2),(23);
+
