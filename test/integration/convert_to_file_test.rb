@@ -37,39 +37,71 @@ class ConvertToFileTest < Test::Unit::TestCase
   end
 
   # tests for the conversion of numeric types
+  def get_basic_numerics_match(column)
+    Regexp.new('CREATE TABLE "numeric_types_basics".*"' + column + '" ([^\n]*).*\)', Regexp::MULTILINE).match( content )
+  end
   def test_basic_numerics_tinyint
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_tinyint" smallint,.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_tinyint' )    
+    assert_match /smallint/,match[1]
+  end
+  def test_basic_numerics_tinyint_u   
+    match = get_basic_numerics_match( 'f_tinyint_u' )    
+    assert_match /smallint/,match[1]
   end
   def test_basic_numerics_smallint
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_smallint" integer,.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_smallint' )    
+    assert_match /smallint/,match[1]
+  end
+  def test_basic_numerics_smallint_u
+    match = get_basic_numerics_match( 'f_smallint_u' )    
+    assert_match /integer/,match[1]
   end
   def test_basic_numerics_mediumint
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_mediumint" integer,.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_mediumint' )    
+    assert_match /integer/,match[1]  
   end
   def test_basic_numerics_int
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_int" integer,.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_int' )    
+    assert_match /integer/,match[1]   
   end
   def test_basic_numerics_integer
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_integer" integer,.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_integer' )    
+    assert_match /integer/,match[1] 
   end
   def test_basic_numerics_bigint
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_bigint" bigint,.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_bigint' )        
+    assert_match /bigint/,match[1]
+    #assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_bigint" bigint,.*\)', Regexp::MULTILINE).match( content )
   end
   def test_basic_numerics_real
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_real" double precision,.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_real' )    
+    assert_match /double precision/,match[1]    
+    #assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_real" double precision,.*\)', Regexp::MULTILINE).match( content )
   end
   def test_basic_numerics_double
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_double" double precision,.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_double' )    
+    assert_match /double precision/,match[1]  
+    #assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_double" double precision,.*\)', Regexp::MULTILINE).match( content )
   end
   def test_basic_numerics_float
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_float" double precision.*\)', Regexp::MULTILINE).match( content )
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_ufloat" double precision.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_float' )    
+    assert_match /double precision/,match[1]   
+    #assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_float" double precision.*\)', Regexp::MULTILINE).match( content )    
+  end
+  def test_basic_numerics_float_u    
+    match = get_basic_numerics_match( 'f_float_u' )    
+    assert_match /double precision/,match[1]  
+    #assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_float_u" double precision.*\)', Regexp::MULTILINE).match( content )
   end
   def test_basic_numerics_decimal
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_decimal" numeric\(10, 0\),.*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_decimal' )    
+    assert_match /numeric/,match[1] 
+    #assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_decimal" numeric\(10, 0\),.*\)', Regexp::MULTILINE).match( content )
   end
   def test_basic_numerics_numeric
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_numeric" numeric\(10, 0\)[\w\n]*\)', Regexp::MULTILINE).match( content )
+    match = get_basic_numerics_match( 'f_numeric' )    
+    assert_match /numeric/,match[1]    
+    #assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_numeric" numeric\(10, 0\)[\w\n]*\)', Regexp::MULTILINE).match( content )
   end
 
   # test autoincrement handling

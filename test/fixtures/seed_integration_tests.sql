@@ -4,23 +4,31 @@ DROP TABLE IF EXISTS numeric_types_basics;
 CREATE TABLE numeric_types_basics (
   id int,
 	f_tinyint TINYINT,
+	f_tinyint_u TINYINT UNSIGNED,
 	f_smallint SMALLINT,
+	f_smallint_u SMALLINT UNSIGNED,
 	f_mediumint MEDIUMINT,
+	f_mediumint_u MEDIUMINT UNSIGNED,
 	f_int INT,
+	f_int_u INT UNSIGNED,
 	f_integer INTEGER,
+	f_integer_u INTEGER UNSIGNED,
 	f_bigint BIGINT,
+	f_bigint_u BIGINT UNSIGNED,
 	f_real REAL,
 	f_double DOUBLE,
 	f_float FLOAT,
-	f_ufloat FLOAT UNSIGNED,
+	f_float_u FLOAT UNSIGNED,
 	f_decimal DECIMAL,
 	f_numeric NUMERIC
 );
 
 INSERT INTO numeric_types_basics VALUES
-(1,1,1,1,1,1,1,1,1,1,1,1,1),
-(2,2,2,2,2,2,2,2,2,2,2,2,2),
-(23,23,23,23,23,23,23,23,23,23,23,23,23);
+( 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19),
+( 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+( 3,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23),
+( 4, -128,   0,-32768,     0,-8388608,        0,-2147483648,          0,-2147483648,          0,-9223372036854775808,                    0, 1, 1, 1, 1, 1, 1),
+( 5,  127, 255, 32767, 65535, 8388607, 16777215, 2147483647, 4294967295, 2147483647, 4294967295, 9223372036854775807, 18446744073709551615, 1, 1, 1, 1, 1, 1);
 
 
 DROP TABLE IF EXISTS basic_autoincrement;
@@ -33,6 +41,7 @@ CREATE TABLE basic_autoincrement (
 INSERT INTO basic_autoincrement(auto_dummy) VALUES
 (1),(2),(23);
 
+-- see GH#22 float conversion error
 DROP TABLE IF EXISTS numeric_type_floats;
 CREATE TABLE numeric_type_floats (
  latitude FLOAT,
@@ -41,3 +50,17 @@ CREATE TABLE numeric_type_floats (
 
 INSERT INTO numeric_type_floats(latitude,longitude) VALUES
 (1.1,2.2);
+
+-- see GH#18 smallint error
+DROP TABLE IF EXISTS gh18_smallint;
+CREATE TABLE gh18_smallint (
+ s_smallint SMALLINT,
+ u_smallint SMALLINT UNSIGNED
+);
+
+INSERT INTO gh18_smallint(s_smallint,u_smallint) VALUES
+(-32768,32767),
+(-1,0),
+(32767,65535);
+
+

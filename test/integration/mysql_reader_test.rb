@@ -31,7 +31,7 @@ class MysqlReaderTest < Test::Unit::TestCase
     assert_equal 'numeric_types_basics', values[0].name
   end
   def test_paginated_read
-    expected_rows=3
+    expected_rows=5
     page_size=2
     expected_pages=(1.0 * expected_rows / page_size).ceil
     

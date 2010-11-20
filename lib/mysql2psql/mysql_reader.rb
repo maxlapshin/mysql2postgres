@@ -27,15 +27,21 @@ class Mysql2psql
     
       def convert_type(type)
         case type
-        when /int.* unsigned/
+        when /^int.* unsigned/
           "bigint"
         when /bigint/
           "bigint"
         when "bit(1)"
           "boolean"
+        when /smallint.* unsigned/
+          "integer"
+        when /smallint/
+          "smallint"
         when "tinyint(1)"
           "boolean"
-        when /tinyint/
+        when "tinyint(3) unsigned"
+          "tinyint"
+        when "tinyint(4)"
           "tinyint"
         when /int/
           "integer"
@@ -74,7 +80,7 @@ class Mysql2psql
               :primary_key => field[3] == "PRI",
               :auto_increment => field[5] == "auto_increment"
               }
-            desc[:default] = field[4] unless field[4].nil?
+            desc[:default] = field[4] unless field[4].nil?            
             fields << desc
           end
         end

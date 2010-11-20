@@ -16,8 +16,7 @@ class Mysql2psql
     def column_type_info(column)
       if column[:auto_increment]
         return "integer DEFAULT nextval('#{column[:table_name]}_#{column[:name]}_seq'::regclass) NOT NULL"
-      end
-    
+      end      
       default = column[:default] ? " DEFAULT #{column[:default] == nil ? 'NULL' : "'"+PGconn.escape(column[:default])+"'"}" : nil
       null = column[:null] ? "" : " NOT NULL"
       type = 
@@ -38,7 +37,7 @@ class Mysql2psql
       when "bigint"
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
         "bigint"
-      when "tinyint"
+      when /tinyint|smallint/
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
         "smallint"
     
