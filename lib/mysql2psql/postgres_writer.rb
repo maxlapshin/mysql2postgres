@@ -29,7 +29,6 @@ class Mysql2psql
         "character(#{column[:length]})"
       when "varchar"
         default = default + "::character varying" if default
-  #      puts "VARCHAR: #{column.inspect}"
         "character varying(#{column[:length]})"
       
       # Integer and numeric types
@@ -48,10 +47,10 @@ class Mysql2psql
         "boolean"
       when "float"
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
-        "real"
+        "double precision"
       when "float unsigned"
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
-        "real"
+        "double precision"
       when "decimal"
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
         "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"

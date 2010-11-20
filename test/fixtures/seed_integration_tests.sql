@@ -12,14 +12,15 @@ CREATE TABLE numeric_types_basics (
 	f_real REAL,
 	f_double DOUBLE,
 	f_float FLOAT,
+	f_ufloat FLOAT UNSIGNED,
 	f_decimal DECIMAL,
 	f_numeric NUMERIC
 );
 
 INSERT INTO numeric_types_basics VALUES
-(1,1,1,1,1,1,1,1,1,1,1,1),
-(2,2,2,2,2,2,2,2,2,2,2,2),
-(23,23,23,23,23,23,23,23,23,23,23,23);
+(1,1,1,1,1,1,1,1,1,1,1,1,1),
+(2,2,2,2,2,2,2,2,2,2,2,2,2),
+(23,23,23,23,23,23,23,23,23,23,23,23,23);
 
 
 DROP TABLE IF EXISTS basic_autoincrement;
@@ -32,3 +33,11 @@ CREATE TABLE basic_autoincrement (
 INSERT INTO basic_autoincrement(auto_dummy) VALUES
 (1),(2),(23);
 
+DROP TABLE IF EXISTS numeric_type_floats;
+CREATE TABLE numeric_type_floats (
+ latitude FLOAT,
+ longitude FLOAT
+);
+
+INSERT INTO numeric_type_floats(latitude,longitude) VALUES
+(1.1,2.2);

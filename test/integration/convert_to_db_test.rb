@@ -24,6 +24,8 @@ class ConvertToDbTest < Test::Unit::TestCase
 
   def test_table_creation
     assert_true @@mysql2psql.writer.exists?('numeric_types_basics')
+    assert_true @@mysql2psql.writer.exists?('basic_autoincrement')
+    assert_true @@mysql2psql.writer.exists?('numeric_type_floats')
   end
 
 end
