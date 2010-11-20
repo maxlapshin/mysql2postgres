@@ -39,9 +39,7 @@ class Mysql2psql
           "smallint"
         when "tinyint(1)"
           "boolean"
-        when "tinyint(3) unsigned"
-          "tinyint"
-        when "tinyint(4)"
+        when /tinyint/
           "tinyint"
         when /int/
           "integer"
@@ -80,7 +78,7 @@ class Mysql2psql
               :primary_key => field[3] == "PRI",
               :auto_increment => field[5] == "auto_increment"
               }
-            desc[:default] = field[4] unless field[4].nil?            
+            desc[:default] = field[4] unless field[4].nil?
             fields << desc
           end
         end
