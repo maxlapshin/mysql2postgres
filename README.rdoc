@@ -81,22 +81,26 @@ Running the integration tests *will* rewrite data and schema for the "mysql2psql
 mysql on localhost:3306
 - database created called "mysql2psql_test"
 - user setup for "mysql2psql" with no password
-- e.g. 
+
+e.g.
 
   mysqladmin -uroot -p create mysql2psql_test
   mysql -uroot -p -e "grant all on mysql2psql_test.* to 'mysql2psql'@'localhost';"
   # verify connecction:
   mysql -umysql2psql -e "select database(),'yes' as connected" mysql2psql_test
-  
+
+
 postgres on localhost:5432
 - database created called "mysql2psql_test" 
 - role (user) access setup for "mysql2psql" with no password
-- e.g.
+
+e.g.
 
   psql postgres -c "create role mysql2psql with login"
   psql postgres -c "create database mysql2psql_test with owner mysql2psql encoding='UTF8'"
   # verify connection:
   psql mysql2psql_test -U mysql2psql -c "\c"
+
 
 == Notes, Limitations, Outstanding Issues..
 
