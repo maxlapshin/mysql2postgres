@@ -47,6 +47,8 @@ class Mysql2psql
           "decimal"
         when /double/
            "double precision"
+        when /set/
+           "varchar"
         else
           type
         end 
