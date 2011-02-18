@@ -2,3 +2,4 @@
 configs
 test/fixtures/test*.sql
 pkg
+*~
