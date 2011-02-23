@@ -165,8 +165,9 @@ class Mysql2psql
         self.reconnect
         retry
       else
-        puts "MySQL Query failed '#{args.inspect}' #{e.inspect}, #{e.inspect}"
+        puts "MySQL Query failed '#{args.inspect}' #{e.inspect}"
         puts e.backtrace[0,3].join("\n")
+        return []
       end
     end
 
