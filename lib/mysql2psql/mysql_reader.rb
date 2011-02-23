@@ -159,7 +159,7 @@ class Mysql2psql
     end
 
     def query(*args)
-      @mysql.query(*args)
+      self.mysql.query(*args)
     rescue Mysql::Error => e
       if e.message =~ /gone away/i
         self.reconnect
