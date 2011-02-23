@@ -158,15 +158,15 @@ class Mysql2psql
       connect
     end
 
-    def query(*args)
-      self.mysql.query(*args)
+    def query(*args, &block)
+      self.mysql.query(*args, &block)
     rescue Mysql::Error => e
       if e.message =~ /gone away/i
         self.reconnect
         retry
       else
         puts "MySQL Query failed '#{args.inspect}' #{e.inspect}"
-        puts e.backtrace[0,3].join("\n")
+        puts e.backtrace[0,5].join("\n")
         return []
       end
     end
