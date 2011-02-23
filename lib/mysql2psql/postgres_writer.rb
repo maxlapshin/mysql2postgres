@@ -111,9 +111,9 @@ class Mysql2psql
     	table.columns.each_with_index do |column, index|
 
           if column[:type] == "time"
-            row[index] = "%02d:%02d:%02d" % [row[index].hour, row[index].minute, row[index].second]
+            row[index] = "%02d:%02d:%02d" % [row[index].hour, row[index].minute, row[index].second] unless row[index].nil?
           end
-        
+
           if row[index].is_a?(Mysql::Time)
             row[index] = row[index].to_s.gsub('0000-00-00 00:00', '1970-01-01 00:00')
             row[index] = row[index].to_s.gsub('0000-00-00 00:00:00', '1970-01-01 00:00:00')
