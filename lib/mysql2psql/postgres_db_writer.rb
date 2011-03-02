@@ -5,13 +5,14 @@ require 'mysql2psql/postgres_writer'
 class Mysql2psql
 
 class SafePgConnector
-  def initialize(*args)
+  def initialize(schema, *args)
     @conn = PGconn.new(*args)
+    @schema = schema
     self.open
   end
 
   def open
-    @conn.exec("SET search_path TO #{PGconn.quote_ident(schema)}") if schema
+    @conn.exec("SET search_path TO #{PGconn.quote_ident(@schema)}") if @schema
     @conn.exec("SET client_encoding = 'UTF8'")
     @conn.exec("SET standard_conforming_strings = off") if @conn.server_version >= 80200
     @conn.exec("SET check_function_bodies = false")
@@ -59,7 +60,7 @@ class PostgresDbWriter < PostgresWriter
   end
 
   def open
-    @conn = SafePgConnector.new(hostname, port, '', '', database, login, password)
+    @conn = SafePgConnector.new(schema, hostname, port, '', '', database, login, password)
   end
 
   def close
