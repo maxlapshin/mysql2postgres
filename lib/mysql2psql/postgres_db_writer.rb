@@ -6,12 +6,13 @@ class Mysql2psql
 
 class SafePgConnector
   def initialize(schema, *args)
-    @conn = PGconn.new(*args)
+    @args = args
     @schema = schema
     self.open
   end
 
   def open
+    @conn = PGconn.new(*@args)
     @conn.exec("SET search_path TO #{PGconn.quote_ident(@schema)}") if @schema
     @conn.exec("SET client_encoding = 'UTF8'")
     @conn.exec("SET standard_conforming_strings = off") if @conn.server_version >= 80200
@@ -38,7 +39,7 @@ class SafePgConnector
     $stderr.puts e
     $stderr.puts e.backtrace[0,3].join("\n")
     @conn.close
-    sleep(1)
+    sleep(2)
     self.open
     retry
   end
