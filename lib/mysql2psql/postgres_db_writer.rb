@@ -20,7 +20,19 @@ class SafePgConnector
   end
 
   def exec(*args)
-    @conn.exec(*args)
+    self.safe_command(:exec, *args)
+  end
+
+  def put_copy_data(*args)
+    self.safe_command(:put_copy_data, *args)
+  end
+
+  def put_copy_end(*args)
+    self.safe_command(:put_copy_end, *args)
+  end
+
+  def safe_command(name, *args)
+    @conn.send(name, *args)
   rescue Exception => e
     $stderr.puts "Mysql2psql: Pg failed: #{e.to_s}, retrying"
     $stderr.puts e
