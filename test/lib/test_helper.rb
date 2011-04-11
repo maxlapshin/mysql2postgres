@@ -12,7 +12,8 @@ require 'ext_test_unit'
 def seed_test_database
   options=get_test_config_by_label(:localmysql_to_file_convert_nothing)
   seedfilepath = "#{File.dirname(__FILE__)}/../fixtures/seed_integration_tests.sql"
-  rc=system("mysql -u#{options.mysqlusername} #{options.mysqldatabase} < #{seedfilepath}")
+  mysql_cmd = `which mysql`.empty? ? 'mysql5' : 'mysql'
+  rc=system("#{mysql_cmd} -u#{options.mysqlusername} #{options.mysqldatabase} < #{seedfilepath}")
   raise StandardError unless rc
   return true
 rescue
