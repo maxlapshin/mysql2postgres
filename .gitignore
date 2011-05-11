@@ -2,3 +2,5 @@
 configs
 test/fixtures/test*.sql
 pkg
+.rvmrc
+.bundle
