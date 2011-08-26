@@ -2,22 +2,16 @@ require 'test_helper'
 
 class MysqlReaderTest < Test::Unit::TestCase
 
-  class << self
-    def startup
-      seed_test_database
-      @@options = get_test_config_by_label(:localmysql_to_file_convert_nothing)
-      @@reader=get_test_reader(@@options)
-    end
-    def shutdown
-      delete_files_for_test_config(@@options)
-    end
-  end
   def setup
+    seed_test_database
+    @options = get_test_config_by_label(:localmysql_to_file_convert_nothing)
+    @reader=get_test_reader(@options)
   end
   def teardown
+    delete_files_for_test_config(@options)
   end
   def reader
-    @@reader
+    @reader
   end
   
   def test_db_connection
