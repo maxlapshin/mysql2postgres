@@ -119,9 +119,9 @@ class Mysql2psql
         if column_type(column) == "boolean"
           current_value = row[index]
           row[index] = (
-            if current_value == 1
+            if current_value == 1 || current_value == "\1"
               't'
-            elsif current_value == 0
+            elsif current_value == 0 || current_value == "\0"
               'f'
             else
               current_value
