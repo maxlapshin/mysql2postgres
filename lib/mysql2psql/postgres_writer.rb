@@ -117,7 +117,16 @@ class Mysql2psql
         end
 
         if column_type(column) == "boolean"
-          row[index] = row[index] == 1 ? 't' : row[index] == 0 ? 'f' : row[index]
+          current_value = row[index]
+          row[index] = (
+            if current_value == 1
+              't'
+            elsif current_value == 0
+              'f'
+            else
+              current_value
+            end
+          )
         end
 
         if row[index].is_a?(String)
