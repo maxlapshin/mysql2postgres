@@ -125,7 +125,6 @@ COPY "#{table.name}" (#{table.columns.map {|column| PGconn.quote_ident(column[:n
 EOF
     
     reader.paginated_read(table, 1000) do |row, counter|
-      line = []
       process_row(table, row)
       @f << row.join("\t") + "\n"
     end
