@@ -127,7 +127,7 @@ class Mysql2psql
           row[index] = row[index].to_s.gsub('0000-00-00 00:00:00', '1970-01-01 00:00:00')
         end
 
-        if column_type(column) == "boolean"
+        if column[:type] == 'boolean'
           row[index] = (
             case row[index]
             when nil
