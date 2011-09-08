@@ -42,7 +42,18 @@ class Mysql2psql
         "smallint"
 
       when "boolean"
-        default = " DEFAULT #{column[:default].to_i == 1 ? 'true' : 'false'}" if default
+        default_value = (
+          case column[:default]
+          when nil
+            'NULL'
+          when 0, '0', "b'0'"
+            'false'
+          else
+            # Case for 1, '1', "b'1'" (for BIT(1) the data type), or anything non-nil and non-zero (for the TINYINT(1) type)
+            'true'
+          end
+        )
+        default = " DEFAULT #{default_value}" if default
         "boolean"
       when "real"
         default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
@@ -117,14 +128,15 @@ class Mysql2psql
         end
 
         if column_type(column) == "boolean"
-          current_value = row[index]
           row[index] = (
-            if current_value == 1 || current_value == "\1"
-              't'
-            elsif current_value == 0 || current_value == "\0"
+            case row[index]
+            when nil
+              nil
+            when 0, "\0"
               'f'
             else
-              current_value
+              # Case for 1, "\1" (for the BIT(1) data type), or anything non-nil and non-zero (to handle the TINYINT(1) type)
+              't'
             end
           )
         end
@@ -137,7 +149,10 @@ class Mysql2psql
           end
         end
 
-        row[index] = '\N' if !row[index]
+        # Note: '\N' not "\N" is correct here:
+        #       The string containing the literal backslash followed by 'N'
+        #       represents database NULL value in PostgreSQL's text mode. 
+        row[index] = '\N' if row[index].nil?
       end
     end
 
