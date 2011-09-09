@@ -108,18 +108,14 @@ class Mysql2psql
       table.columns.each_with_index do |column, index|
         if column[:type] == 'time'
           row[index] = "%02d:%02d:%02d" % [row[index].hour, row[index].minute, row[index].second]
-        end
-
-        if row[index].is_a?(Mysql::Time)
+        elsif row[index].is_a?(Mysql::Time)
           row[index] = row[index].to_s.gsub('0000-00-00 00:00', '1970-01-01 00:00')
           row[index] = row[index].to_s.gsub('0000-00-00 00:00:00', '1970-01-01 00:00:00')
-        end
-
-        if column[:type] == 'boolean'
+        elsif column[:type] == 'boolean'
           row[index] = (
             case row[index]
             when nil
-              nil
+              '\N' # See note below about null values.
             when 0, "\0"
               'f'
             else
@@ -127,20 +123,18 @@ class Mysql2psql
               't'
             end
           )
-        end
-
-        if row[index].is_a?(String)
+        elsif row[index].is_a?(String)
           if column_type(column) == "bytea"
             row[index] = PGconn.escape_bytea(row[index])
           else
-            row[index] = row[index].gsub(/\\/, '\\\\\\').gsub(/\n/,'\n').gsub(/\t/,'\t').gsub(/\r/,'\r').gsub(/\0/, '')
+            row[index] = row[index].gsub(/\\/, '\\\\\\').gsub(/\n/,'\n').gsub(/\t/,'\t').gsub(/\r/,'\r')
           end
+        elsif row[index].nil?
+          # Note: '\N' not "\N" is correct here:
+          #       The string containing the literal backslash followed by 'N'
+          #       represents database NULL value in PostgreSQL's text mode. 
+          row[index] = '\N'
         end
-
-        # Note: '\N' not "\N" is correct here:
-        #       The string containing the literal backslash followed by 'N'
-        #       represents database NULL value in PostgreSQL's text mode. 
-        row[index] = '\N' if row[index].nil?
       end
     end
 
