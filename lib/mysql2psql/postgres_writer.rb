@@ -74,20 +74,24 @@ class Mysql2psql
             # Case for 1, '1', "b'1'" (for BIT(1) the data type), or anything non-nil and non-zero (for the TINYINT(1) type)
             'true'
           end
-        when 'datetime', 'date'
-          nil # TODO: I have a hard time believing that this is the correct logic.
-        when 'timestamp'
+        when 'timestamp', 'datetime', 'date'
           case column[:default]
           when 'CURRENT_TIMESTAMP'
             'CURRENT_TIMESTAMP'
+          when '0000-00-00'
+            "'1970-01-01'"
           when '0000-00-00 00:00'
             "'1970-01-01 00:00'"
           when '0000-00-00 00:00:00'
             "'1970-01-01 00:00:00'"
+          else
+            "'#{column[:default]}'"
           end
         when 'time'
-          'NOW()' # TODO: Check this logic...
+          "'#{column[:default]}'"
         else
+          # TODO: column[:default] will never be nil here.
+          #       Perhaps we should also issue a warning if this case is encountered.
           "#{column[:default] == nil ? 'NULL' : "'"+PGconn.escape(column[:default])+"'"}"
         end
       end
