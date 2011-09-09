@@ -101,7 +101,7 @@ class Mysql2psql
       type = column_type(column)
       if type
         not_null = !column[:null] || column[:auto_increment] ? ' NOT NULL' : ''
-        default = column[:default] || column[:auto_increment] ? ' DEFAULT ' + column_default(column) : ''
+        default = column[:default] || column[:auto_increment] ? " DEFAULT #{column_default(column)}" : ''
         "#{type}#{default}#{not_null}"
       else
         ''
