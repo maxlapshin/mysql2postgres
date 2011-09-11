@@ -92,6 +92,19 @@ class ConvertToFileTest < Test::Unit::TestCase
     #assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_numeric" numeric\(10, 0\)[\w\n]*\)', Regexp::MULTILINE).match( content )
   end
 
+  # test boolean conversion
+  def get_boolean_column_definition_match(column)
+    Regexp.new('CREATE TABLE "test_boolean_conversion".*"' + column + '" ([^\n]*)[^;]*', Regexp::MULTILINE).match(content)[1]
+  end
+  def test_boolean_default_values
+    assert_match /DEFAULT false/, get_boolean_column_definition_match('bit_1_default_0')
+    assert_match /DEFAULT false/, get_boolean_column_definition_match('tinyint_1_default_0')
+    
+    assert_match /DEFAULT true/, get_boolean_column_definition_match('bit_1_default_1')
+    assert_match /DEFAULT true/, get_boolean_column_definition_match('tinyint_1_default_1')
+    assert_match /DEFAULT true/, get_boolean_column_definition_match('tinyint_1_default_2')
+  end
+
   # test autoincrement handling
   def test_autoincrement
     assert_not_nil Regexp.new('CREATE TABLE "basic_autoincrement".*"auto_id" integer DEFAULT.*\)', Regexp::MULTILINE).match( content )

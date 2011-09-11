@@ -63,4 +63,21 @@ INSERT INTO gh18_smallint(s_smallint,u_smallint) VALUES
 (-1,0),
 (32767,65535);
 
+-- see https://github.com/maxlapshin/mysql2postgres/issues/27
+DROP TABLE IF EXISTS test_boolean_conversion;
+CREATE TABLE test_boolean_conversion (
+  test_name VARCHAR(25),
+  bit_1 BIT(1),
+  tinyint_1 TINYINT(1),
+  bit_1_default_0 BIT(1) DEFAULT 0,
+  bit_1_default_1 BIT(1) DEFAULT 1,
+  tinyint_1_default_0 TINYINT(1) DEFAULT 0,
+  tinyint_1_default_1 TINYINT(1) DEFAULT 1,
+  tinyint_1_default_2 TINYINT(1) DEFAULT 2 -- Test the fact that 1 byte isn't limited to [0,1]
+);
 
+INSERT INTO test_boolean_conversion (test_name, bit_1, tinyint_1)
+VALUES ('test-null', NULL, NULL),
+       ('test-false', 0, 0),
+       ('test-true', 1, 1);
+INSERT INTO test_boolean_conversion (test_name, tinyint_1) VALUES ('test-true-nonzero', 2);
