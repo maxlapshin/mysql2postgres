@@ -52,7 +52,7 @@ class Mysql2psql
         when /float/
           "float"
         when /real|double/
-           "double precision"
+          "double precision"
         else
           type
         end 

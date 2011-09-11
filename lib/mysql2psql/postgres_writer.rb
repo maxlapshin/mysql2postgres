@@ -13,36 +13,58 @@ class Mysql2psql
       column_type_info(column).split(" ").first
     end
 
-    def column_type_info(column)
+    def column_type(column)
       if column[:auto_increment]
-        return "integer DEFAULT nextval('#{column[:table_name]}_#{column[:name]}_seq'::regclass) NOT NULL"
-      end      
-      default = column[:default] ? " DEFAULT #{column[:default] == nil ? 'NULL' : "'"+PGconn.escape(column[:default])+"'"}" : nil
-      null = column[:null] ? "" : " NOT NULL"
-      type = 
-      case column[:type]
-
-      # String types
-      when "char"
-        default = default + "::char" if default
-        "character(#{column[:length]})"
-      when "varchar"
-        default = default + "::character varying" if default
-        "character varying(#{column[:length]})"
-
-      # Integer and numeric types
-      when "integer"
-        default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
-        "integer"
-      when "bigint"
-        default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
-        "bigint"
-      when /tinyint|smallint/
-        default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_i}" if default
-        "smallint"
-
-      when "boolean"
-        default_value = (
+        'integer'
+      else
+        case column[:type]
+        when 'char'
+          "character(#{column[:length]})"
+        when 'varchar'
+          "character varying(#{column[:length]})"
+        when /tinyint|smallint/
+          'smallint'
+        when 'real', /float/, 'double precision'
+          'double precision'
+        when 'decimal'
+          "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
+        when 'datetime', 'timestamp'
+          'timestamp without time zone'
+        when 'time'
+          'time without time zone'
+        when 'tinyblob', 'mediumblob', 'longblob', 'blob', 'varbinary'
+          'bytea'
+        when 'tinytext', 'mediumtext', 'longtext', 'text'
+          'text'
+        when /^enum/
+          enum = column[:type].gsub(/enum|\(|\)/, '')
+          max_enum_size = enum.split(',').map{ |check| check.size() -2}.sort[-1]
+          "character varying(#{max_enum_size}) check( #{column[:name]} in (#{enum}))"
+        when 'integer', 'bigint', 'boolean', 'date'
+          column[:type]
+        else
+          puts "Unknown #{column.inspect}"
+          ''
+        end
+      end
+    end
+    
+    def column_default(column)
+      if column[:auto_increment]
+        "nextval('#{column[:table_name]}_#{column[:name]}_seq'::regclass)"
+      elsif column[:default]
+        case column[:type]
+        when 'char'
+          "#{column[:default]}::char"
+        when 'varchar', /^enum/
+          "#{column[:default]}::character varying"
+        when 'integer', 'bigint', /tinyint|smallint/
+          column[:default].to_i
+        when 'real', /float/
+          column[:default].to_f
+        when 'decimal', 'double precision'
+          column[:default]
+        when 'boolean'
           case column[:default]
           when nil
             'NULL'
@@ -52,73 +74,39 @@ class Mysql2psql
             # Case for 1, '1', "b'1'" (for BIT(1) the data type), or anything non-nil and non-zero (for the TINYINT(1) type)
             'true'
           end
-        )
-        default = " DEFAULT #{default_value}" if default
-        "boolean"
-      when "real"
-        default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
-        "double precision"
-      when /float/
-        default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default].to_f}" if default
-        "double precision"
-      when "decimal"
-        default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
-        "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
-
-      when "double precision"
-        default = " DEFAULT #{column[:default].nil? ? 'NULL' : column[:default]}" if default
-        "double precision"
-
-      # Mysql datetime fields
-      when "datetime"
-        default = nil
-        "timestamp without time zone"
-      when "date"
-        default = nil
-        "date"
-      when "timestamp"
-        default = " DEFAULT CURRENT_TIMESTAMP" if column[:default] == "CURRENT_TIMESTAMP"
-        default = " DEFAULT '1970-01-01 00:00'" if column[:default] == "0000-00-00 00:00"
-        default = " DEFAULT '1970-01-01 00:00:00'" if column[:default] == "0000-00-00 00:00:00"
-        "timestamp without time zone"
-      when "time"
-        default = " DEFAULT NOW()" if default
-        "time without time zone"
-
-      when "tinyblob"
-        "bytea"
-      when "mediumblob"
-        "bytea"
-      when "longblob"
-        "bytea"
-      when "blob"
-        "bytea"
-      when "varbinary"
-        "bytea"
-      when "tinytext"
-        "text"
-      when "mediumtext"
-        "text"
-      when "longtext"
-        "text"
-      when "text"
-        "text"
-      when /^enum/
-        default = default + "::character varying" if default
-        enum = column[:type].gsub(/enum|\(|\)/, '')
-        max_enum_size = enum.split(',').map{ |check| check.size() -2}.sort[-1]
-        "character varying(#{max_enum_size}) check( #{column[:name]} in (#{enum}))"
-      else
-        puts "Unknown #{column.inspect}"
-        column[:type].inspect
-        return ""
+        when 'datetime', 'date'
+          nil # TODO: I have a hard time believing that this is the correct logic.
+        when 'timestamp'
+          case column[:default]
+          when 'CURRENT_TIMESTAMP'
+            'CURRENT_TIMESTAMP'
+          when '0000-00-00 00:00'
+            "'1970-01-01 00:00'"
+          when '0000-00-00 00:00:00'
+            "'1970-01-01 00:00:00'"
+          end
+        when 'time'
+          'NOW()' # TODO: Check this logic...
+        else
+          "#{column[:default] == nil ? 'NULL' : "'"+PGconn.escape(column[:default])+"'"}"
+        end
       end
-      "#{type}#{default}#{null}"
+    end
+
+    def column_type_info(column)
+      type = column_type(column)
+      if type
+        not_null = !column[:null] || column[:auto_increment] ? ' NOT NULL' : ''
+        default = column[:default] || column[:auto_increment] ? ' DEFAULT ' + column_default(column) : ''
+        "#{type}#{default}#{not_null}"
+      else
+        ''
+      end
     end
 
     def process_row(table, row)
       table.columns.each_with_index do |column, index|
-        if column[:type] == "time"
+        if column[:type] == 'time'
           row[index] = "%02d:%02d:%02d" % [row[index].hour, row[index].minute, row[index].second]
         end
 
@@ -127,7 +115,7 @@ class Mysql2psql
           row[index] = row[index].to_s.gsub('0000-00-00 00:00:00', '1970-01-01 00:00:00')
         end
 
-        if column_type(column) == "boolean"
+        if column[:type] == 'boolean'
           row[index] = (
             case row[index]
             when nil
