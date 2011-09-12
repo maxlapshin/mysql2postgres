@@ -81,3 +81,7 @@ VALUES ('test-null', NULL, NULL),
        ('test-false', 0, 0),
        ('test-true', 1, 1);
 INSERT INTO test_boolean_conversion (test_name, tinyint_1) VALUES ('test-true-nonzero', 2);
+
+CREATE OR REPLACE VIEW test_view AS
+SELECT b.test_name
+FROM test_boolean_conversion b;

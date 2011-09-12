@@ -74,20 +74,24 @@ class Mysql2psql
             # Case for 1, '1', "b'1'" (for BIT(1) the data type), or anything non-nil and non-zero (for the TINYINT(1) type)
             'true'
           end
-        when 'datetime', 'date'
-          nil # TODO: I have a hard time believing that this is the correct logic.
-        when 'timestamp'
+        when 'timestamp', 'datetime', 'date'
           case column[:default]
           when 'CURRENT_TIMESTAMP'
             'CURRENT_TIMESTAMP'
+          when '0000-00-00'
+            "'1970-01-01'"
           when '0000-00-00 00:00'
             "'1970-01-01 00:00'"
           when '0000-00-00 00:00:00'
             "'1970-01-01 00:00:00'"
+          else
+            "'#{column[:default]}'"
           end
         when 'time'
-          'NOW()' # TODO: Check this logic...
+          "'#{column[:default]}'"
         else
+          # TODO: column[:default] will never be nil here.
+          #       Perhaps we should also issue a warning if this case is encountered.
           "#{column[:default] == nil ? 'NULL' : "'"+PGconn.escape(column[:default])+"'"}"
         end
       end
@@ -97,7 +101,7 @@ class Mysql2psql
       type = column_type(column)
       if type
         not_null = !column[:null] || column[:auto_increment] ? ' NOT NULL' : ''
-        default = column[:default] || column[:auto_increment] ? ' DEFAULT ' + column_default(column) : ''
+        default = column[:default] || column[:auto_increment] ? " DEFAULT #{column_default(column)}" : ''
         "#{type}#{default}#{not_null}"
       else
         ''
@@ -108,18 +112,14 @@ class Mysql2psql
       table.columns.each_with_index do |column, index|
         if column[:type] == 'time'
           row[index] = "%02d:%02d:%02d" % [row[index].hour, row[index].minute, row[index].second]
-        end
-
-        if row[index].is_a?(Mysql::Time)
+        elsif row[index].is_a?(Mysql::Time)
           row[index] = row[index].to_s.gsub('0000-00-00 00:00', '1970-01-01 00:00')
           row[index] = row[index].to_s.gsub('0000-00-00 00:00:00', '1970-01-01 00:00:00')
-        end
-
-        if column[:type] == 'boolean'
+        elsif column[:type] == 'boolean'
           row[index] = (
             case row[index]
             when nil
-              nil
+              '\N' # See note below about null values.
             when 0, "\0"
               'f'
             else
@@ -127,20 +127,18 @@ class Mysql2psql
               't'
             end
           )
-        end
-
-        if row[index].is_a?(String)
+        elsif row[index].is_a?(String)
           if column_type(column) == "bytea"
             row[index] = PGconn.escape_bytea(row[index])
           else
-            row[index] = row[index].gsub(/\\/, '\\\\\\').gsub(/\n/,'\n').gsub(/\t/,'\t').gsub(/\r/,'\r').gsub(/\0/, '')
+            row[index] = row[index].gsub(/\\/, '\\\\\\').gsub(/\n/,'\n').gsub(/\t/,'\t').gsub(/\r/,'\r')
           end
+        elsif row[index].nil?
+          # Note: '\N' not "\N" is correct here:
+          #       The string containing the literal backslash followed by 'N'
+          #       represents database NULL value in PostgreSQL's text mode. 
+          row[index] = '\N'
         end
-
-        # Note: '\N' not "\N" is correct here:
-        #       The string containing the literal backslash followed by 'N'
-        #       represents database NULL value in PostgreSQL's text mode. 
-        row[index] = '\N' if row[index].nil?
       end
     end
 

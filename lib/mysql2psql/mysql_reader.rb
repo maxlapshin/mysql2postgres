@@ -155,7 +155,7 @@ class Mysql2psql
     end
   
     def connect
-      @mysql = ::Mysql.connect(@host, @user, @passwd, @db, @port, @sock, @flag)
+      @mysql = Mysql.connect(@host, @user, @passwd, @db, @port, @sock, @flag)
       @mysql.query("SET NAMES utf8")
       @mysql.query("SET SESSION query_cache_type = OFF")
     end
@@ -174,9 +174,22 @@ class Mysql2psql
     end
   
     attr_reader :mysql
-  
+    
+    def views
+      unless defined? @views
+        @mysql.query("SELECT t.TABLE_NAME FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = '#{@db}' AND t.TABLE_TYPE = 'VIEW';") do |res|
+          @views = []
+          res.each { |row| @views << row[0] }
+        end
+      end
+      
+      @views
+    end
+    
     def tables
-      @tables ||= @mysql.list_tables.map {|table| Table.new(self, table)}
+      @tables ||= (@mysql.list_tables - views).map do |table|
+        Table.new(self, table)
+      end
     end
   
     def paginated_read(table, page_size)

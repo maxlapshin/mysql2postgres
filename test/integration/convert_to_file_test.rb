@@ -109,4 +109,9 @@ class ConvertToFileTest < Test::Unit::TestCase
   def test_autoincrement
     assert_not_nil Regexp.new('CREATE TABLE "basic_autoincrement".*"auto_id" integer DEFAULT.*\)', Regexp::MULTILINE).match( content )
   end
+  
+  # test view creation (or lack thereof!)
+  def test_should_not_copy_views_as_tables
+    assert_no_match /CREATE TABLE "test_view"/, content
+  end
 end
