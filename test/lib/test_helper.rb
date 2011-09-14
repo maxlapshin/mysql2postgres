@@ -72,7 +72,7 @@ def get_test_config_by_label(name)
   when :localmysql_to_file_convert_nothing
     get_new_test_config(true, ['unobtainium'], ['kryptonite'], true, true, false)
   when :localmysql_to_file_convert_all
-    get_new_test_config(true, [], [], false, false, false)
+    get_new_test_config(true, [], [], false, false, true)
   when :localmysql_to_db_convert_all
     get_new_test_config(false, [], [], false, false, false)
   when :localmysql_to_db_convert_nothing
