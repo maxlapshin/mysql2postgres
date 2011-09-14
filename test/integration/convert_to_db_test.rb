@@ -60,5 +60,9 @@ class ConvertToDbTest < Test::Unit::TestCase
     result = exec_sql_on_psql('SELECT column_a FROM test_datetime_conversion').first
     assert_equal '1970-01-01 00:00:00', result['column_a']
   end
-
+  
+  def test_index_conversion
+    result = exec_sql_on_psql('SELECT pg_get_indexdef(indexrelid) FROM pg_index WHERE indrelid = \'test_index_conversion\'::regclass').first
+    assert_equal "CREATE UNIQUE INDEX test_index_conversion_index ON test_index_conversion USING btree (column_a)", result["pg_get_indexdef"]
+  end
 end

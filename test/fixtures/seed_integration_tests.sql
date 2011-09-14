@@ -88,15 +88,13 @@ SELECT b.test_name
 FROM test_boolean_conversion b;
 
 DROP TABLE IF EXISTS test_null_conversion;
-CREATE TABLE test_null_conversion (
-	column_a VARCHAR(10)
-);
-
+CREATE TABLE test_null_conversion (column_a VARCHAR(10));
 INSERT INTO test_null_conversion (column_a) VALUES (NULL);
 
 DROP TABLE IF EXISTS test_datetime_conversion;
-CREATE TABLE test_datetime_conversion (
-	column_a DATETIME
-);
-
+CREATE TABLE test_datetime_conversion (column_a DATETIME);
 INSERT INTO test_datetime_conversion (column_a) VALUES ('0000-00-00 00:00');
+
+DROP TABLE IF EXISTS test_index_conversion;
+CREATE TABLE test_index_conversion (column_a VARCHAR(10));
+CREATE UNIQUE INDEX test_index_conversion ON test_index_conversion (column_a);
