@@ -63,9 +63,11 @@ end
 begin
   require 'rcov/rcovtask'
   Rcov::RcovTask.new do |test|
-    test.libs << 'test'
+    test.libs << 'lib'
+    test.libs << 'test/lib'
     test.pattern = 'test/**/*test.rb'
     test.verbose = true
+    test.rcov_opts << "--exclude gems/*"
   end
 rescue LoadError
   task :rcov do
