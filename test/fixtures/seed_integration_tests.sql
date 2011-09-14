@@ -92,7 +92,13 @@ CREATE TABLE test_null_conversion (column_a VARCHAR(10));
 INSERT INTO test_null_conversion (column_a) VALUES (NULL);
 
 DROP TABLE IF EXISTS test_datetime_conversion;
-CREATE TABLE test_datetime_conversion (column_a DATETIME);
+CREATE TABLE test_datetime_conversion (
+	column_a DATETIME,
+	column_b TIMESTAMP,
+	column_c DATETIME DEFAULT '0000-00-00',
+	column_d DATETIME DEFAULT '0000-00-00 00:00',
+	column_e DATETIME DEFAULT '0000-00-00 00:00:00'
+);
 INSERT INTO test_datetime_conversion (column_a) VALUES ('0000-00-00 00:00');
 
 DROP TABLE IF EXISTS test_index_conversion;

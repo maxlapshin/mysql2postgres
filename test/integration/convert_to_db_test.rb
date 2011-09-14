@@ -61,6 +61,33 @@ class ConvertToDbTest < Test::Unit::TestCase
     assert_equal '1970-01-01 00:00:00', result['column_a']
   end
   
+  def test_datetime_defaults
+    result = exec_sql_on_psql(<<-SQL)
+      SELECT a.attname,
+        pg_catalog.format_type(a.atttypid, a.atttypmod),
+        (SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128)
+         FROM pg_catalog.pg_attrdef d
+         WHERE d.adrelid = a.attrelid AND d.adnum = a.attnum AND a.atthasdef) AS default
+      FROM pg_catalog.pg_attribute a
+      WHERE a.attrelid = 'test_datetime_conversion'::regclass AND a.attnum > 0
+    SQL
+    
+    assert_equal 5, result.count
+    
+    result.each do |row|
+      assert_equal "timestamp without time zone", row["format_type"]
+      
+      case row["attname"]
+      when "column_a"
+        assert_nil row["default"]
+      when "column_b"
+        assert_equal "now()", row["default"]
+      when "column_c", "column_d", "column_e"
+        assert_equal "'1970-01-01 00:00:00'::timestamp without time zone", row["default"]
+      end
+    end
+  end
+  
   def test_index_conversion
     result = exec_sql_on_psql('SELECT pg_get_indexdef(indexrelid) FROM pg_index WHERE indrelid = \'test_index_conversion\'::regclass').first
     assert_equal "CREATE UNIQUE INDEX test_index_conversion_index ON test_index_conversion USING btree (column_a)", result["pg_get_indexdef"]
