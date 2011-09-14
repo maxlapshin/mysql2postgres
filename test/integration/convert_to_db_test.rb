@@ -50,5 +50,15 @@ class ConvertToDbTest < Test::Unit::TestCase
     assert_nil null_record['bit_1']
     assert_nil null_record['tinyint_1']
   end
+  
+  def test_null_conversion
+    result = exec_sql_on_psql('SELECT column_a FROM test_null_conversion').first
+    assert_nil result['column_a']
+  end
+  
+  def test_datetime_conversion
+    result = exec_sql_on_psql('SELECT column_a FROM test_datetime_conversion').first
+    assert_equal '1970-01-01 00:00:00', result['column_a']
+  end
 
 end

@@ -31,6 +31,7 @@ INSERT INTO numeric_types_basics VALUES
 ( 5,  127, 255, 32767, 65535, 8388607, 16777215, 2147483647, 4294967295, 2147483647, 4294967295, 9223372036854775807, 18446744073709551615, 1, 1, 1, 1, 1, 1);
 
 
+
 DROP TABLE IF EXISTS basic_autoincrement;
 CREATE TABLE basic_autoincrement (
   auto_id INT(11) NOT NULL AUTO_INCREMENT,
@@ -85,3 +86,17 @@ INSERT INTO test_boolean_conversion (test_name, tinyint_1) VALUES ('test-true-no
 CREATE OR REPLACE VIEW test_view AS
 SELECT b.test_name
 FROM test_boolean_conversion b;
+
+DROP TABLE IF EXISTS test_null_conversion;
+CREATE TABLE test_null_conversion (
+	column_a VARCHAR(10)
+);
+
+INSERT INTO test_null_conversion (column_a) VALUES (NULL);
+
+DROP TABLE IF EXISTS test_datetime_conversion;
+CREATE TABLE test_datetime_conversion (
+	column_a DATETIME
+);
+
+INSERT INTO test_datetime_conversion (column_a) VALUES ('0000-00-00 00:00');
