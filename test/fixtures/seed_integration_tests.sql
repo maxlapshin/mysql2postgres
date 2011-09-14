@@ -98,3 +98,11 @@ INSERT INTO test_datetime_conversion (column_a) VALUES ('0000-00-00 00:00');
 DROP TABLE IF EXISTS test_index_conversion;
 CREATE TABLE test_index_conversion (column_a VARCHAR(10));
 CREATE UNIQUE INDEX test_index_conversion ON test_index_conversion (column_a);
+
+DROP TABLE IF EXISTS test_foreign_keys_child;
+DROP TABLE IF EXISTS test_foreign_keys_parent;
+CREATE TABLE test_foreign_keys_parent (id INT NOT NULL, PRIMARY KEY (id)) ENGINE=INNODB;
+CREATE TABLE test_foreign_keys_child (id INT, test_foreign_keys_parent_id INT,
+	INDEX par_ind (test_foreign_keys_parent_id),
+	FOREIGN KEY (test_foreign_keys_parent_id) REFERENCES test_foreign_keys_parent(id) ON DELETE CASCADE
+) ENGINE=INNODB;

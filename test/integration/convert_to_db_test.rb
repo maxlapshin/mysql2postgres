@@ -65,4 +65,10 @@ class ConvertToDbTest < Test::Unit::TestCase
     result = exec_sql_on_psql('SELECT pg_get_indexdef(indexrelid) FROM pg_index WHERE indrelid = \'test_index_conversion\'::regclass').first
     assert_equal "CREATE UNIQUE INDEX test_index_conversion_index ON test_index_conversion USING btree (column_a)", result["pg_get_indexdef"]
   end
+  
+  def test_foreign_keys
+    result = exec_sql_on_psql("SELECT conname, pg_catalog.pg_get_constraintdef(r.oid, true) as condef FROM pg_catalog.pg_constraint r WHERE r.conrelid = 'test_foreign_keys_child'::regclass")
+    expected = {"condef" => "FOREIGN KEY (test_foreign_keys_parent_id) REFERENCES test_foreign_keys_parent(id)", "conname" => "test_foreign_keys_child_test_foreign_keys_parent_id_fkey"}
+    assert_equal expected, result.first
+  end
 end
