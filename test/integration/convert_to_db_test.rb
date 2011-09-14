@@ -5,15 +5,22 @@ require 'mysql2psql'
 class ConvertToDbTest < Test::Unit::TestCase
 
   def setup
+    $stdout = StringIO.new
+    $stderr = StringIO.new
+
     seed_test_database
     @options=get_test_config_by_label(:localmysql_to_db_convert_all)
     @mysql2psql = Mysql2psql.new([@options.filepath])
     @mysql2psql.convert
     @mysql2psql.writer.open
   end
+
   def teardown
     @mysql2psql.writer.close
     delete_files_for_test_config(@options)
+    
+    $stdout = STDOUT
+    $stderr = STDERR
   end
 
   def exec_sql_on_psql(sql, parameters=nil)
@@ -102,5 +109,12 @@ class ConvertToDbTest < Test::Unit::TestCase
     result = exec_sql_on_psql("SELECT conname, pg_catalog.pg_get_constraintdef(r.oid, true) as condef FROM pg_catalog.pg_constraint r WHERE r.conrelid = 'test_foreign_keys_child'::regclass")
     expected = {"condef" => "FOREIGN KEY (test_foreign_keys_parent_id) REFERENCES test_foreign_keys_parent(id)", "conname" => "test_foreign_keys_child_test_foreign_keys_parent_id_fkey"}
     assert_equal expected, result.first
+  end
+  
+  def test_output
+    $stdout.rewind
+    actual = $stdout.read
+    
+    assert_match /Counting rows of test_foreign_keys_child/, actual
   end
 end
