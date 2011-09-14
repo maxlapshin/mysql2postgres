@@ -57,8 +57,9 @@ class ConvertToDbTest < Test::Unit::TestCase
   end
   
   def test_datetime_conversion
-    result = exec_sql_on_psql('SELECT column_a FROM test_datetime_conversion').first
+    result = exec_sql_on_psql('SELECT column_a, column_f FROM test_datetime_conversion').first
     assert_equal '1970-01-01 00:00:00', result['column_a']
+    assert_equal '08:15:30', result['column_f']
   end
   
   def test_datetime_defaults
@@ -72,10 +73,14 @@ class ConvertToDbTest < Test::Unit::TestCase
       WHERE a.attrelid = 'test_datetime_conversion'::regclass AND a.attnum > 0
     SQL
     
-    assert_equal 5, result.count
+    assert_equal 6, result.count
     
     result.each do |row|
-      assert_equal "timestamp without time zone", row["format_type"]
+      if row["attname"] == "column_f"
+        assert_equal "time without time zone", row["format_type"]
+      else
+        assert_equal "timestamp without time zone", row["format_type"]
+      end
       
       case row["attname"]
       when "column_a"

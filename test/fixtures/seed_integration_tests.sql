@@ -97,9 +97,10 @@ CREATE TABLE test_datetime_conversion (
 	column_b TIMESTAMP,
 	column_c DATETIME DEFAULT '0000-00-00',
 	column_d DATETIME DEFAULT '0000-00-00 00:00',
-	column_e DATETIME DEFAULT '0000-00-00 00:00:00'
+	column_e DATETIME DEFAULT '0000-00-00 00:00:00',
+	column_f TIME
 );
-INSERT INTO test_datetime_conversion (column_a) VALUES ('0000-00-00 00:00');
+INSERT INTO test_datetime_conversion (column_a, column_f) VALUES ('0000-00-00 00:00', '08:15:30');
 
 DROP TABLE IF EXISTS test_index_conversion;
 CREATE TABLE test_index_conversion (column_a VARCHAR(10));
