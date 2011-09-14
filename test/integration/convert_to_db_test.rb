@@ -117,4 +117,16 @@ class ConvertToDbTest < Test::Unit::TestCase
     
     assert_match /Counting rows of test_foreign_keys_child/, actual
   end
+  
+  def test_enum
+    result = exec_sql_on_psql(<<-SQL)
+      SELECT r.conname, pg_catalog.pg_get_constraintdef(r.oid, true)
+      FROM pg_catalog.pg_constraint r
+      WHERE r.conrelid = 'test_enum'::regclass AND r.contype = 'c'
+      ORDER BY 1
+    SQL
+    
+    assert_equal 1, result.count
+    assert_equal "CHECK (name::text = ANY (ARRAY['small'::character varying, 'medium'::character varying, 'large'::character varying]::text[]))", result.first["pg_get_constraintdef"]
+  end
 end

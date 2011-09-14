@@ -113,3 +113,7 @@ CREATE TABLE test_foreign_keys_child (id INT, test_foreign_keys_parent_id INT,
 	INDEX par_ind (test_foreign_keys_parent_id),
 	FOREIGN KEY (test_foreign_keys_parent_id) REFERENCES test_foreign_keys_parent(id) ON DELETE CASCADE
 ) ENGINE=INNODB;
+
+DROP TABLE IF EXISTS test_enum;
+CREATE TABLE test_enum (name ENUM('small', 'medium', 'large'));
+INSERT INTO test_enum (name) VALUES ('medium');
