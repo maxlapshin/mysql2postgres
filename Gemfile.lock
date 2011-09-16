@@ -1,0 +1,21 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    git (1.2.5)
+    jeweler (1.6.0)
+      bundler (~> 1.0.0)
+      git (>= 1.2.5)
+      rake
+    mysql (2.8.1)
+    pg (0.11.0)
+    rake (0.8.7)
+    test-unit (2.3.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  jeweler
+  mysql
+  pg
+  test-unit
