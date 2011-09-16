@@ -111,7 +111,7 @@ EOF
   
   def write_constraints(table)
     table.foreign_keys.each do |key|
-      @f << "ALTER TABLE #{PGconn.quote_ident(table.name)} ADD FOREIGN KEY (#{PGconn.quote_ident(key[:column])}) REFERENCES #{PGconn.quote_ident(key[:ref_table])}(#{PGconn.quote_ident(key[:ref_column])});\n"
+      @f << "ALTER TABLE #{PGconn.quote_ident(table.name)} ADD FOREIGN KEY (#{key[:column].map{|c|PGconn.quote_ident(c)}.join(', ')}) REFERENCES #{PGconn.quote_ident(key[:ref_table])}(#{key[:ref_column].map{|c|PGconn.quote_ident(c)}.join(', ')}) ON UPDATE #{key[:on_update]} ON DELETE #{key[:on_delete]};\n"
     end
   end
   

@@ -1,4 +1,5 @@
 require 'mysql'
+require 'csv'
 
 class Mysql2psql
 
@@ -104,11 +105,26 @@ class Mysql2psql
           explain.split(/\n/).each do |line|
             next unless line =~ / KEY /
             index = {}
-            if match_data = /CONSTRAINT `(\w+)` FOREIGN KEY \(`(\w+)`\) REFERENCES `(\w+)` \(`(\w+)`\)/.match(line)
+            if match_data = /CONSTRAINT `(\w+)` FOREIGN KEY \((.*?)\) REFERENCES `(\w+)` \((.*?)\)(.*)/.match(line)
               index[:name] = match_data[1]
-              index[:column] = match_data[2]
+              index[:column] = match_data[2].parse_csv(:quote_char => '`',:col_sep => ', ')
               index[:ref_table] = match_data[3]
-              index[:ref_column] = match_data[4]
+              index[:ref_column] = match_data[4].parse_csv(:quote_char => '`',:col_sep => ', ')
+              
+              the_rest = match_data[5]
+
+              if match_data = /ON DELETE (SET NULL|SET DEFAULT|RESTRICT|NO ACTION|CASCADE)/.match(the_rest)
+                index[:on_delete] = match_data[1]
+              else
+                index[:on_delete] ||= 'RESTRICT'
+              end
+
+              if match_data = /ON UPDATE (SET NULL|SET DEFAULT|RESTRICT|NO ACTION|CASCADE)/.match(the_rest)
+                index[:on_update] = match_data[1]
+              else
+                index[:on_update] ||= 'RESTRICT'
+              end
+              
               @foreign_keys << index
             elsif match_data = /KEY `(\w+)` \((.*)\)/.match(line)
               index[:name] = match_data[1]
