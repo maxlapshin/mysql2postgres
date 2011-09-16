@@ -171,7 +171,7 @@ class Mysql2psql
     end
   
     def connect
-      @mysql = Mysql.connect(@host, @user, @passwd, @db, @port, @sock, @flag)
+      @mysql = ::Mysql.connect(@host, @user, @passwd, @db, @port, @sock, @flag)
       @mysql.query("SET NAMES utf8")
       @mysql.query("SET SESSION query_cache_type = OFF")
     end
@@ -185,7 +185,10 @@ class Mysql2psql
       @host, @user, @passwd, @db, @port, @sock, @flag = 
         options.mysqlhostname('localhost'), options.mysqlusername, 
         options.mysqlpassword, options.mysqldatabase, 
-        options.mysqlport, options.mysqlsocket(nil)
+        options.mysqlport, options.mysqlsocket
+      @port = nil if @port == ""  # for things like Amazon's RDS you don't have a port and connect fails with "" for a value
+      @sock = nil if @sock == ""
+      @flag = nil if @flag == ""
       connect
     end
   

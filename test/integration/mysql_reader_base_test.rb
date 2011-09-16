@@ -24,4 +24,11 @@ class MysqlReaderBaseTest < Test::Unit::TestCase
       reader.reconnect
     end
   end
+  def test_mysql_connection_without_port
+    assert_nothing_raised do
+      options.mysqlport = ""
+      options.mysqlsocket = ""
+      reader = Mysql2psql::MysqlReader.new(options)
+    end
+  end
 end

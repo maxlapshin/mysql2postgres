@@ -51,6 +51,8 @@ The 'mysql' gem in particular may need a hint on where to find the mysql headers
   
 NB: With Ruby 1.8.x, the gem install will usually complain about "No definition for ..." errors. These are non-fatal and just affect the documentation install. This doesn't happen with Ruby 1.9.2.
 
+With bundler you can do a simple: bundle install
+
 == Contributing to Mysql2psql
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
