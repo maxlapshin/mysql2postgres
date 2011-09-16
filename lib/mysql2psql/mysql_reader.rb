@@ -179,6 +179,9 @@ class Mysql2psql
         options.mysqlhostname('localhost'), options.mysqlusername, 
         options.mysqlpassword, options.mysqldatabase, 
         options.mysqlport, options.mysqlsocket
+      @port = nil if @port == ""  # for things like Amazon's RDS you don't have a port and connect fails with "" for a value
+      @sock = nil if @sock == ""
+      @flag = nil if @flag == ""
       connect
     end
   
