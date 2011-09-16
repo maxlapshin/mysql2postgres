@@ -32,7 +32,7 @@ Please review the configuration and retry..\n\n\n")
 mysql:
  hostname: localhost
  port: 3306
- socket: /tmp/mysql.sock
+ socket:
  username: mysql2psql
  password: 
  database: mysql2psql_test

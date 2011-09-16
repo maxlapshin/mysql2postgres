@@ -1,7 +1,7 @@
 mysql:
  hostname: localhost
  port: 3306
- socket: /tmp/mysql.sock
+ socket:
  username: somename
  password: secretpassword
  database: somename 

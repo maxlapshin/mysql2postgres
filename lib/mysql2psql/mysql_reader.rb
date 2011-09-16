@@ -28,12 +28,16 @@ class Mysql2psql
     
       def convert_type(type)
         case type
-        when /int.* unsigned/
+        when /^int.* unsigned/
           "bigint"
         when /bigint/
           "bigint"
         when "bit(1)"
           "boolean"
+        when /smallint.* unsigned/
+          "integer"
+        when /smallint/
+          "smallint"
         when "tinyint(1)"
           "boolean"
         when /tinyint/
@@ -43,11 +47,13 @@ class Mysql2psql
         when /varchar/
           "varchar"
         when /char/
-          "char"
-        when /(float|decimal)/
+          "char"          
+        when /decimal/
           "decimal"
-        when /double/
-           "double precision"
+        when /float/
+          "float"
+        when /real|double/
+          "double precision"
         else
           type
         end 
@@ -60,6 +66,7 @@ class Mysql2psql
         fields = []
         @reader.mysql.query("EXPLAIN `#{name}`") do |res|
           while field = res.fetch_row do
+            length = -1
             length = field[1][/\((\d+)\)/, 1] if field[1] =~ /\((\d+)\)/
             length = field[1][/\((\d+),(\d+)\)/, 1] if field[1] =~ /\((\d+),(\d+)\)/
             desc = {
@@ -164,7 +171,7 @@ class Mysql2psql
     end
   
     def connect
-      @mysql = ::Mysql.connect(@host, @user, @passwd, @db, @port, @sock, @flag)
+      @mysql = Mysql.connect(@host, @user, @passwd, @db, @port, @sock, @flag)
       @mysql.query("SET NAMES utf8")
       @mysql.query("SET SESSION query_cache_type = OFF")
     end
@@ -178,14 +185,27 @@ class Mysql2psql
       @host, @user, @passwd, @db, @port, @sock, @flag = 
         options.mysqlhostname('localhost'), options.mysqlusername, 
         options.mysqlpassword, options.mysqldatabase, 
-        options.mysqlport, options.mysqlsocket
+        options.mysqlport, options.mysqlsocket(nil)
       connect
     end
   
     attr_reader :mysql
-  
+    
+    def views
+      unless defined? @views
+        @mysql.query("SELECT t.TABLE_NAME FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = '#{@db}' AND t.TABLE_TYPE = 'VIEW';") do |res|
+          @views = []
+          res.each { |row| @views << row[0] }
+        end
+      end
+      
+      @views
+    end
+    
     def tables
-      @tables ||= @mysql.list_tables.map {|table| Table.new(self, table)}
+      @tables ||= (@mysql.list_tables - views).map do |table|
+        Table.new(self, table)
+      end
     end
   
     def paginated_read(table, page_size)

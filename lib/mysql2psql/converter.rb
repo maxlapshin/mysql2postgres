@@ -29,7 +29,7 @@ class Mysql2psql
  
       _time2 = Time.now
       tables.each do |table|
-        writer.truncate(table) if force_truncate && supress_ddl
+        writer.truncate(table) if force_truncate && !supress_ddl
         writer.write_contents(table, reader)
       end unless @supress_data
  

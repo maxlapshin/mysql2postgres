@@ -1,0 +1,11 @@
+0.1.1 May 3, 2011
+===
+
+* updated for pg driver ~> 0.11.0
+* add a check for mysql cmd, e.g. mysql or mysql5
+* remove deprecated feature per gem -v 1.7.2
+
+0.1.0 September 18, 2010
+===
+
+* Initial packaging as a gem

@@ -4,18 +4,12 @@ require 'mysql2psql/converter'
 
 class ConverterTest < Test::Unit::TestCase
 
-  class << self
-    def startup
-      seed_test_database
-      @@options=get_test_config_by_label(:localmysql_to_file_convert_nothing)
-    end
-    def shutdown
-      delete_files_for_test_config(@@options)
-    end
-  end
   def setup
+    seed_test_database
+    @@options=get_test_config_by_label(:localmysql_to_file_convert_nothing)
   end
   def teardown
+    delete_files_for_test_config(@@options)
   end
   def options
     @@options

@@ -26,5 +26,8 @@ module Test::Unit::Assertions
   def assert_true(object, message="")
     assert_equal(true, object, message)
   end
+  def assert_nil(object, message="")
+    assert_equal(nil, object, message)
+  end
 end
 

@@ -11,9 +11,8 @@ to contact me, I'll help you.
 Mysql2psql is packaged as a gem. Install as usual (use sudo if required).
 
   $ gem install mysql2psql
-  NB: the gem hasn't been formally released on http://rubygems.org/ yet. For now you need to clone the git repo at http://github.com/tardate/mysql2postgres and 'rake install' 
 
-After installation, the "mysql2psql" command will be available. 
+After installation, the "mysql2psql" command will be available.
 When run, it will generate a default configuration file in the current directory if a config
 file is not already found. The default configuration filename is mysql2psql.yml.
 
@@ -42,7 +41,7 @@ After editing the configuration file and launching tool, you will see something 
 
 
 == Database driver dependencies
-Mysql2psql uses the 'mysql' and 'pg' gems for database connectivity. 
+Mysql2psql uses the 'mysql' and 'pg' gems for database connectivity.
 Mysql2psql gem installation should automatically install these too.
 
 If you encounter any issues with db connectivity, verify that the 'mysql' and 'pg' gems are installed and working correctly first.
@@ -52,14 +51,25 @@ The 'mysql' gem in particular may need a hint on where to find the mysql headers
   
 NB: With Ruby 1.8.x, the gem install will usually complain about "No definition for ..." errors. These are non-fatal and just affect the documentation install. This doesn't happen with Ruby 1.9.2.
 
+== Contributing to Mysql2psql
+ 
+* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
+* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
+* Fork the project
+* Start a feature/bugfix branch
+* Commit and push until you are happy with your contribution
+* Make sure to add tests for it. This is important so no-one unintentionally breaks it in a future version.
+* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so the gem maintainers can cherry-pick around it.
+* Send a pull request
+
 == Getting the source
-Mysql2psql was first produced by Max Lapshin <max@maxidoors.ru> who maintains the master 
+Mysql2psql was first produced by Max Lapshin <max@maxidoors.ru> who maintains the master
 repository at http://github.com/maxlapshin/mysql2postgres
 
-The gem packaged version you are currently looking at has yet to be merged into the master repo.
 The gem bundling and refactoring for testing was done by Paul Gallagher <gallagher.paul@gmail.com> and
 the repository is at http://github.com/tardate/mysql2postgres
 
+Gem packaging is done with Jeweler. Note that on windows this means you must run under mingw or other shell that supports git to do the gem bundling (but you can gem install the built gem in the normal Windows shell).
 
 == Running tests
 If you fork/clone the project, you will want to run the test suite (and add to it if you are developing new features or fixing bugs).
@@ -67,51 +77,44 @@ If you fork/clone the project, you will want to run the test suite (and add to i
 A suite of tests are provided and are run using rake (rake -T for more info)
   rake test:units
   rake test:integration
-  rake test 
+  rake test
 
 Rake without parameters (or "rake test") will run both the unit and integration tests.
 
 Unit tests are small standalone tests of the mysql2psql codebase that have no external dependencies (like a database)
 
-Integration tests require suitable mysql and postgres databases to be setup in advance. 
+Integration tests require suitable mysql and postgres databases to be setup in advance.
 Running the integration tests *will* rewrite data and schema for the "mysql2psql_test" databases in mysql and postgres. Don't use this database for anything else!
 
-mysql on localhost:3306
-- database created called "mysql2psql_test"
-- user setup for "mysql2psql" with no password
-- e.g. 
+Setting up mysql on localhost:3306
+- create a database called "mysql2psql_test"
+- setup a user "mysql2psql" with no password
+
+e.g.
+
   mysqladmin -uroot -p create mysql2psql_test
   mysql -uroot -p -e "grant all on mysql2psql_test.* to 'mysql2psql'@'localhost';"
   # verify connecction:
   mysql -umysql2psql -e "select database(),'yes' as connected" mysql2psql_test
-  
-postgres on localhost:5432
-- database created called "mysql2psql_test" 
-- role (user) access setup for "mysql2psql" with no password
-- e.g.
+
+
+Setting up PostgreSQL on localhost:5432
+- create a database called "mysql2psql_test"
+- setup a role (user) "mysql2psql" with no password
+
+e.g.
+
   psql postgres -c "create role mysql2psql with login"
   psql postgres -c "create database mysql2psql_test with owner mysql2psql encoding='UTF8'"
   # verify connection:
   psql mysql2psql_test -U mysql2psql -c "\c"
 
+
 == Notes, Limitations, Outstanding Issues..
 
-Todo:
+=== Todo
 - more tests
-- release gem
-- a windows cmd shim
 
-=== note from mgkimsal
-I'm still having trouble with bit(1)/boolean fields
-workaround I've found is to put output in file
-then in VIM on file, search/replace the true/false binary fields with t/f
-specifically
-
-(reversed on 3/23 - should be ^A gets f)
-:%s/^@/t/g
-:%s/^A/f/g
-keystrokes are ctrl-v ctrl-shift-@ to get the 'true' binary field
-keystrokes are ctrl-v ctrl-shift-A to get the 'false' binary field
 
 == Contributors
 Project founded by Max Lapshin <max@maxidoors.ru>
@@ -129,7 +132,4 @@ Other contributors (in git log order):
 - Neszt Tibor <neszt@tvnetwork.hu>
 - Miroslav Kratochvil <exa.exa@gmail.com>
 - Paul Gallagher <gallagher.paul@gmail.com>
-
-
- 
-
+- James Coleman <jtc331@gmail.com>

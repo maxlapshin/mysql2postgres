@@ -30,7 +30,7 @@ begin
       "Paul Gallagher <gallagher.paul@gmail.com>"
       ]
     gem.add_dependency "mysql", "= 2.8.1"
-    gem.add_dependency "pg", "= 0.9.0"
+    gem.add_dependency "pg", "~> 0.11.0"
     gem.add_development_dependency "test-unit", ">= 2.1.1"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
@@ -63,9 +63,11 @@ end
 begin
   require 'rcov/rcovtask'
   Rcov::RcovTask.new do |test|
-    test.libs << 'test'
+    test.libs << 'lib'
+    test.libs << 'test/lib'
     test.pattern = 'test/**/*test.rb'
     test.verbose = true
+    test.rcov_opts << "--exclude gems/*"
   end
 rescue LoadError
   task :rcov do
