@@ -38,7 +38,7 @@ EOF
     end
   end
   
-  def write_table(table)
+  def write_table(table, options)
     primary_keys = []
     serial_key = nil
     maxval = nil
@@ -51,7 +51,7 @@ EOF
       if column[:primary_key]
         primary_keys << column[:name]
       end
-      "  " + column_description(column)
+      "  " + column_description(column, options)
     end.join(",\n")
     
     if serial_key

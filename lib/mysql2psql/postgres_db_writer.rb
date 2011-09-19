@@ -33,7 +33,7 @@ class PostgresDbWriter < PostgresWriter
     (!rc.nil?) && (rc.to_a.length==1) && (rc.first.count.to_i==1)
   end
   
-  def write_table(table)
+  def write_table(table, options)
     puts "Creating table #{table.name}..."
     primary_keys = []
     serial_key = nil
@@ -47,7 +47,7 @@ class PostgresDbWriter < PostgresWriter
       if column[:primary_key]
         primary_keys << column[:name]
       end
-      "  " + column_description(column)
+      "  " + column_description(column, options)
     end.join(",\n")
     
     if serial_key

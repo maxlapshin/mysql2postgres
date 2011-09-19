@@ -5,11 +5,11 @@ require 'mysql2psql/writer'
 class Mysql2psql
 
   class PostgresWriter < Writer
-    def column_description(column)
-      "#{PGconn.quote_ident(column[:name])} #{column_type_info(column)}"
+    def column_description(column, options)
+      "#{PGconn.quote_ident(column[:name])} #{column_type_info(column, options)}"
     end
 
-    def column_type(column)
+    def column_type(column, options={})
       if column[:auto_increment]
         'integer'
       else
@@ -25,9 +25,9 @@ class Mysql2psql
         when 'decimal'
           "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
         when 'datetime', 'timestamp'
-          'timestamp without time zone'
+          "timestamp with#{options[:use_timezones] ? '' : 'out'} time zone"
         when 'time'
-          'time without time zone'
+          "time with#{options[:use_timezones] ? '' : 'out'} time zone"
         when 'tinyblob', 'mediumblob', 'longblob', 'blob', 'varbinary'
           'bytea'
         when 'tinytext', 'mediumtext', 'longtext', 'text'
@@ -93,8 +93,8 @@ class Mysql2psql
       end
     end
 
-    def column_type_info(column)
-      type = column_type(column)
+    def column_type_info(column, options)
+      type = column_type(column, options)
       if type
         not_null = !column[:null] || column[:auto_increment] ? ' NOT NULL' : ''
         default = column[:default] || column[:auto_increment] ? " DEFAULT #{column_default(column)}" : ''

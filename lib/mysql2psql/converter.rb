@@ -13,6 +13,7 @@ class Mysql2psql
       @supress_data = options.supress_data(false)
       @supress_ddl = options.supress_ddl(false)
       @force_truncate = options.force_truncate(false)
+      @use_timezones = options.use_timezones(false)
     end
   
     def convert
@@ -24,7 +25,7 @@ class Mysql2psql
 
 
       tables.each do |table|
-        writer.write_table(table)
+        writer.write_table(table, {:use_timezones => @use_timezones})
       end unless @supress_ddl
  
       _time2 = Time.now

@@ -27,7 +27,7 @@ Please review the configuration and retry..\n\n\n")
       file.close
     end
 
-    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], supress_data = false, supress_ddl = false, force_truncate = false)
+    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], supress_data = false, supress_ddl = false, force_truncate = false, use_timezones = false)
       configtext = <<EOS
 mysql:
  hostname: localhost
@@ -92,6 +92,15 @@ EOS
 force_truncate: #{force_truncate}
 EOS
       end
+      if !use_timezones.nil?
+        configtext += <<EOS
+        
+# if use_timezones is true, timestamp/time columns will be created in postgres as "with time zone"
+# rather than "without time zone"
+use_timezones: false
+EOS
+      end
+      
       configtext
     end
     
