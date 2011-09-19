@@ -31,6 +31,7 @@ INSERT INTO numeric_types_basics VALUES
 ( 5,  127, 255, 32767, 65535, 8388607, 16777215, 2147483647, 4294967295, 2147483647, 4294967295, 9223372036854775807, 18446744073709551615, 1, 1, 1, 1, 1, 1);
 
 
+
 DROP TABLE IF EXISTS basic_autoincrement;
 CREATE TABLE basic_autoincrement (
   auto_id INT(11) NOT NULL AUTO_INCREMENT,
@@ -85,3 +86,34 @@ INSERT INTO test_boolean_conversion (test_name, tinyint_1) VALUES ('test-true-no
 CREATE OR REPLACE VIEW test_view AS
 SELECT b.test_name
 FROM test_boolean_conversion b;
+
+DROP TABLE IF EXISTS test_null_conversion;
+CREATE TABLE test_null_conversion (column_a VARCHAR(10));
+INSERT INTO test_null_conversion (column_a) VALUES (NULL);
+
+DROP TABLE IF EXISTS test_datetime_conversion;
+CREATE TABLE test_datetime_conversion (
+	column_a DATETIME,
+	column_b TIMESTAMP,
+	column_c DATETIME DEFAULT '0000-00-00',
+	column_d DATETIME DEFAULT '0000-00-00 00:00',
+	column_e DATETIME DEFAULT '0000-00-00 00:00:00',
+	column_f TIME
+);
+INSERT INTO test_datetime_conversion (column_a, column_f) VALUES ('0000-00-00 00:00', '08:15:30');
+
+DROP TABLE IF EXISTS test_index_conversion;
+CREATE TABLE test_index_conversion (column_a VARCHAR(10));
+CREATE UNIQUE INDEX test_index_conversion ON test_index_conversion (column_a);
+
+DROP TABLE IF EXISTS test_foreign_keys_child;
+DROP TABLE IF EXISTS test_foreign_keys_parent;
+CREATE TABLE test_foreign_keys_parent (id INT NOT NULL, PRIMARY KEY (id)) ENGINE=INNODB;
+CREATE TABLE test_foreign_keys_child (id INT, test_foreign_keys_parent_id INT,
+	INDEX par_ind (test_foreign_keys_parent_id),
+	FOREIGN KEY (test_foreign_keys_parent_id) REFERENCES test_foreign_keys_parent(id) ON DELETE CASCADE
+) ENGINE=INNODB;
+
+DROP TABLE IF EXISTS test_enum;
+CREATE TABLE test_enum (name ENUM('small', 'medium', 'large'));
+INSERT INTO test_enum (name) VALUES ('medium');

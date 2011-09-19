@@ -10,10 +10,6 @@ class Mysql2psql
     end
 
     def column_type(column)
-      column_type_info(column).split(" ").first
-    end
-
-    def column_type(column)
       if column[:auto_increment]
         'integer'
       else

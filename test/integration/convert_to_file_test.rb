@@ -114,4 +114,8 @@ class ConvertToFileTest < Test::Unit::TestCase
   def test_should_not_copy_views_as_tables
     assert_no_match /CREATE TABLE "test_view"/, content
   end
+  
+  def test_truncate
+    assert_match /TRUNCATE/, content
+  end
 end
