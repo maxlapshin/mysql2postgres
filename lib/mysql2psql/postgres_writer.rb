@@ -131,7 +131,17 @@ class Mysql2psql
           if column_type(column) == "bytea"
             row[index] = PGconn.escape_bytea(row[index])
           else
-            row[index] = row[index].gsub(/\\/, '\\\\\\').gsub(/\n/,'\n').gsub(/\t/,'\t').gsub(/\r/,'\r')
+            if row[index] == '\N' || row[index] == '\.'
+              row[index] = '\\' + row[index] # Escape our two PostgreSQL-text-mode-special strings.
+            else
+              # Awesome side-effect producing conditional. Don't do this at home.
+              unless row[index].gsub!(/\0/, '').nil?
+                puts "Removed null bytes from string since PostgreSQL TEXT types don't allow the storage of null bytes."
+              end
+              
+              row[index] = row[index].dump
+              row[index] = row[index].slice(1, row[index].size-2)
+            end
           end
         elsif row[index].nil?
           # Note: '\N' not "\N" is correct here:
