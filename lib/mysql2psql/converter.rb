@@ -2,7 +2,7 @@ class Mysql2psql
 
   class Converter
     attr_reader :reader, :writer, :options
-    attr_reader :exclude_tables, :only_tables, :suppress_data, :suppress_ddl, :force_truncate
+    attr_reader :exclude_tables, :only_tables, :suppress_data, :suppress_ddl, :force_truncate, :suppress_indexes
 
     def initialize(reader, writer, options)
       @reader = reader
@@ -13,6 +13,7 @@ class Mysql2psql
       @suppress_data = options.suppress_data(false)
       @suppress_ddl = options.suppress_ddl(false)
       @force_truncate = options.force_truncate(false)
+      @suppress_indexes = options.suppress_indexes(false)
     end
 
     def convert
@@ -35,7 +36,7 @@ class Mysql2psql
 
       _time3 = Time.now
       tables.each do |table|
-        writer.write_indexes(table)
+        writer.write_indexes(table) unless @suppress_indexes
       end unless @suppress_ddl
       tables.each do |table|
         writer.write_constraints(table)

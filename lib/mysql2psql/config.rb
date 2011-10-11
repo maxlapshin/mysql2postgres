@@ -27,7 +27,7 @@ Please review the configuration and retry..\n\n\n")
       file.close
     end
 
-    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], suppress_data = false, suppress_ddl = false, force_truncate = false)
+    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], suppress_data = false, suppress_ddl = false, force_truncate = false, suppress_indexes = false)
       configtext = <<EOS
 mysql:
  hostname: localhost
@@ -90,6 +90,12 @@ EOS
 
 # if force_truncate is true, forces a table truncate before table loading
 force_truncate: #{force_truncate}
+EOS
+      if !suppress_indexes.nil?
+        configtext += <<EOS
+
+# if suppress_indexes is true, indexes will not be exported/migrated
+suppress_indexes: #{suppress_indexes}
 EOS
       end
       configtext

@@ -36,3 +36,6 @@ suppress_ddl: false
 
 # if force_truncate is true, forces a table truncate before table loading
 force_truncate: false
+
+# if suppress_indexes is true, indexes will not be exported/migrated.
+suppress_indexes: false
