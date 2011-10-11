@@ -91,6 +91,7 @@ EOS
 # if force_truncate is true, forces a table truncate before table loading
 force_truncate: #{force_truncate}
 EOS
+      end
       if !suppress_indexes.nil?
         configtext += <<EOS
 
