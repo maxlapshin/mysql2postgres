@@ -1,13 +1,13 @@
 require 'mysql2psql/config_base'
 
 class Mysql2psql
-  
+
   class Config < ConfigBase
-    
+
     def initialize(configfilepath, generate_default_if_not_found = true)
       unless File.exists?(configfilepath)
         reset_configfile(configfilepath) if generate_default_if_not_found
-        if File.exists?(configfilepath) 
+        if File.exists?(configfilepath)
           raise Mysql2psql::ConfigurationFileInitialized.new("\n
 No configuration file found.
 A new file has been initialized at: #{configfilepath}
@@ -27,14 +27,14 @@ Please review the configuration and retry..\n\n\n")
       file.close
     end
 
-    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], supress_data = false, supress_ddl = false, force_truncate = false)
+    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], suppress_data = false, suppress_ddl = false, force_truncate = false)
       configtext = <<EOS
 mysql:
  hostname: localhost
  port: 3306
  socket:
  username: mysql2psql
- password: 
+ password:
  database: mysql2psql_test
 
 destination:
@@ -44,7 +44,7 @@ destination:
   hostname: localhost
   port: 5432
   username: mysql2psql
-  password: 
+  password:
   database: mysql2psql_test
 
 # if tables is given, only the listed tables will be converted.  leave empty to convert all tables.
@@ -71,18 +71,18 @@ EOS
           configtext += "- #{t}\n"
         end
       end
-      if !supress_data.nil?
+      if !suppress_data.nil?
         configtext += <<EOS
 
-# if supress_data is true, only the schema definition will be exported/migrated, and not the data
-supress_data: #{supress_data}
+# if suppress_data is true, only the schema definition will be exported/migrated, and not the data
+suppress_data: #{suppress_data}
 EOS
       end
-      if !supress_ddl.nil?
+      if !suppress_ddl.nil?
         configtext += <<EOS
 
-# if supress_ddl is true, only the data will be exported/imported, and not the schema
-supress_ddl: #{supress_ddl}
+# if suppress_ddl is true, only the data will be exported/imported, and not the schema
+suppress_ddl: #{suppress_ddl}
 EOS
       end
       if !force_truncate.nil?
@@ -94,7 +94,7 @@ EOS
       end
       configtext
     end
-    
+
   end
 
 end

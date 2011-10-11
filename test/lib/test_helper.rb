@@ -26,7 +26,7 @@ def get_test_reader(options)
   require 'mysql2psql/mysql_reader'
   Mysql2psql::MysqlReader.new(options)
 rescue
-  raise StandardError.new("Failed to initialize integration test db. See README for setup requirements.")  
+  raise StandardError.new("Failed to initialize integration test db. See README for setup requirements.")
 end
 
 def get_test_file_writer(options)
@@ -55,11 +55,11 @@ def get_temp_file(basename)
 end
 
 
-def get_new_test_config(to_file = true, include_tables = [], exclude_tables = [], supress_data = false, supress_ddl = false, force_truncate = false)
+def get_new_test_config(to_file = true, include_tables = [], exclude_tables = [], suppress_data = false, suppress_ddl = false, force_truncate = false)
   require 'mysql2psql/config'
   require 'mysql2psql/config_base'
   to_filename = to_file ? get_temp_file('mysql2psql_tmp_output') : nil
-  configtext = Mysql2psql::Config.template(to_filename, include_tables, exclude_tables, supress_data, supress_ddl, force_truncate)
+  configtext = Mysql2psql::Config.template(to_filename, include_tables, exclude_tables, suppress_data, suppress_ddl, force_truncate)
   configfile=get_temp_file('mysql2psql_tmp_config')
   File.open(configfile, 'w') {|f| f.write(configtext) }
   Mysql2psql::ConfigBase.new( configfile )
