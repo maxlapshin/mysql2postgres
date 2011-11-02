@@ -27,7 +27,7 @@ Please review the configuration and retry..\n\n\n")
       file.close
     end
 
-    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], supress_data = false, supress_ddl = false, force_truncate = false, use_timezones = false)
+    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], supress_data = false, supress_ddl = false, supress_sequence_update = false, force_truncate = false, use_timezones = false)
       configtext = <<EOS
 mysql:
  hostname: localhost
@@ -83,6 +83,15 @@ EOS
 
 # if supress_ddl is true, only the data will be exported/imported, and not the schema
 supress_ddl: #{supress_ddl}
+EOS
+      end
+      if !supress_sequence_update.nil?
+        configtext += <<EOS
+
+# if supress_sequence_update is true, the sequences for serial (auto-incrementing) columns
+# will not be update to the current maximum value of that column in the database
+# if supress_ddl is not set to true, then this option is implied to be false as well (unless overridden here)
+supress_sequence_update: #{supress_sequence_update}
 EOS
       end
       if !force_truncate.nil?

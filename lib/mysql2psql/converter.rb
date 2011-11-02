@@ -2,7 +2,7 @@ class Mysql2psql
 
   class Converter
     attr_reader :reader, :writer, :options
-    attr_reader :exclude_tables, :only_tables, :supress_data, :supress_ddl, :force_truncate
+    attr_reader :exclude_tables, :only_tables, :supress_data, :supress_ddl, :supress_sequence_update, :force_truncate
   
     def initialize(reader, writer, options)
       @reader = reader
@@ -12,6 +12,7 @@ class Mysql2psql
       @only_tables = options.only_tables(nil)
       @supress_data = options.supress_data(false)
       @supress_ddl = options.supress_ddl(false)
+      @supress_sequence_update
       @force_truncate = options.force_truncate(false)
       @use_timezones = options.use_timezones(false)
     end
@@ -23,6 +24,9 @@ class Mysql2psql
         reject {|table| @exclude_tables.include?(table.name)}.
         select {|table| @only_tables ? @only_tables.include?(table.name) : true}
 
+      tables.each do |table|
+        writer.write_sequence_update(table, options)
+      end if !(@supress_sequence_update && @supress_ddl)
 
       tables.each do |table|
         writer.write_table(table, {:use_timezones => @use_timezones})
