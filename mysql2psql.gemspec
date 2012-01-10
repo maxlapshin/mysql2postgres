@@ -49,7 +49,7 @@ Gem::Specification.new do |s|
     "test/units/config_test.rb",
     "test/units/postgres_file_writer_test.rb"
   ]
-  s.homepage = %q{http://github.com/tardate/mysql2postgresql}
+  s.homepage = %q{https://github.com/tardate/mysql2postgres}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.7.2}
   s.summary = %q{Tool for converting mysql database to postgresql}

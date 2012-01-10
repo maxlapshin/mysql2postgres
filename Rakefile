@@ -13,7 +13,7 @@ begin
     gem.description = %Q{It can create postgresql dump from mysql database or directly load data from mysql to
     postgresql (at about 100 000 records per minute). Translates most data types and indexes.}
     gem.email = "gallagher.paul@gmail.com"
-    gem.homepage = "http://github.com/tardate/mysql2postgresql"
+    gem.homepage = "https://github.com/tardate/mysql2postgres"
     gem.authors = [
       "Max Lapshin <max@maxidoors.ru>",
       "Anton Ageev <anton@ageev.name>",
