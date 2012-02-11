@@ -27,46 +27,54 @@ class PostgresDbWriter < PostgresWriter
   def close
     @conn.close
   end
-
+  
   def exists?(relname)
     rc = @conn.exec("SELECT COUNT(*) FROM pg_class WHERE relname = '#{relname}'")
     (!rc.nil?) && (rc.to_a.length==1) && (rc.first.count.to_i==1)
   end
   
-  def write_table(table)
+  def write_sequence_update(table, options)
+    serial_key_column = table.columns.detect do |column|
+      column[:auto_increment]
+    end
+    
+    if serial_key_column
+      serial_key = serial_key_column[:name]
+      max_value = serial_key_column[:maxval].to_i < 1 ? 1 : serial_key_column[:maxval] + 1
+      serial_key_seq = "#{table.name}_#{serial_key}_seq"
+      
+      if !options.supress_ddl
+        if @conn.server_version < 80200
+          @conn.exec("DROP SEQUENCE #{serial_key_seq} CASCADE") if exists?(serial_key_seq)
+        else
+          @conn.exec("DROP SEQUENCE IF EXISTS #{serial_key_seq} CASCADE")
+        end
+        @conn.exec <<-EOF
+          CREATE SEQUENCE #{serial_key_seq}
+          INCREMENT BY 1
+          NO MAXVALUE
+          NO MINVALUE
+          CACHE 1
+        EOF
+      end
+      
+      if !options.supress_sequence_update
+        puts "Updated sequence #{serial_key_seq} to current value of #{max_value}"
+        @conn.exec sqlfor_set_serial_sequence(table, serial_key_seq, max_value)
+      end
+    end
+  end
+  
+  def write_table(table, options)
     puts "Creating table #{table.name}..."
     primary_keys = []
-    serial_key = nil
-    maxval = nil
     
     columns = table.columns.map do |column|
-      if column[:auto_increment]
-        serial_key = column[:name]
-        maxval = column[:maxval].to_i < 1 ? 1 : column[:maxval] + 1
-      end
       if column[:primary_key]
         primary_keys << column[:name]
       end
-      "  " + column_description(column)
+      "  " + column_description(column, options)
     end.join(",\n")
-    
-    if serial_key
-      if @conn.server_version < 80200
-        serial_key_seq = "#{table.name}_#{serial_key}_seq"
-        @conn.exec("DROP SEQUENCE #{serial_key_seq} CASCADE") if exists?(serial_key_seq)
-      else
-        @conn.exec("DROP SEQUENCE IF EXISTS #{table.name}_#{serial_key}_seq CASCADE")
-      end
-      @conn.exec <<-EOF
-        CREATE SEQUENCE #{table.name}_#{serial_key}_seq
-        INCREMENT BY 1
-        NO MAXVALUE
-        NO MINVALUE
-        CACHE 1
-      EOF
-    
-      @conn.exec sqlfor_set_serial_sequence(table,serial_key,maxval)
-    end
     
     if @conn.server_version < 80200
       @conn.exec "DROP TABLE #{PGconn.quote_ident(table.name)} CASCADE;" if exists?(table.name)

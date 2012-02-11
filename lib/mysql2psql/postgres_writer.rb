@@ -5,15 +5,11 @@ require 'mysql2psql/writer'
 class Mysql2psql
 
   class PostgresWriter < Writer
-    def column_description(column)
-      "#{PGconn.quote_ident(column[:name])} #{column_type_info(column)}"
+    def column_description(column, options)
+      "#{PGconn.quote_ident(column[:name])} #{column_type_info(column, options)}"
     end
 
-    def column_type(column)
-      column_type_info(column).split(" ").first
-    end
-
-    def column_type(column)
+    def column_type(column, options={})
       if column[:auto_increment]
         'integer'
       else
@@ -29,9 +25,9 @@ class Mysql2psql
         when 'decimal'
           "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
         when 'datetime', 'timestamp'
-          'timestamp without time zone'
+          "timestamp with#{options[:use_timezones] ? '' : 'out'} time zone"
         when 'time'
-          'time without time zone'
+          "time with#{options[:use_timezones] ? '' : 'out'} time zone"
         when 'tinyblob', 'mediumblob', 'longblob', 'blob', 'varbinary'
           'bytea'
         when 'tinytext', 'mediumtext', 'longtext', 'text'
@@ -97,8 +93,8 @@ class Mysql2psql
       end
     end
 
-    def column_type_info(column)
-      type = column_type(column)
+    def column_type_info(column, options)
+      type = column_type(column, options)
       if type
         not_null = !column[:null] || column[:auto_increment] ? ' NOT NULL' : ''
         default = column[:default] || column[:auto_increment] ? " DEFAULT #{column_default(column)}" : ''
@@ -131,7 +127,17 @@ class Mysql2psql
           if column_type(column) == "bytea"
             row[index] = PGconn.escape_bytea(row[index])
           else
-            row[index] = row[index].gsub(/\\/, '\\\\\\').gsub(/\n/,'\n').gsub(/\t/,'\t').gsub(/\r/,'\r')
+            if row[index] == '\N' || row[index] == '\.'
+              row[index] = '\\' + row[index] # Escape our two PostgreSQL-text-mode-special strings.
+            else
+              # Awesome side-effect producing conditional. Don't do this at home.
+              unless row[index].gsub!(/\0/, '').nil?
+                puts "Removed null bytes from string since PostgreSQL TEXT types don't allow the storage of null bytes."
+              end
+              
+              row[index] = row[index].dump
+              row[index] = row[index].slice(1, row[index].size-2)
+            end
           end
         elsif row[index].nil?
           # Note: '\N' not "\N" is correct here:
@@ -145,11 +151,11 @@ class Mysql2psql
     def truncate(table)
     end
 
-    def sqlfor_set_serial_sequence(table,serial_key,maxval)
-      "SELECT pg_catalog.setval('#{table.name}_#{serial_key}_seq', #{maxval}, true);"
+    def sqlfor_set_serial_sequence(table, serial_key_seq, max_value)
+      "SELECT pg_catalog.setval('#{serial_key_seq}', #{max_value}, true);"
     end
-    def sqlfor_reset_serial_sequence(table,serial_key,maxval)
-      "SELECT pg_catalog.setval(pg_get_serial_sequence('#{table.name}', '#{serial_key}'), #{maxval}, true);"
+    def sqlfor_reset_serial_sequence(table, serial_key, max_value)
+      "SELECT pg_catalog.setval(pg_get_serial_sequence('#{table.name}', '#{serial_key}'), #{max_value}, true);"
     end
 
   end
