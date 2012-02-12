@@ -43,17 +43,22 @@ class ConfigTest < Test::Unit::TestCase
   def test_template_option_suppress_data
     expected = true
     value = Mysql2psql::Config.template({ :suppress_data => expected })
-    assert_match /supress_data: #{expected}/,value #NB: option spelling needs fixing
+    assert_match /suppress_data: #{expected}/,value #NB: option spelling needs fixing
   end
   def test_template_option_suppress_ddl
     expected = true
     value = Mysql2psql::Config.template({ :suppress_ddl => expected })
-    assert_match /supress_ddl: #{expected}/,value #NB: option spelling needs fixing
+    assert_match /suppress_ddl: #{expected}/,value #NB: option spelling needs fixing
   end
   def test_template_option_suppress_sequence_update
     expected = true
     value = Mysql2psql::Config.template({ :suppress_sequence_update => expected })
-    assert_match /supress_sequence_update: #{expected}/,value #NB: option spelling needs fixing
+    assert_match /suppress_sequence_update: #{expected}/,value #NB: option spelling needs fixing
+  end
+  def test_template_option_suppress_indexes
+    expected = true
+    value = Mysql2psql::Config.template({ :suppress_indexes => expected })
+    assert_match /suppress_indexes: #{expected}/,value #NB: option spelling needs fixing
   end
   def test_template_option_force_truncate
     expected = true

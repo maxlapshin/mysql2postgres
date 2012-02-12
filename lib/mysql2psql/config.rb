@@ -103,10 +103,10 @@ EOS
       if !options[:suppress_sequence_update].nil?
         configtext += <<EOS
 
-# if supress_sequence_update is true, the sequences for serial (auto-incrementing) columns
+# if suppress_sequence_update is true, the sequences for serial (auto-incrementing) columns
 # will not be update to the current maximum value of that column in the database
-# if supress_ddl is not set to true, then this option is implied to be false as well (unless overridden here)
-supress_sequence_update: #{options[:suppress_sequence_update]}
+# if suppress_ddl is not set to true, then this option is implied to be false as well (unless overridden here)
+suppress_sequence_update: #{options[:suppress_sequence_update]}
 EOS
       end
 

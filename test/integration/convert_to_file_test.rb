@@ -116,7 +116,6 @@ class ConvertToFileTest < Test::Unit::TestCase
   end
   
   def test_truncate
-    puts content.inspect
     assert_match /TRUNCATE/, content
   end
 end

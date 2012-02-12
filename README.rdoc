@@ -134,3 +134,4 @@ Contributors (roughly git log order):
 - {Paul Gallagher}[https://github.com/tardate] <gallagher.paul@gmail.com>
 - {James Coleman}[https://github.com/jcoleman] <jtc331@gmail.com>
 - {Aaron Peckham}[https://github.com/apeckham]
+- {James Tippett}[https://github.com/jtippett]
