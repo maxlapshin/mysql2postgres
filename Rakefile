@@ -32,7 +32,8 @@ begin
       "Aaron Peckham",
       "James Tippett",
       "Tim Morgan",
-      "dakhota"
+      "dakhota",
+      "Matthew Soldo"
     ]
     gem.add_dependency "mysql", "= 2.8.1"
     gem.add_dependency "pg", "~> 0.11.0"

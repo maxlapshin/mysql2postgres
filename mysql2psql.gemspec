@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Max Lapshin <max@maxidoors.ru>", "Anton Ageev <anton@ageev.name>", "Samuel Tribehou <cracoucax@gmail.com>", "Marco Nenciarini <marco.nenciarini@devise.it>", "James Nobis <jnobis@jnobis.controldocs.com>", "quel <github@quelrod.net>", "Holger Amann <keeney@fehu.org>", "Maxim Dobriakov <closer.main@gmail.com>", "Michael Kimsal <mgkimsal@gmail.com>", "Jacob Coby <jcoby@portallabs.com>", "Neszt Tibor <neszt@tvnetwork.hu>", "Miroslav Kratochvil <exa.exa@gmail.com>", "Paul Gallagher <gallagher.paul@gmail.com>", "James Coleman <jtc331@gmail.com>", "Aaron Peckham", "James Tippett", "Tim Morgan", "dakhota"]
+  s.authors = ["Max Lapshin <max@maxidoors.ru>", "Anton Ageev <anton@ageev.name>", "Samuel Tribehou <cracoucax@gmail.com>", "Marco Nenciarini <marco.nenciarini@devise.it>", "James Nobis <jnobis@jnobis.controldocs.com>", "quel <github@quelrod.net>", "Holger Amann <keeney@fehu.org>", "Maxim Dobriakov <closer.main@gmail.com>", "Michael Kimsal <mgkimsal@gmail.com>", "Jacob Coby <jcoby@portallabs.com>", "Neszt Tibor <neszt@tvnetwork.hu>", "Miroslav Kratochvil <exa.exa@gmail.com>", "Paul Gallagher <gallagher.paul@gmail.com>", "James Coleman <jtc331@gmail.com>", "Aaron Peckham", "James Tippett", "Tim Morgan", "dakhota", "Matthew Soldo"]
   s.date = %q{2012-02-13}
   s.default_executable = %q{mysql2psql}
   s.description = %q{It can create postgresql dump from mysql database or directly load data from mysql to
@@ -79,6 +79,11 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<jeweler>, ["~> 1.5.2"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.21"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.5.2"])
+      s.add_development_dependency(%q<bundler>, ["~> 1.0.21"])
+      s.add_development_dependency(%q<jeweler>, ["~> 1.5.2"])
+      s.add_development_dependency(%q<test-unit>, [">= 2.1.1"])
+      s.add_development_dependency(%q<rake>, ["~> 0.9.2.2"])
+      s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_development_dependency(%q<test-unit>, [">= 2.1.1"])
       s.add_development_dependency(%q<rake>, ["~> 0.9.2.2"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
@@ -102,6 +107,11 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
       s.add_dependency(%q<bundler>, ["~> 1.0.21"])
       s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
+      s.add_dependency(%q<bundler>, ["~> 1.0.21"])
+      s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
+      s.add_dependency(%q<test-unit>, [">= 2.1.1"])
+      s.add_dependency(%q<rake>, ["~> 0.9.2.2"])
+      s.add_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_dependency(%q<test-unit>, [">= 2.1.1"])
       s.add_dependency(%q<rake>, ["~> 0.9.2.2"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
@@ -126,6 +136,11 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
     s.add_dependency(%q<bundler>, ["~> 1.0.21"])
     s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
+    s.add_dependency(%q<bundler>, ["~> 1.0.21"])
+    s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
+    s.add_dependency(%q<test-unit>, [">= 2.1.1"])
+    s.add_dependency(%q<rake>, ["~> 0.9.2.2"])
+    s.add_dependency(%q<rdoc>, ["~> 3.12"])
     s.add_dependency(%q<test-unit>, [">= 2.1.1"])
     s.add_dependency(%q<rake>, ["~> 0.9.2.2"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])

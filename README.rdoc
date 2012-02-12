@@ -146,3 +146,4 @@ Contributors (roughly git log order):
 - {James Tippett}[https://github.com/jtippett]
 - {Tim Morgan}[https://github.com/seven1m]
 - {dakhota}[https://github.com/dakhota]
+- {Matthew Soldo}[https://github.com/mattsoldo]
