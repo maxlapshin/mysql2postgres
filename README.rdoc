@@ -61,7 +61,7 @@ NB: With Ruby 1.8.x, the gem install will usually complain about "No definition 
 * Make sure to add tests for it. This is important so no-one unintentionally breaks it in a future version.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so the gem maintainers can cherry-pick around it.
 * Send a pull request
-
+  
 == Getting the source
 Mysql2psql was first produced by Max Lapshin <max@maxidoors.ru> who maintains the master
 repository at https://github.com/maxlapshin/mysql2postgres
@@ -71,6 +71,15 @@ the repository is at https://github.com/tardate/mysql2postgres
 
 Gem packaging is done with Jeweler. Note that on windows this means you must run under mingw or other shell that supports git to do the gem bundling (but you can gem install the built gem in the normal Windows shell).
 
+== Setting up for development
+
+The project includes a Gemfile so with bundler you can install gem dependencies with:
+
+  gem install bundler # if not already installed
+  bundle install
+
+Note comments 'Database driver dependencies' regarding issues that you may encounter with the mysql gem.
+  
 == Running tests
 If you fork/clone the project, you will want to run the test suite (and add to it if you are developing new features or fixing bugs).
 
@@ -135,3 +144,4 @@ Contributors (roughly git log order):
 - {James Coleman}[https://github.com/jcoleman] <jtc331@gmail.com>
 - {Aaron Peckham}[https://github.com/apeckham]
 - {James Tippett}[https://github.com/jtippett]
+- {Tim Morgan}[https://github.com/seven1m]

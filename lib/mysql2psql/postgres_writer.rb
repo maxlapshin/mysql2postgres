@@ -23,7 +23,8 @@ class Mysql2psql
         when 'real', /float/, 'double precision'
           'double precision'
         when 'decimal'
-          "numeric(#{column[:length] || 10}, #{column[:decimals] || 0})"
+          # TODO: seven1m thinks "real" instead?
+          "numeric(#{column[:length] || 10}, #{column[:decimals] || 5})"
         when 'datetime', 'timestamp'
           "timestamp with#{options[:use_timezones] ? '' : 'out'} time zone"
         when 'time'
@@ -107,7 +108,11 @@ class Mysql2psql
     def process_row(table, row)
       table.columns.each_with_index do |column, index|
         if column[:type] == 'time'
-          row[index] = "%02d:%02d:%02d" % [row[index].hour, row[index].minute, row[index].second]
+          begin
+            row[index] = "%02d:%02d:%02d" % [row[index].hour, row[index].minute, row[index].second]
+          rescue
+            # Don't fail on nil date/time.
+          end
         elsif row[index].is_a?(Mysql::Time)
           row[index] = row[index].to_s.gsub('0000-00-00 00:00', '1970-01-01 00:00')
           row[index] = row[index].to_s.gsub('0000-00-00 00:00:00', '1970-01-01 00:00:00')
@@ -142,7 +147,7 @@ class Mysql2psql
         elsif row[index].nil?
           # Note: '\N' not "\N" is correct here:
           #       The string containing the literal backslash followed by 'N'
-          #       represents database NULL value in PostgreSQL's text mode. 
+          #       represents database NULL value in PostgreSQL's text mode.
           row[index] = '\N'
         end
       end

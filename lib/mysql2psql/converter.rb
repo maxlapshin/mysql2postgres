@@ -54,6 +54,7 @@ class Mysql2psql
       return 0
     rescue => e
       $stderr.puts "Mysql2psql: conversion failed: #{e.to_s}"
+      $stderr.puts e.backtrace
       return -1
     end
   end

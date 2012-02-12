@@ -116,7 +116,7 @@ class PostgresDbWriter < PostgresWriter
 
   def write_constraints(table)
     table.foreign_keys.each do |key|
-      key_sql = "ALTER TABLE #{PGconn.quote_ident(table.name)} ADD FOREIGN KEY (#{PGconn.quote_ident(key[:column])}) REFERENCES #{PGconn.quote_ident(key[:ref_table])}(#{PGconn.quote_ident(key[:ref_column])})"
+      key_sql = "ALTER TABLE #{PGconn.quote_ident(table.name)} ADD FOREIGN KEY (#{key[:column].map{|c|PGconn.quote_ident(c)}.join(', ')}) REFERENCES #{PGconn.quote_ident(key[:ref_table])}(#{key[:ref_column].map{|c|PGconn.quote_ident(c)}.join(', ')}) ON UPDATE #{key[:on_update]} ON DELETE #{key[:on_delete]}"
       begin
         @conn.exec(key_sql)
       rescue Exception => e

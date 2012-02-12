@@ -30,7 +30,8 @@ begin
       "Paul Gallagher <gallagher.paul@gmail.com>",
       "James Coleman <jtc331@gmail.com>",
       "Aaron Peckham",
-      "James Tippett"
+      "James Tippett",
+      "Tim Morgan"
     ]
     gem.add_dependency "mysql", "= 2.8.1"
     gem.add_dependency "pg", "~> 0.11.0"

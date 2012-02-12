@@ -2,8 +2,6 @@ PATH
   remote: .
   specs:
     mysql2psql (0.2.0)
-      bundler (~> 1.0.21)
-      jeweler (~> 1.5.2)
       mysql (= 2.8.1)
       mysql2psql
       pg (~> 0.11.0)
