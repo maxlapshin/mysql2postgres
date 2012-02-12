@@ -27,11 +27,16 @@ begin
       "Jacob Coby <jcoby@portallabs.com>",
       "Neszt Tibor <neszt@tvnetwork.hu>",
       "Miroslav Kratochvil <exa.exa@gmail.com>",
-      "Paul Gallagher <gallagher.paul@gmail.com>"
-      ]
+      "Paul Gallagher <gallagher.paul@gmail.com>",
+      "James Coleman <jtc331@gmail.com>",
+      "Aaron Peckham",
+      "James Tippett"
+    ]
     gem.add_dependency "mysql", "= 2.8.1"
     gem.add_dependency "pg", "~> 0.11.0"
     gem.add_development_dependency "test-unit", ">= 2.1.1"
+    gem.add_development_dependency "rake", "~> 0.9.2.2"
+    gem.add_development_dependency "rdoc", "~> 3.12"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
@@ -75,15 +80,13 @@ rescue LoadError
   end
 end
 
-
 task :default => :test
 
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
+require 'rdoc/task'
+RDoc::Task.new do |rdoc|
   version = Mysql2psql::Version::STRING
 
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "mysql2psql #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+  rdoc.rdoc_files.include("README*", "lib/**/*.rb")
 end

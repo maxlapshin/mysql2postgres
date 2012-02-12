@@ -1,3 +1,11 @@
+0.2.2 Feb 13, 2012
+===
+
+* merge contributions from: James Coleman, Aaron Peckham, James Tippett
+* breaking change: note that "supress*" configuration parameters now use correct spelling. Existing config files you may have will need housekeeping.
+* new configuration options: suppress_sequence_update; suppress_indexes; use_timezones
+* adds a Gemfile to help setup development environment
+
 0.1.1 May 3, 2011
 ===
 
