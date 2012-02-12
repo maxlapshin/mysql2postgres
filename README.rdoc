@@ -94,7 +94,7 @@ e.g.
 
   mysqladmin -uroot -p create mysql2psql_test
   mysql -uroot -p -e "grant all on mysql2psql_test.* to 'mysql2psql'@'localhost';"
-  # verify connecction:
+  # verify connection:
   mysql -umysql2psql -e "select database(),'yes' as connected" mysql2psql_test
 
 

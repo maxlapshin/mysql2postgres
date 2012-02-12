@@ -4,4 +4,6 @@ test/fixtures/test*.sql
 pkg
 .redcar
 .rvmrc
+.bundle
+*.out
 

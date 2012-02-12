@@ -4,7 +4,7 @@ mysql:
  socket:
  username: somename
  password: secretpassword
- database: somename 
+ database: somename
 
 destination:
  # if file is given, output goes to file, else postgres
@@ -34,5 +34,14 @@ supress_data: true
 # if supress_ddl is true, only the data will be exported/imported, and not the schema
 supress_ddl: false
 
+# if supress_sequence_update is true, the sequences for serial (auto-incrementing) columns
+# will not be update to the current maximum value of that column in the database
+# if supress_ddl is not set to true, then this option is implied to be false as well (unless overridden here)
+supress_sequence_update: false
+
 # if force_truncate is true, forces a table truncate before table loading
 force_truncate: false
+
+# if use_timezones is true, timestamp/time columns will be created in postgres as "with time zone"
+# rather than "without time zone"
+use_timezones: false
