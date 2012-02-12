@@ -104,7 +104,7 @@ INSERT INTO test_datetime_conversion (column_a, column_f) VALUES ('0000-00-00 00
 
 DROP TABLE IF EXISTS test_index_conversion;
 CREATE TABLE test_index_conversion (column_a VARCHAR(10));
-CREATE UNIQUE INDEX test_index_conversion ON test_index_conversion (column_a);
+CREATE UNIQUE INDEX index_test_index_conversion_on_column_a ON test_index_conversion (column_a);
 
 DROP TABLE IF EXISTS test_foreign_keys_child;
 DROP TABLE IF EXISTS test_foreign_keys_parent;

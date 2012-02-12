@@ -101,8 +101,13 @@ class ConvertToDbTest < Test::Unit::TestCase
   end
   
   def test_index_conversion
-    result = exec_sql_on_psql('SELECT pg_get_indexdef(indexrelid) FROM pg_index WHERE indrelid = \'test_index_conversion\'::regclass').first
-    assert_equal "CREATE UNIQUE INDEX test_index_conversion_column_a_idx ON test_index_conversion USING btree (column_a)", result["pg_get_indexdef"]
+    result = exec_sql_on_psql(%(
+       SELECT pg_get_indexdef(indexrelid)
+       FROM pg_index
+       join pg_class on pg_class.oid=pg_index.indrelid
+       where pg_class.relname='test_index_conversion'
+    )).first
+    assert_equal "CREATE UNIQUE INDEX index_test_index_conversion_on_column_a ON test_index_conversion USING btree (column_a)", result["pg_get_indexdef"]
   end
   
   def test_foreign_keys

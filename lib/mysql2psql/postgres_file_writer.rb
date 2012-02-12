@@ -68,7 +68,7 @@ EOF
       
       if !options.supress_sequence_update
         @f << <<-EOF
-#{sqlfor_set_serial_sequence(table, serial_key_seq, max_value)} 
+#{sqlfor_set_serial_sequence(table, serial_key_seq, max_value)}
 EOF
       end
     end

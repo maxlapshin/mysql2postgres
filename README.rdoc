@@ -112,14 +112,14 @@ e.g.
 
 == Notes, Limitations, Outstanding Issues..
 
-=== Todo
-- more tests
+* index migration doesn't handle cases where the index name is the same as a table name (this is ok on MYSQL by not PostgreSQL). Workaround: manual migration required.
+* more test coverage, as always...
 
 
 == Contributors
 Project founded by Max Lapshin <max@maxidoors.ru>
 
-Other contributors (in git log order):
+Contributors (roughly git log order):
 - Anton Ageev <anton@ageev.name>
 - Samuel Tribehou <cracoucax@gmail.com>
 - Marco Nenciarini <marco.nenciarini@devise.it>
@@ -131,5 +131,6 @@ Other contributors (in git log order):
 - Jacob Coby <jcoby@portallabs.com>
 - Neszt Tibor <neszt@tvnetwork.hu>
 - Miroslav Kratochvil <exa.exa@gmail.com>
-- Paul Gallagher <gallagher.paul@gmail.com>
-- James Coleman <jtc331@gmail.com>
+- {Paul Gallagher}[https://github.com/tardate] <gallagher.paul@gmail.com>
+- {James Coleman}[https://github.com/jcoleman] <jtc331@gmail.com>
+- {Aaron Peckham}[https://github.com/apeckham]

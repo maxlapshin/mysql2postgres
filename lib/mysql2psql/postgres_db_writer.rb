@@ -8,8 +8,8 @@ class PostgresDbWriter < PostgresWriter
   attr_reader :conn, :hostname, :login, :password, :database, :schema, :port
   
   def initialize(options)
-    @hostname, @login, @password, @database, @port =  
-      options.pghostname('localhost'), options.pgusername, 
+    @hostname, @login, @password, @database, @port =
+      options.pghostname('localhost'), options.pgusername,
       options.pgpassword, options.pgdatabase, options.pgport(5432).to_s
     @database, @schema = database.split(":")
     open
@@ -21,7 +21,7 @@ class PostgresDbWriter < PostgresWriter
     @conn.exec("SET client_encoding = 'UTF8'")
     @conn.exec("SET standard_conforming_strings = off") if @conn.server_version >= 80200
     @conn.exec("SET check_function_bodies = false")
-    @conn.exec("SET client_min_messages = warning")    
+    @conn.exec("SET client_min_messages = warning")
   end
   
   def close
@@ -91,21 +91,21 @@ class PostgresDbWriter < PostgresWriter
     puts "Created table #{table.name}"
  
   end
-  
+
   def write_indexes(table)
     puts "Indexing table #{table.name}..."
     if primary_index = table.indexes.find {|index| index[:primary]}
-      @conn.exec("ALTER TABLE #{PGconn.quote_ident(table.name)} ADD CONSTRAINT \"#{table.name}_pkey\" PRIMARY KEY(#{primary_index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")})")
+      index_sql = "ALTER TABLE #{PGconn.quote_ident(table.name)} ADD CONSTRAINT \"#{table.name}_pkey\" PRIMARY KEY(#{primary_index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")})"
+      @conn.exec(index_sql)
     end
-    
+
     table.indexes.each do |index|
       next if index[:primary]
       unique = index[:unique] ? "UNIQUE " : nil
-      
-      @conn.exec("CREATE #{unique}INDEX ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});")
+      index_sql = "CREATE #{unique}INDEX #{PGconn.quote_ident(index[:name])} ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});"
+      @conn.exec(index_sql)
     end
-    
-    
+
     #@conn.exec("VACUUM FULL ANALYZE #{PGconn.quote_ident(table.name)}")
     puts "Indexed table #{table.name}"
   rescue Exception => e
@@ -113,7 +113,7 @@ class PostgresDbWriter < PostgresWriter
     puts e
     puts e.backtrace[0,3].join("\n")
   end
-  
+
   def write_constraints(table)
     table.foreign_keys.each do |key|
       key_sql = "ALTER TABLE #{PGconn.quote_ident(table.name)} ADD FOREIGN KEY (#{PGconn.quote_ident(key[:column])}) REFERENCES #{PGconn.quote_ident(key[:ref_table])}(#{PGconn.quote_ident(key[:ref_column])})"
