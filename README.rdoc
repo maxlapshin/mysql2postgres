@@ -121,7 +121,6 @@ e.g.
 
 == Notes, Limitations, Outstanding Issues..
 
-* index migration doesn't handle cases where the index name is the same as a table name (this is ok on MYSQL by not PostgreSQL). Workaround: manual migration required.
 * more test coverage, as always...
 
 

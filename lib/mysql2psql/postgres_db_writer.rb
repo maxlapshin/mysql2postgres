@@ -102,7 +102,26 @@ class PostgresDbWriter < PostgresWriter
     table.indexes.each do |index|
       next if index[:primary]
       unique = index[:unique] ? "UNIQUE " : nil
-      index_sql = "CREATE #{unique}INDEX #{PGconn.quote_ident(index[:name])} ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});"
+      
+      # MySQL allows an index name which could be equal to a table name, Postgres doesn't
+      indexname = index[:name]
+      indexname_quoted = ''
+
+      if indexname.eql?(table.name)
+        indexname = (@conn.server_version < 90000) ? "#{indexname}_index" : nil
+        puts "WARNING: index \"#{index[:name]}\" equals table name. This is not allowed in PostgreSQL and will be renamed."
+      end
+
+      if indexname
+        indexname_quoted = PGconn.quote_ident(indexname)
+        if @conn.server_version < 80200
+          @conn.exec("DROP INDEX #{PGconn.quote_ident(indexname)} CASCADE;") if exists?(indexname)
+        else
+          @conn.exec("DROP INDEX IF EXISTS #{PGconn.quote_ident(indexname)} CASCADE;")
+        end
+      end
+      
+      index_sql = "CREATE #{unique}INDEX #{indexname_quoted} ON #{PGconn.quote_ident(table.name)} (#{index[:columns].map {|col| PGconn.quote_ident(col)}.join(", ")});"
       @conn.exec(index_sql)
     end
 
