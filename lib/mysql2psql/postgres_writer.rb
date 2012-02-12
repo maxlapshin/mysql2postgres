@@ -52,9 +52,9 @@ class Mysql2psql
       elsif column[:default]
         case column[:type]
         when 'char'
-          "#{column[:default]}::char"
+          "'#{PGconn.escape(column[:default])}'::char"
         when 'varchar', /^enum/
-          "'#{column[:default]}'::character varying"
+          "'#{PGconn.escape(column[:default])}'::character varying"
         when 'integer', 'bigint', /tinyint|smallint/
           column[:default].to_i
         when 'real', /float/
@@ -82,10 +82,10 @@ class Mysql2psql
           when '0000-00-00 00:00:00'
             "'1970-01-01 00:00:00'"
           else
-            "'#{column[:default]}'"
+            "'#{PGconn.escape(column[:default])}'"
           end
         when 'time'
-          "'#{column[:default]}'"
+          "'#{PGconn.escape(column[:default])}'"
         else
           # TODO: column[:default] will never be nil here.
           #       Perhaps we should also issue a warning if this case is encountered.
