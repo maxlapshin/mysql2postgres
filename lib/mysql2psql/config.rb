@@ -1,9 +1,9 @@
 require 'mysql2psql/config_base'
 
 class Mysql2psql
-  
+
   class Config < ConfigBase
-    
+
     def initialize(configfilepath, generate_default_if_not_found = true)
       unless File.exists?(configfilepath)
         reset_configfile(configfilepath) if generate_default_if_not_found
@@ -34,6 +34,7 @@ Please review the configuration and retry..\n\n\n")
     # :suppress_data - default: false
     # :suppress_ddl - default: false
     # :suppress_sequence_update - default: false
+    # :suppress_indexes - default: false
     # :force_truncate - default: false
     # :use_timezones - default: false
     def self.template(options={})
@@ -86,16 +87,16 @@ EOS
       if !options[:suppress_data].nil?
         configtext += <<EOS
 
-# if supress_data is true, only the schema definition will be exported/migrated, and not the data
-supress_data: #{options[:suppress_data]}
+# if suppress_data is true, only the schema definition will be exported/migrated, and not the data
+suppress_data: #{options[:suppress_data]}
 EOS
       end
 
       if !options[:suppress_ddl].nil?
         configtext += <<EOS
 
-# if supress_ddl is true, only the data will be exported/imported, and not the schema
-supress_ddl: #{options[:suppress_ddl]}
+# if suppress_ddl is true, only the data will be exported/imported, and not the schema
+suppress_ddl: #{options[:suppress_ddl]}
 EOS
       end
 
@@ -125,10 +126,17 @@ EOS
 use_timezones: #{options[:use_timezones]}
 EOS
       end
-      
+
+      if !options[:suppress_indexes].nil?
+        configtext += <<EOS
+
+# if suppress_indexes is true, indexes will not be exported/migrated
+suppress_indexes: #{options[:suppress_indexes]}
+EOS
+      end
       configtext
     end
-    
+
   end
 
 end

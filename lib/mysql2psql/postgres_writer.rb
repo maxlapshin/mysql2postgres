@@ -53,7 +53,7 @@ class Mysql2psql
         when 'char'
           "#{column[:default]}::char"
         when 'varchar', /^enum/
-          "#{column[:default]}::character varying"
+          "'#{column[:default]}'::character varying"
         when 'integer', 'bigint', /tinyint|smallint/
           column[:default].to_i
         when 'real', /float/

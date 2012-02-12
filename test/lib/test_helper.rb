@@ -54,7 +54,6 @@ def get_temp_file(basename)
   path
 end
 
-
 def get_new_test_config(options={})
   require 'mysql2psql/config'
   require 'mysql2psql/config_base'
@@ -78,7 +77,10 @@ def get_test_config_by_label(name)
       :exclude_tables => ['kryptonite'],
       :suppress_data => true,
       :suppress_ddl => true,
-      :force_truncate => false
+      :supress_sequence_update => false,
+      :suppress_indexes => false,
+      :force_truncate => false,
+      :use_timezones => false
     }
   when :localmysql_to_file_convert_all
     {
@@ -87,7 +89,10 @@ def get_test_config_by_label(name)
       :exclude_tables => [],
       :suppress_data => false,
       :suppress_ddl => false,
-      :force_truncate => true
+      :supress_sequence_update => false,
+      :suppress_indexes => false,
+      :force_truncate => true,
+      :use_timezones => false
     }
   when :localmysql_to_db_convert_all
     {
@@ -96,7 +101,10 @@ def get_test_config_by_label(name)
       :exclude_tables => [],
       :suppress_data => false,
       :suppress_ddl => false,
-      :force_truncate => false
+      :supress_sequence_update => false,
+      :suppress_indexes => false,
+      :force_truncate => false,
+      :use_timezones => false
     }
   when :localmysql_to_db_convert_nothing
     {
@@ -105,7 +113,10 @@ def get_test_config_by_label(name)
       :exclude_tables => ['kryptonite'],
       :suppress_data => true,
       :suppress_ddl => true,
-      :force_truncate => false
+      :supress_sequence_update => false,
+      :suppress_indexes => false,
+      :force_truncate => false,
+      :use_timezones => false
     }
   else
     raise StandardError.new("Invalid label: #{name}")
