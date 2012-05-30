@@ -106,10 +106,10 @@ class Mysql2psql
             next unless line =~ / KEY /
             index = {}
             if match_data = /CONSTRAINT `(\w+)` FOREIGN KEY \((.*?)\) REFERENCES `(\w+)` \((.*?)\)(.*)/.match(line)
-              index[:name] = match_data[1]
-              index[:column] = match_data[2].parse_csv(:quote_char => '`',:col_sep => ', ')
+              index[:name] = "fk_"+name+"_"+match_data[1]
+              index[:column] = match_data[2].gsub!('`','').split(', ')
               index[:ref_table] = match_data[3]
-              index[:ref_column] = match_data[4].parse_csv(:quote_char => '`',:col_sep => ', ')
+              index[:ref_column] = match_data[4].gsub!('`','').split(', ')
               
               the_rest = match_data[5]
 
@@ -127,7 +127,7 @@ class Mysql2psql
               
               @foreign_keys << index
             elsif match_data = /KEY `(\w+)` \((.*)\)/.match(line)
-              index[:name] = match_data[1]
+              index[:name] = "idx_"+name+"_"+match_data[1]
               index[:columns] = match_data[2].split(",").map {|col| col[/`(\w+)`/, 1]}
               index[:unique] = true if line =~ /UNIQUE/
               @indexes << index
