@@ -28,12 +28,16 @@ class Mysql2psql
     
       def convert_type(type)
         case type
-        when /int.* unsigned/
+        when /^int.* unsigned/
           "bigint"
         when /bigint/
           "bigint"
         when "bit(1)"
           "boolean"
+        when /smallint.* unsigned/
+          "integer"
+        when /smallint/
+          "smallint"
         when "tinyint(1)"
           "boolean"
         when /tinyint/
@@ -44,13 +48,15 @@ class Mysql2psql
           "varchar"
         when /char/
           "char"
-        when /(float|decimal)/
+        when /decimal/
           "decimal"
-        when /double/
-           "double precision"
+        when /float/
+          "float"
+        when /real|double/
+          "double precision"
         else
           type
-        end 
+        end
       end
     
       def load_columns
@@ -60,6 +66,7 @@ class Mysql2psql
         fields = []
         @reader.mysql.query("EXPLAIN `#{name}`") do |res|
           while field = res.fetch_row do
+            length = -1
             length = field[1][/\((\d+)\)/, 1] if field[1] =~ /\((\d+)\)/
             length = field[1][/\((\d+),(\d+)\)/, 1] if field[1] =~ /\((\d+),(\d+)\)/
             desc = {
@@ -88,7 +95,7 @@ class Mysql2psql
     
       def indexes
         load_indexes unless @indexes
-        @indexes 
+        @indexes
       end
  
       def foreign_keys
@@ -147,7 +154,7 @@ class Mysql2psql
       end
     
       def has_id?
-        !!columns.find {|col| col[:name] == "id"} 
+        !!columns.find {|col| col[:name] == "id"}
       end
     
       def count_for_pager
@@ -175,9 +182,9 @@ class Mysql2psql
     end
   
     def initialize(options)
-      @host, @user, @passwd, @db, @port, @sock, @flag = 
-        options.mysqlhostname('localhost'), options.mysqlusername, 
-        options.mysqlpassword, options.mysqldatabase, 
+      @host, @user, @passwd, @db, @port, @sock, @flag =
+        options.mysqlhostname('localhost'), options.mysqlusername,
+        options.mysqlpassword, options.mysqldatabase,
         options.mysqlport, options.mysqlsocket
       @port = nil if @port == ""  # for things like Amazon's RDS you don't have a port and connect fails with "" for a value
       @sock = nil if @sock == ""
@@ -186,9 +193,22 @@ class Mysql2psql
     end
   
     attr_reader :mysql
-  
+    
+    def views
+      unless defined? @views
+        @mysql.query("SELECT t.TABLE_NAME FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = '#{@db}' AND t.TABLE_TYPE = 'VIEW';") do |res|
+          @views = []
+          res.each { |row| @views << row[0] }
+        end
+      end
+      
+      @views
+    end
+    
     def tables
-      @tables ||= @mysql.list_tables.map {|table| Table.new(self, table)}
+      @tables ||= (@mysql.list_tables - views).map do |table|
+        Table.new(self, table)
+      end
     end
   
     def paginated_read(table, page_size)

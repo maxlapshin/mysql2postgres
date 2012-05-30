@@ -1,0 +1,19 @@
+0.2.2 Feb 13, 2012
+===
+
+* merge contributions from: James Coleman, Aaron Peckham, James Tippett
+* breaking change: note that "supress*" configuration parameters now use correct spelling. Existing config files you may have will need housekeeping.
+* new configuration options: suppress_sequence_update; suppress_indexes; use_timezones
+* adds a Gemfile to help setup development environment
+
+0.1.1 May 3, 2011
+===
+
+* updated for pg driver ~> 0.11.0
+* add a check for mysql cmd, e.g. mysql or mysql5
+* remove deprecated feature per gem -v 1.7.2
+
+0.1.0 September 18, 2010
+===
+
+* Initial packaging as a gem

@@ -33,47 +33,58 @@ TRUNCATE #{PGconn.quote_ident(table.name)} CASCADE;
 EOF
     if serial_key
     @f << <<-EOF
-SELECT pg_catalog.setval(pg_get_serial_sequence('#{table.name}', '#{serial_key}'), #{maxval}, true);
+#{sqlfor_reset_serial_sequence(table,serial_key,maxval)}
 EOF
     end
   end
   
-  def write_table(table)
+  def write_sequence_update(table, options)
+    serial_key_column = table.columns.detect do |column|
+      column[:auto_increment]
+    end
+    
+    if serial_key_column
+      serial_key = serial_key_column[:name]
+      serial_key_seq = "#{table.name}_#{serial_key}_seq"
+      max_value = serial_key_column[:maxval].to_i < 1 ? 1 : serial_key_column[:maxval] + 1
+      
+      @f << <<-EOF
+--
+-- Name: #{serial_key_seq}; Type: SEQUENCE; Schema: public
+--
+EOF
+
+      if !options.supress_ddl
+        @f << <<-EOF
+DROP SEQUENCE IF EXISTS #{serial_key_seq} CASCADE;
+ 
+CREATE SEQUENCE #{serial_key_seq}
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+EOF
+      end
+      
+      if !options.supress_sequence_update
+        @f << <<-EOF
+#{sqlfor_set_serial_sequence(table, serial_key_seq, max_value)}
+EOF
+      end
+    end
+  end
+  
+  def write_table(table, options)
     primary_keys = []
     serial_key = nil
     maxval = nil
     
     columns = table.columns.map do |column|
-      if column[:auto_increment]
-        serial_key = column[:name]
-        maxval = column[:maxval].to_i < 1 ? 1 : column[:maxval] + 1
-      end
       if column[:primary_key]
         primary_keys << column[:name]
       end
-      "  " + column_description(column)
+      "  " + column_description(column, options)
     end.join(",\n")
-    
-    if serial_key
-      
-      @f << <<-EOF
---
--- Name: #{table.name}_#{serial_key}_seq; Type: SEQUENCE; Schema: public
---
- 
-DROP SEQUENCE IF EXISTS #{table.name}_#{serial_key}_seq CASCADE;
- 
-CREATE SEQUENCE #{table.name}_#{serial_key}_seq
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-    
-    
-SELECT pg_catalog.setval('#{table.name}_#{serial_key}_seq', #{maxval}, true);
- 
-      EOF
-    end
     
     @f << <<-EOF
 -- Table: #{table.name}
@@ -126,7 +137,6 @@ COPY "#{table.name}" (#{table.columns.map {|column| PGconn.quote_ident(column[:n
 EOF
     
     reader.paginated_read(table, 1000) do |row, counter|
-      line = []
       process_row(table, row)
       @f << row.join("\t") + "\n"
     end
