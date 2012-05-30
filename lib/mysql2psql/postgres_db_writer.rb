@@ -164,16 +164,25 @@ class PostgresDbWriter < PostgresWriter
       
       if counter % 5000 == 0
         @conn.put_copy_end
+        res = @conn.get_result
+        if res.cmdtuples != 5000
+          puts "\nWARNING: #{table.name} expected 5000 tuple inserts got #{res.cmdtuples} at row #{counter}\n"
+        end
         @conn.exec(copy_line)
       end
        
     end
-    _time2 = Time.now
-    puts "\n#{_counter} rows loaded in #{((_time2 - _time1) / 60).round}min #{((_time2 - _time1) % 60).round}s"
-#    @conn.putline(".\n")
     @conn.put_copy_end
+    if _counter && (_counter % 5000) > 0
+      res = @conn.get_result
+      if res.cmdtuples != (_counter % 5000)
+        puts "\nWARNING: table #{table.name} expected #{_counter % 5000} tuple inserts got #{res.cmdtuples}\n"
+      end
+    end
+    _time2 = Time.now
+    puts "\n#{table.name} #{_counter} rows loaded in #{((_time2 - _time1) / 60).round}min #{((_time2 - _time1) % 60).round}s"
   end
-  
+
 end
 
 end
