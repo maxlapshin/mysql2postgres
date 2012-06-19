@@ -27,7 +27,7 @@ Please review the configuration and retry..\n\n\n")
       file.close
     end
 
-    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], supress_data = false, supress_ddl = false, force_truncate = false)
+    def self.template(to_filename = nil, include_tables = [], exclude_tables = [], suppress_data = false, suppress_ddl = false, force_truncate = false)
       configtext = <<EOS
 mysql:
  hostname: localhost
@@ -51,6 +51,12 @@ destination:
 #tables:
 #- table1
 #- table2
+
+# set preserve_order to true if you wish to preserve the order of the tables (listed above)
+
+#preserve_order: true
+
+
 EOS
       if include_tables.length>0
         configtext += "\ntables:\n"
@@ -71,18 +77,18 @@ EOS
           configtext += "- #{t}\n"
         end
       end
-      if !supress_data.nil?
+      if !suppress_data.nil?
         configtext += <<EOS
 
-# if supress_data is true, only the schema definition will be exported/migrated, and not the data
-supress_data: #{supress_data}
+# if suppress_data is true, only the schema definition will be exported/migrated, and not the data
+suppress_data: #{suppress_data}
 EOS
       end
-      if !supress_ddl.nil?
+      if !suppress_ddl.nil?
         configtext += <<EOS
 
-# if supress_ddl is true, only the data will be exported/imported, and not the schema
-supress_ddl: #{supress_ddl}
+# if suppress_ddl is true, only the data will be exported/imported, and not the schema
+suppress_ddl: #{suppress_ddl}
 EOS
       end
       if !force_truncate.nil?
