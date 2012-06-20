@@ -1,4 +1,4 @@
-require 'pg'
+require 'postgres-pr/postgres-compat'
 
 require 'mysql2psql/postgres_writer'
 

@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mysql2psql}
-  s.version = "0.2.0-acj"
+  s.version = "0.2.9"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Max Lapshin <max@maxidoors.ru>", "Anton Ageev <anton@ageev.name>", "Samuel Tribehou <cracoucax@gmail.com>", "Marco Nenciarini <marco.nenciarini@devise.it>", "James Nobis <jnobis@jnobis.controldocs.com>", "quel <github@quelrod.net>", "Holger Amann <keeney@fehu.org>", "Maxim Dobriakov <closer.main@gmail.com>", "Michael Kimsal <mgkimsal@gmail.com>", "Jacob Coby <jcoby@portallabs.com>", "Neszt Tibor <neszt@tvnetwork.hu>", "Miroslav Kratochvil <exa.exa@gmail.com>", "Paul Gallagher <gallagher.paul@gmail.com>", "Alex C Jokela <ajokela@umn.edu>"]
@@ -50,11 +50,11 @@ Gem::Specification.new do |s|
      "test/units/config_test.rb",
      "test/units/postgres_file_writer_test.rb"
   ]
-  s.homepage = %q{http://github.com/tardate/mysql2postgresql}
+  s.homepage = %q{https://github.com/ajokela/mysql2postgresql}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
-  s.summary = %q{Tool for converting mysql database to postgresql}
+  s.summary = %q{Tool for converting mysql database to postgresql (with pure ruby gems!)}
   s.test_files = [
     "test/integration/convert_to_db_test.rb",
      "test/integration/convert_to_file_test.rb",
@@ -74,17 +74,17 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<mysql>, ["= 2.8.1"])
-      s.add_runtime_dependency(%q<pg>, ["= 0.9.0"])
+      s.add_runtime_dependency(%q<ruby-mysql>, ["= 2.9.9"])
+      s.add_runtime_dependency(%q<postgres-pr>, ["= 0.6.3"])
       s.add_development_dependency(%q<test-unit>, [">= 2.1.1"])
     else
-      s.add_dependency(%q<mysql>, ["= 2.8.1"])
-      s.add_dependency(%q<pg>, ["= 0.9.0"])
+      s.add_dependency(%q<ruby-mysql>, ["= 2.9.9"])
+      s.add_dependency(%q<postgres-pr>, ["= 0.6.3"])
       s.add_dependency(%q<test-unit>, [">= 2.1.1"])
     end
   else
-    s.add_dependency(%q<mysql>, ["= 2.8.1"])
-    s.add_dependency(%q<pg>, ["= 0.9.0"])
+    s.add_dependency(%q<ruby-mysql>, ["= 2.9.9"])
+    s.add_dependency(%q<postgres-pr>, ["= 0.6.3"])
     s.add_dependency(%q<test-unit>, [">= 2.1.1"])
   end
 end
