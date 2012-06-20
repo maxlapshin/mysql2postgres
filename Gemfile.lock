@@ -1,21 +1,20 @@
+GIT
+  remote: git://github.com/ajokela/ruby-mysql.git
+  revision: 6228948b57b658cdbd5fd25601a2e74249606312
+  specs:
+    ruby-mysql (2.9.10)
+
 GEM
   remote: http://rubygems.org/
   specs:
-    git (1.2.5)
-    jeweler (1.6.0)
-      bundler (~> 1.0.0)
-      git (>= 1.2.5)
-      rake
-    mysql (2.8.1)
-    pg (0.11.0)
-    rake (0.8.7)
+    postgres-pr (0.6.3)
     test-unit (2.3.0)
 
 PLATFORMS
+  java
   ruby
 
 DEPENDENCIES
-  jeweler
-  mysql
-  pg
+  postgres-pr
+  ruby-mysql!
   test-unit
