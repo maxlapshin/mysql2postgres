@@ -8,10 +8,26 @@ class PostgresDbWriter < PostgresWriter
   attr_reader :conn, :hostname, :login, :password, :database, :schema, :port
   
   def initialize(options)
-    @hostname, @login, @password, @database, @port =  
-      options.pghostname('localhost'), options.pgusername, 
-      options.pgpassword, options.pgdatabase, options.pgport(5432).to_s
-    @database, @schema = database.split(":")
+    # @hostname, @login, @password, @database, @port =  
+    #  options.pghostname('localhost'), options.pgusername, 
+    #  options.pgpassword, options.pgdatabase, options.pgport(5432).to_s
+    
+    # Rails-centric stuffs
+    environment = ENV['RAILS_ENV'].nil? ? 'development' : ENV['RAILS_ENV']
+
+    if options.has_key?('config') and options['config'].has_key?('destination') and options['config']['destination'].has_key?(environment)
+      
+      pg_options = Config.new(YAML::load(options['config']['destination'][environment].to_yaml))
+      @hostname, @login, @password, @database, @port =  
+        pg_options.hostname('localhost'), pg_options.username, 
+        pg_options.password, pg_options.database, pg_options.port(5432).to_s
+        
+        @database, @schema = database.split(":")
+      
+    else
+      raise "Unable to locate PostgreSQL destination environment in database.yml"
+    end
+    
     open
   end
 
@@ -19,9 +35,11 @@ class PostgresDbWriter < PostgresWriter
     @conn = PGconn.new(hostname, port, '', '', database, login, password)
     @conn.exec("SET search_path TO #{PGconn.quote_ident(schema)}") if schema
     @conn.exec("SET client_encoding = 'UTF8'")
-    @conn.exec("SET standard_conforming_strings = off") if @conn.server_version >= 80200
+    @conn.exec("SET standard_conforming_strings = off") # if @conn.server_version >= 80200
     @conn.exec("SET check_function_bodies = false")
-    @conn.exec("SET client_min_messages = warning")    
+    # @conn.exec("SET client_min_messages = warning")
+    
+    puts "==> Connected to PostgreSQL server..."
   end
   
   def close
@@ -141,6 +159,7 @@ class PostgresDbWriter < PostgresWriter
   def write_contents(table, reader)
     _time1 = Time.now
     copy_line = "COPY #{PGconn.quote_ident(table.name)} (#{table.columns.map {|column| PGconn.quote_ident(column[:name])}.join(", ")}) FROM stdin;"
+    puts "==> '#{copy_line}'"
     @conn.exec(copy_line)
     puts "Counting rows of #{table.name}... "
     STDOUT.flush
