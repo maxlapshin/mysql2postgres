@@ -1,4 +1,6 @@
 test/fixtures/test*.sql
+*.yml
+config
 pkg
 .rvmrc
 .bundle
