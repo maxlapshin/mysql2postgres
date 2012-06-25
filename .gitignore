@@ -1,6 +1,4 @@
 test/fixtures/test*.sql
-*.yml
-config
 config/database.yml
 pkg
 .rvmrc
