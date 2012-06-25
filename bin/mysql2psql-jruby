@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+
+require 'rubygems'
+require 'bundler/setup'
+require 'active_record'
+
+require '../lib/mysql2psql'
+
+CONFIG_FILE = File.expand_path(File.expand_path(File.dirname(__FILE__)) + "/../config/database.yml")
+
+if FileTest.exist?(CONFIG_FILE)
+
+  db_yaml = YAML::load_file CONFIG_FILE
+
+  if db_yaml.has_key?('mysql2psql')
+    # puts db_yaml["mysql2psql"].to_s
+    Mysql2psql.new(db_yaml["mysql2psql"]).convert
+  else
+    # Oh Noes! There is no key in the hash...
+    raise "database.yml does not contain a configuration directive for mysql -> postgres"
+  end
+
+end
+
+# exit Mysql2psql.new(yaml).convert

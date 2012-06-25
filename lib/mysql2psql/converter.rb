@@ -17,8 +17,7 @@ class Mysql2psql
     end
   
     def convert
-      _time1 = Time.now
-
+      
       tables = reader.tables.
         reject {|table| @exclude_tables.include?(table.name)}.
         select {|table| @only_tables ? @only_tables.include?(table.name) : true}
@@ -40,13 +39,11 @@ class Mysql2psql
         writer.write_table(table)
       end unless @suppress_ddl
  
-      _time2 = Time.now
       tables.each do |table|
         writer.truncate(table) if force_truncate && suppress_ddl
         writer.write_contents(table, reader)
       end unless @suppress_data
  
-      _time3 = Time.now
       tables.each do |table|
         writer.write_indexes(table)
       end unless @suppress_ddl
@@ -54,15 +51,12 @@ class Mysql2psql
         writer.write_constraints(table)
       end unless @suppress_ddl
  
- 
       writer.close
-      _time4 = Time.now
-      puts "Table creation #{((_time2 - _time1) / 60).round} min, loading #{((_time3 - _time2) / 60).round} min, indexing #{((_time4 - _time3) / 60).round} min, total #{((_time4 - _time1) / 60).round} min"
+
       return 0
-    rescue => e
-      $stderr.puts "Mysql2psql: conversion failed: #{e.to_s}"
-      return -1
+      
     end
+        
   end
 
 end

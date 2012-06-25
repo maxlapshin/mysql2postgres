@@ -6,10 +6,11 @@ class Mysql2psql
   class ConfigBase
     attr_reader :config, :filepath
 
-    def initialize(configfilepath)
-      @filepath=configfilepath
-      @config = YAML::load(File.read(filepath))
+    def initialize(yaml)
+      @filepath=nil
+      @config = yaml #YAML::load(File.read(filepath))
     end
+    
     def [](key)
       self.send( key )
     end
@@ -21,9 +22,6 @@ class Mysql2psql
       when /mysql/i
         key=token.sub( /^mysql/, '' )
         value=config["mysql"][key]
-      when /pg/i
-        key=token.sub( /^pg/, '' )
-        value=config["destination"]["postgres"][key]
       when /dest/i
         key=token.sub( /^dest/, '' )
         value=config["destination"][key]
