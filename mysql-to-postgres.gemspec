@@ -1,6 +1,6 @@
 
 Gem::Specification.new do |s|
-  s.name = %q{mysql2psql-jruby}
+  s.name = %q{mysql-to-postgres}
   s.version = "0.2.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.default_executable = %q{mysql2psql-jruby}
   s.description = %q{Translates MySQL -> PostgreSQL via pure ruby MySQL (dumping to file); injestion via JDBC PostgreSQL}
   s.email = %q{alex@camulus.com}
-  s.executables = ["mysql2psql-jruby"]
+  s.executables = ["mysql-to-postgres"]
   s.extra_rdoc_files = [
     "README.rdoc"
   ]
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
      "MIT-LICENSE",
      "README.rdoc",
      "Rakefile",
-     "bin/mysql2psql",
+     "bin/mysql-to-postgres",
      "lib/mysql2psql.rb",
      "lib/mysql2psql/config.rb",
      "lib/mysql2psql/config_base.rb",
@@ -46,7 +46,7 @@ Gem::Specification.new do |s|
      "test/units/config_test.rb",
      "test/units/postgres_file_writer_test.rb"
   ]
-  s.homepage = %q{https://github.com/ajokela/mysql2postgresql}
+  s.homepage = %q{https://github.com/ajokela/mysql-to-postgres}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
