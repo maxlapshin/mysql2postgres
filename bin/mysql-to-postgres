@@ -17,7 +17,7 @@ else
   require 'pg'
 end
 
-require '../lib/mysql2psql'
+require 'mysql2psql'
 
 CONFIG_FILE = File.expand_path(File.expand_path(File.dirname(__FILE__)) + "/../config/database.yml")
 
@@ -44,5 +44,3 @@ if FileTest.exist?(CONFIG_FILE) or (ARGV.length > 0 and FileTest.exist?(File.exp
 else
   raise "#{base_name} does not exist"
 end
-
-# exit Mysql2psql.new(yaml).convert

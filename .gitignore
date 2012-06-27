@@ -3,4 +3,5 @@ config/database.yml
 pkg
 .rvmrc
 .bundle
+*.sql
 Gemfile.lock

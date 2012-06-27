@@ -1,6 +1,6 @@
 source :rubygems
 
-gem 'mysql-pr', :git => 'git://github.com/ajokela/mysql-pr.git'
+gem 'mysql-pr'
 gem 'postgres-pr'
 
 platforms :jruby do
