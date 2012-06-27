@@ -1,5 +1,3 @@
-require 'postgres-pr/postgres-compat'
-
 require 'mysql2psql/writer'
 
 class Mysql2psql

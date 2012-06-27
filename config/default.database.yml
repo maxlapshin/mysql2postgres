@@ -56,3 +56,6 @@ mysql2psql:
 
   preserve_order: true
 
+  remove_dump_file: true
+  
+  report_status:  json    # false, json, xml

@@ -6,7 +6,7 @@ require 'mysql2psql/mysql_reader'
 require 'mysql2psql/writer'
 require 'mysql2psql/postgres_writer'
 require 'mysql2psql/postgres_file_writer.rb'
-require 'mysql2psql/postgres_activerecord_writer.rb'
+require 'mysql2psql/postgres_db_writer.rb'
 
 class Mysql2psql
   
@@ -33,13 +33,15 @@ class Mysql2psql
     
     tag = Time.new.to_s.gsub(/((\-)|( )|(:))+/, '')
     
-    filename = tag + '_output.sql'
+    filename = File.expand_path('./' + tag + '_output.sql')
 
-    @writer = PostgresActiveRecordWriter.new(filename, options)
+    @writer = PostgresDbWriter.new(filename, options)
 
     Converter.new(reader, writer, options).convert
     
-    writer.inload
+    if options.config['remove_dump_file']
+      File.delete filename if File::exists?( filename )
+    end
         
   end
 

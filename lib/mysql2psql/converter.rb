@@ -39,10 +39,24 @@ class Mysql2psql
         writer.write_table(table)
       end unless @suppress_ddl
  
-      tables.each do |table|
-        writer.truncate(table) if force_truncate && suppress_ddl
-        writer.write_contents(table, reader)
-      end unless @suppress_data
+      # tables.each do |table|
+      #   writer.truncate(table) if force_truncate && suppress_ddl
+      #   writer.write_contents(table, reader)
+      # end unless @suppress_data
+ 
+      unless @suppress_data
+        
+        tables.each do |table|
+          writer.truncate(table) if force_truncate and suppress_ddl
+        end
+        
+        tables.each do |table|
+          writer.write_contents(table, reader)
+        end
+        
+        writer.inload
+        
+      end
  
       tables.each do |table|
         writer.write_indexes(table)
