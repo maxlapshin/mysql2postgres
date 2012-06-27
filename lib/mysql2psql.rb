@@ -14,9 +14,6 @@ class Mysql2psql
   
   def initialize(yaml)
     
-    # help if args.length==1 && args[0] =~ /^-.?|^-*he?l?p?$/i 
-    # configfile = args[0] || File.expand_path('mysql2psql.yml')
-    
     @options = Config.new( yaml )
     
   end
@@ -24,12 +21,6 @@ class Mysql2psql
   def convert
     
     @reader = MysqlReader.new( options )
-
-    # if options.destfile(nil)
-    #  @writer = PostgresFileWriter.new(options.destfile)
-    # else
-    #  @writer = PostgresDbWriter.new(options)
-    # end
     
     tag = Time.new.to_s.gsub(/((\-)|( )|(:))+/, '')
     
@@ -40,7 +31,7 @@ class Mysql2psql
     Converter.new(reader, writer, options).convert
     
     if options.config['remove_dump_file']
-      File.delete filename if File::exists?( filename )
+      File.delete filename if File::exist?( filename )
     end
         
   end

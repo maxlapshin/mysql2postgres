@@ -22,7 +22,7 @@ class Mysql2psql
         raise "Unable to locate PostgreSQL destination environment in the configuration file"
       end
       
-      if RUBY_PLATFORM == 'jruby'
+      if RUBY_PLATFORM == 'java'
         @jruby = true
         
         ActiveRecord::Base.establish_connection(
