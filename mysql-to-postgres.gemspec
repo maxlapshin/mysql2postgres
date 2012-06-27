@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.files = [
     ".gitignore",
      "MIT-LICENSE",
-     "README.rdoc",
+     "README.md",
      "Rakefile",
      "bin/mysql-to-postgres",
      "lib/mysql2psql.rb",
@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
      "lib/mysql2psql/postgres_writer.rb",
      "lib/mysql2psql/version.rb",
      "lib/mysql2psql/writer.rb",
-     "mysql2psql.gemspec",
+     "mysql-to-postgres.gemspec",
      "test/fixtures/config_all_options.yml",
      "test/fixtures/seed_integration_tests.sql",
      "test/integration/convert_to_db_test.rb",
