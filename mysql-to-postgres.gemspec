@@ -5,13 +5,11 @@ Gem::Specification.new do |s|
 
   s.authors = ["Max Lapshin <max@maxidoors.ru>", "Anton Ageev <anton@ageev.name>", "Samuel Tribehou <cracoucax@gmail.com>", "Marco Nenciarini <marco.nenciarini@devise.it>", "James Nobis <jnobis@jnobis.controldocs.com>", "quel <github@quelrod.net>", "Holger Amann <keeney@fehu.org>", "Maxim Dobriakov <closer.main@gmail.com>", "Michael Kimsal <mgkimsal@gmail.com>", "Jacob Coby <jcoby@portallabs.com>", "Neszt Tibor <neszt@tvnetwork.hu>", "Miroslav Kratochvil <exa.exa@gmail.com>", "Paul Gallagher <gallagher.paul@gmail.com>", "Alex C Jokela <ajokela@umn.edu>"]
   s.date = %q{2010-09-19}
-  s.default_executable = %q{mysql2psql-jruby}
+  s.default_executable = %q{mysql-to-postgres}
   s.description = %q{Translates MySQL -> PostgreSQL via pure ruby MySQL}
   s.email = %q{alex@camulus.com}
   s.executables = ["mysql-to-postgres"]
-  s.extra_rdoc_files = [
-    "README.rdoc"
-  ]
+
   s.files = [
     ".gitignore",
      "MIT-LICENSE",
