@@ -69,7 +69,7 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<ruby-pr>, [">= 2.9.10"])
+      s.add_runtime_dependency(%q<mysql-pr>, [">= 2.9.10"])
       s.add_runtime_dependency(%q<postgres-pr>, ["= 0.6.3"])
       s.add_development_dependency(%q<test-unit>, [">= 2.1.1"])
     else
