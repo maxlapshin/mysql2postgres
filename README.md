@@ -1,4 +1,4 @@
-= mysql-to-postgres - MySQL to PostgreSQL Data Translation
+# mysql-to-postgres - MySQL to PostgreSQL Data Translation
 
 MRI or jruby supported.
 
