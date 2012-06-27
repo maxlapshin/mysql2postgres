@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
      "lib/mysql2psql/mysql_reader.rb",
      "lib/mysql2psql/postgres_db_writer.rb",
      "lib/mysql2psql/postgres_file_writer.rb",
-     "lib/mysql2psql/postgres_activerecord_writer.rb",
+     "lib/mysql2psql/postgres_db_writer.rb",
      "lib/mysql2psql/postgres_writer.rb",
      "lib/mysql2psql/version.rb",
      "lib/mysql2psql/writer.rb",
