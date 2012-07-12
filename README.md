@@ -68,6 +68,3 @@ Sample Configuration file:
   
       report_status:  json    # false, json, xml
 
-
-== Use
-
