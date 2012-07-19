@@ -1,4 +1,7 @@
-require 'mysql'
+require "rubygems"
+require "bundler/setup"
+
+require 'mysql-pr'
 require 'csv'
 
 class Mysql2psql
@@ -9,14 +12,15 @@ class Mysql2psql
   
     class Table
       attr_reader :name
-    
+      
       def initialize(reader, name)
         @reader = reader
         @name = name
+        
       end
     
       @@types = %w(tiny enum decimal short long float double null timestamp longlong int24 date time datetime year set blob string var_string char).inject({}) do |list, type|
-        list[eval("::Mysql::Field::TYPE_#{type.upcase}")] = type
+        list[eval("::MysqlPR::Field::TYPE_#{type.upcase}")] = type
         list
       end
     
@@ -56,7 +60,7 @@ class Mysql2psql
       def load_columns
         @reader.reconnect
         result = @reader.mysql.list_fields(name)
-        mysql_flags = ::Mysql::Field.constants.select {|c| c =~ /FLAG/}
+        mysql_flags = ::MysqlPR::Field.constants.select {|c| c =~ /FLAG/}
         fields = []
         @reader.mysql.query("EXPLAIN `#{name}`") do |res|
           while field = res.fetch_row do
@@ -164,7 +168,7 @@ class Mysql2psql
     end
   
     def connect
-      @mysql = ::Mysql.connect(@host, @user, @passwd, @db, @port, @sock, @flag)
+      @mysql = ::MysqlPR.connect(@host, @user, @passwd, @db, @port)
       @mysql.query("SET NAMES utf8")
       @mysql.query("SET SESSION query_cache_type = OFF")
     end
@@ -179,7 +183,7 @@ class Mysql2psql
         options.mysqlhostname('localhost'), options.mysqlusername, 
         options.mysqlpassword, options.mysqldatabase, 
         options.mysqlport, options.mysqlsocket
-      @port = nil if @port == ""  # for things like Amazon's RDS you don't have a port and connect fails with "" for a value
+      @port = 3306 if @port == ""  # for things like Amazon's RDS you don't have a port and connect fails with "" for a value
       @sock = nil if @sock == ""
       @flag = nil if @flag == ""
       connect
