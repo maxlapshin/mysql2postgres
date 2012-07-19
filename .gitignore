@@ -1,6 +1,7 @@
-*.yml
-configs
 test/fixtures/test*.sql
+config/database.yml
 pkg
 .rvmrc
 .bundle
+*.sql
+Gemfile.lock
