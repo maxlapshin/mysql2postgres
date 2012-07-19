@@ -54,7 +54,7 @@ class ConvertToFileTest < Test::Unit::TestCase
     assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_double" double precision,.*\)', Regexp::MULTILINE).match( content )
   end
   def test_basic_numerics_float
-    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_float" numeric\(20, 0\),.*\)', Regexp::MULTILINE).match( content )
+    assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_float" double precision,.*\)', Regexp::MULTILINE).match( content )
   end
   def test_basic_numerics_decimal
     assert_not_nil Regexp.new('CREATE TABLE "numeric_types_basics".*"f_decimal" numeric\(10, 0\),.*\)', Regexp::MULTILINE).match( content )
