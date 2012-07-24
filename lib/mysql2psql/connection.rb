@@ -64,7 +64,7 @@ class Mysql2psql
       if sql.match(/^COPY /) and ! is_copying
         # sql.chomp!   # cHomp! cHomp!
 
-        $stderr.puts sql.chomp
+        $stderr.puts sql
         
         if jruby
           @stream = copy_manager.copy_in(sql)
@@ -73,6 +73,7 @@ class Mysql2psql
         end
         
         @is_copying = true
+        return
         
       elsif sql.match(/^TRUNCATE /) and ! is_copying
 
