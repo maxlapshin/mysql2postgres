@@ -87,7 +87,9 @@ class Mysql2psql
       else
         
         if is_copying
-        
+          
+          $stderr.puts "==> #{sql}"
+          
           if sql.chomp == '\.' or sql.chomp.match(/^$/)
           
             @is_copying = false
