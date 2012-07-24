@@ -75,8 +75,6 @@ class Mysql2psql
         $stderr.puts e
       end
       
-      $stderr.puts "==> Ending Copy..."
-      
     end
     
     def execute(sql)
@@ -84,8 +82,6 @@ class Mysql2psql
       if sql.match(/^COPY /) and ! is_copying
         # sql.chomp!   # cHomp! cHomp!
 
-        $stderr.puts sql + "\n"
-        
         if jruby
           @stream = copy_manager.copy_in(sql)
         else
@@ -152,8 +148,6 @@ class Mysql2psql
         
         else
           
-          $stderr.puts "==> ERR: Not Copying"
-        
         end
 
       end
