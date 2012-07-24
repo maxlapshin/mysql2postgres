@@ -102,8 +102,6 @@ class Mysql2psql
 
       else
 
-        $stderr.puts "==> #{sql}"
-        
         if is_copying
           
           if sql.chomp == '\.' or sql.chomp.match(/^$/)
