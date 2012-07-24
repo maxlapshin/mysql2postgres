@@ -83,8 +83,10 @@ class Mysql2psql
         
         $stderr.puts "===> ERR: ALTER is not implemented!"
         @is_copying = false
+      
+      end
         
-      elsif is_copying
+      if is_copying
         
         if sql.match(/^\\\.$/)
           
@@ -99,14 +101,19 @@ class Mysql2psql
         else
           
           if jruby
+            
             begin
               row = sql.to_java_bytes
               stream.write_to_copy(row, 0, row.length)
             rescue Exception => e
+              
               stream.cancel_copy
               @is_copying = false
+              $stderr.puts e
+              
               raise e
             end
+            
           else
             
             begin
