@@ -77,14 +77,16 @@ class Mysql2psql
       elsif sql.match(/^TRUNCATE /) and ! is_copying
 
         $stderr.puts "===> ERR: TRUNCATE is not implemented!"
+        @is_copying = false
         
       elsif sql.match(/^ALTER /) and ! is_copying
         
         $stderr.puts "===> ERR: ALTER is not implemented!"
+        @is_copying = false
         
       elsif is_copying
         
-        if sql.match(/^\\\./)
+        if sql.match(/^\\\.$/)
           
           @is_copying = false
           
@@ -102,6 +104,7 @@ class Mysql2psql
               stream.write_to_copy(row, 0, row.length)
             rescue Exception => e
               stream.cancel_copy
+              @is_copying = false
               raise e
             end
           else
@@ -114,6 +117,7 @@ class Mysql2psql
               end
               
             rescue Exception => e
+              @is_copying = false
               $stderr.puts e
               raise e
             end
