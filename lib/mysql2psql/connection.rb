@@ -88,7 +88,7 @@ class Mysql2psql
         
         if is_copying
         
-          if sql.chomp == '\.'
+          if sql.chomp == '\.' or sql.chomp.match(/^$/)
           
             @is_copying = false
           
