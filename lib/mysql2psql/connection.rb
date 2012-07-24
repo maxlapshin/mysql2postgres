@@ -64,7 +64,7 @@ class Mysql2psql
       if sql.match(/^COPY /) and ! is_copying
         # sql.chomp!   # cHomp! cHomp!
 
-        $stderr.puts sql
+        $stderr.puts sql + "\n"
         
         if jruby
           @stream = copy_manager.copy_in(sql)
@@ -73,7 +73,6 @@ class Mysql2psql
         end
         
         @is_copying = true
-        return
         
       elsif sql.match(/^TRUNCATE /) and ! is_copying
 
@@ -84,56 +83,61 @@ class Mysql2psql
         
         $stderr.puts "===> ERR: ALTER is not implemented!"
         @is_copying = false
-      
-      end
+
+      else
         
-      if is_copying
+        if is_copying
         
-        if sql.match(/^\\\.$/)
+          if sql.chomp == '\.'
           
-          @is_copying = false
+            @is_copying = false
           
-          if jruby
-            stream.end_copy
-          else
-            conn.put_copy_end
-          end
-          
-        else
-          
-          if jruby
-            
-            begin
-              row = sql.to_java_bytes
-              stream.write_to_copy(row, 0, row.length)
-            rescue Exception => e
-              
-              stream.cancel_copy
-              @is_copying = false
-              $stderr.puts e
-              
-              raise e
+            if jruby
+              stream.end_copy
+            else
+              conn.put_copy_end
             end
-            
+          
           else
+          
+            if jruby
             
-            begin
+              begin
+                row = sql.to_java_bytes
+                stream.write_to_copy(row, 0, row.length)
+                
+                $stderr.puts "==> Copied #{row.length} bytes..."
+                
+              rescue Exception => e
               
-              until conn.put_copy_data( sql )
-                $stderr.puts "  waiting for connection to be writable..."
-                sleep 0.1
+                stream.cancel_copy
+                @is_copying = false
+                $stderr.puts e
+              
+                raise e
               end
-              
-            rescue Exception => e
-              @is_copying = false
-              $stderr.puts e
-              raise e
-            end
             
-          end
+            else
+            
+              begin
+              
+                until conn.put_copy_data( sql )
+                  $stderr.puts "  waiting for connection to be writable..."
+                  sleep 0.1
+                end
+              
+              rescue Exception => e
+                @is_copying = false
+                $stderr.puts e
+                raise e
+              end
+            
+            end
           
-        end
+          end
         
+        end
+
       end
       
     end
