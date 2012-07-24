@@ -98,6 +98,8 @@ class Mysql2psql
               conn.put_copy_end
             end
           
+            $stderr.puts "==> Ending Copy..."
+          
           else
           
             if jruby
@@ -105,8 +107,6 @@ class Mysql2psql
               begin
                 row = sql.to_java_bytes
                 stream.write_to_copy(row, 0, row.length)
-                
-                $stderr.puts "==> Copied #{row.length} bytes..."
                 
               rescue Exception => e
               
