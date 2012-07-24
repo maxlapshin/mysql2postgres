@@ -59,6 +59,26 @@ class Mysql2psql
       
     end
     
+    def flush
+      
+      @is_copying = false
+      
+      begin
+          
+        if jruby
+          stream.end_copy
+        else
+          conn.put_copy_end
+        end
+      
+      rescue Exception => e
+        $stderr.puts e
+      end
+      
+      $stderr.puts "==> Ending Copy..."
+      
+    end
+    
     def execute(sql)
       
       if sql.match(/^COPY /) and ! is_copying
@@ -85,22 +105,14 @@ class Mysql2psql
         @is_copying = false
 
       else
+
+        $stderr.puts "==> #{sql}"
         
         if is_copying
           
-          $stderr.puts "==> #{sql}"
-          
           if sql.chomp == '\.' or sql.chomp.match(/^$/)
-          
-            @is_copying = false
-          
-            if jruby
-              stream.end_copy
-            else
-              conn.put_copy_end
-            end
-          
-            $stderr.puts "==> Ending Copy..."
+
+            flush
           
           else
           
@@ -137,6 +149,10 @@ class Mysql2psql
             end
           
           end
+        
+        else
+          
+          $stderr.puts "==> ERR: Not Copying"
         
         end
 

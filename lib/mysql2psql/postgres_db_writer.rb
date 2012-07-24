@@ -26,7 +26,9 @@ class Mysql2psql
           connection.execute(line)
           
         end
-              
+        
+        connection.flush
+        
       end
     
     end
