@@ -62,7 +62,9 @@ class Mysql2psql
     def execute(sql)
       
       if sql.match(/^COPY /) and ! is_copying
-        sql.chomp!   # cHomp! cHomp!
+        # sql.chomp!   # cHomp! cHomp!
+
+        $stderr.puts sql.chomp
         
         if jruby
           @stream = copy_manager.copy_in(sql)

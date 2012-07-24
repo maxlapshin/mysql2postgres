@@ -5,6 +5,8 @@ default: &default
   username: terrapotamus
   password: default
   host: 127.0.0.1
+  template: template_gis
+  gis_schema_name: gis_tmp 
   
 development: &development
   <<: *default
