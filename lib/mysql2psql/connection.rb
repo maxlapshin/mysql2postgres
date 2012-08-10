@@ -8,13 +8,13 @@ class Mysql2psql
     def initialize(options)
       
       # Rails-centric stuffs
-      $stderr.puts "ENV['RAILS_ENV'] = #{ENV['RAILS_ENV']}"
+      
       @environment = ENV['RAILS_ENV'].nil? ? 'development' : ENV['RAILS_ENV']
 
       if options.has_key?('config') and options['config'].has_key?('destination') and options['config']['destination'].has_key?(environment)
       
         pg_options = Config.new(YAML::load(options['config']['destination'][environment].to_yaml))
-        @hostname, @login, @password, @database, @port = pg_options.hostname('localhost'), pg_options.username, pg_options.password, pg_options.database, pg_options.port(5432).to_s  
+        @hostname, @login, @password, @database, @port = pg_options.host('localhost'), pg_options.username, pg_options.password, pg_options.database, pg_options.port(5432).to_s  
         @database, @schema = database.split(":")
       
         @adapter = pg_options.adapter("jdbcpostgresql")
