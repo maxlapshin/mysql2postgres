@@ -8,7 +8,7 @@ class Mysql2psql
     def initialize(options)
       
       # Rails-centric stuffs
-      $stderr.puts ENV
+      $stderr.puts "ENV['RAILS_ENV'] = #{ENV['RAILS_ENV']}"
       @environment = ENV['RAILS_ENV'].nil? ? 'development' : ENV['RAILS_ENV']
 
       if options.has_key?('config') and options['config'].has_key?('destination') and options['config']['destination'].has_key?(environment)
