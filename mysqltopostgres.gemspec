@@ -1,22 +1,22 @@
 
 Gem::Specification.new do |s|
-  s.name = %q{mysql-to-postgres}
-  s.version = "0.2.13"
+  s.name = %q{mysqltopostgres}
+  s.version = "0.2.14"
 
   s.authors = ["Max Lapshin <max@maxidoors.ru>", "Anton Ageev <anton@ageev.name>", "Samuel Tribehou <cracoucax@gmail.com>", "Marco Nenciarini <marco.nenciarini@devise.it>", "James Nobis <jnobis@jnobis.controldocs.com>", "quel <github@quelrod.net>", "Holger Amann <keeney@fehu.org>", "Maxim Dobriakov <closer.main@gmail.com>", "Michael Kimsal <mgkimsal@gmail.com>", "Jacob Coby <jcoby@portallabs.com>", "Neszt Tibor <neszt@tvnetwork.hu>", "Miroslav Kratochvil <exa.exa@gmail.com>", "Paul Gallagher <gallagher.paul@gmail.com>", "Alex C Jokela <ajokela@umn.edu>"]
-  s.date = %q{2010-09-19}
-  s.default_executable = %q{mysql-to-postgres}
+  s.date = %q{2012-08-20}
+  s.default_executable = %q{mysqltopostgres}
   s.description = %q{Translates MySQL -> PostgreSQL via pure ruby MySQL}
   s.email = %q{ajokela@umn.edu}
-  s.executables = ["mysql-to-postgres"]
+  s.executables = ["mysqltopostgres"]
 
   s.files = [
     ".gitignore",
      "MIT-LICENSE",
      "README.md",
      "Rakefile",
-     "bin/mysql-to-postgres",
-     "lib/mysql-to-postgres.rb",
+     "bin/mysqltopostgres",
+     "lib/mysqltopostgres.rb",
      "lib/mysql2psql/config.rb",
      "lib/mysql2psql/config_base.rb",
      "lib/mysql2psql/converter.rb",
@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
      "lib/mysql2psql/postgres_writer.rb",
      "lib/mysql2psql/version.rb",
      "lib/mysql2psql/writer.rb",
-     "mysql-to-postgres.gemspec",
+     "mysqltopostgres.gemspec",
      "test/fixtures/config_all_options.yml",
      "test/fixtures/seed_integration_tests.sql",
      "test/integration/convert_to_db_test.rb",
@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
      "test/units/config_test.rb",
      "test/units/postgres_file_writer_test.rb"
   ]
-  s.homepage = %q{https://github.com/ajokela/mysql-to-postgres}
+  s.homepage = %q{https://github.com/ajokela/mysqltopostgres}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
