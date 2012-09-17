@@ -60,4 +60,6 @@ mysql2psql:
 
   remove_dump_file: true
   
+  dump_file_directory: /tmp
+  
   report_status:  json    # false, json, xml

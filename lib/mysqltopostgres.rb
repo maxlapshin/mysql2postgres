@@ -36,8 +36,14 @@ class Mysql2psql
     @reader = MysqlReader.new( options )
     
     tag = Time.new.to_s.gsub(/((\-)|( )|(:))+/, '')
+
+    path = './'
     
-    filename = File.expand_path('./' + tag + '_output.sql')
+    unless options.config['dump_file_directory'].nil?
+      path = options.config['dump_file_directory']
+    end
+        
+    filename = File.expand_path( File.join( path, tag + '_output.sql'))
 
     @writer = PostgresDbWriter.new(filename, options)
 
