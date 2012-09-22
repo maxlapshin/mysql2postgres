@@ -60,22 +60,19 @@ class Mysql2psql
       
     end
     
+    # ensure that the copy is completed, in case we hadn't seen a '\.' in the data stream.
     def flush
-      
-      @is_copying = false
-      
       begin
-          
         if jruby
-          stream.end_copy
+          stream.end_copy if @is_copying
         else
           conn.put_copy_end
         end
-      
       rescue Exception => e
         $stderr.puts e
+      ensure
+        @is_copying = false
       end
-      
     end
     
     def execute(sql)
@@ -140,17 +137,21 @@ class Mysql2psql
                 $stderr.puts e
                 raise e
               end
-            
             end
-          
           end
-        
         else
-          
+          # not copying
         end
-
       end
-      
+    end
+
+    # we're done talking to the database, so close the connection cleanly.
+    def finish
+      if jruby
+        ActiveRecord::Base.connection_pool.checkin(@conn) if @conn
+      else
+        @conn.finish if @conn
+      end
     end
 
     # given a file containing psql syntax at path, pipe it down to the database.
@@ -162,6 +163,7 @@ class Mysql2psql
           end
           flush
         end
+        finish
       else
         raise_nil_connection
       end
