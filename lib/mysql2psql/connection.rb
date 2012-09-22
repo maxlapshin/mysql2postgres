@@ -135,17 +135,12 @@ class Mysql2psql
                 $stderr.puts e
                 raise e
               end
-            
             end
-          
           end
-        
         else
-          
+          # not copying
         end
-
       end
-      
     end
 
     # we're done talking to the database, so close the connection cleanly.
