@@ -1,6 +1,6 @@
 require 'test_helper'
 
-require 'mysql2psql'
+require 'mysqltopostgres'
 
 class ConvertToDbTest < Test::Unit::TestCase
 
