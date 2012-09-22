@@ -1,6 +1,6 @@
 require 'test_helper'
 
-require 'mysql2psql'
+require 'mysqltopostgres'
 
 class PostgresFileWriterTest < Test::Unit::TestCase
   attr_accessor :destfile

@@ -152,6 +152,21 @@ class Mysql2psql
       end
       
     end
+
+    # given a file containing psql syntax at path, pipe it down to the database.
+    def load_file(path)
+      if @conn
+        File.open(path, 'r') do |file|
+          file.each_line do |line|
+            execute(line)
+          end
+          flush
+        end
+      else
+        raise_nil_connection
+      end
+    end
+
     
     def raise_nil_connection
       raise "No Connection"
