@@ -60,16 +60,18 @@ class Mysql2psql
       
     end
     
+    # ensure that the copy is completed, in case we hadn't seen a '\.' in the data stream.
     def flush
-      @is_copying = false
       begin
         if jruby
-          stream.end_copy
+          stream.end_copy if @is_copying
         else
           conn.put_copy_end
         end
       rescue Exception => e
         $stderr.puts e
+      ensure
+        @is_copying = false
       end
     end
     
