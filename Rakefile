@@ -76,8 +76,8 @@ end
 
 task :default => :test
 
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
+require 'rdoc/task'
+RDoc::Task.new do |rdoc|
   version = Mysql2psql::Version::STRING
 
   rdoc.rdoc_dir = 'rdoc'
