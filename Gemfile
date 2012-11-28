@@ -1,5 +1,6 @@
 source :rubygems
 
+gem 'rake', '~> 10.0'
 gem 'mysql-pr'
 gem 'postgres-pr'
 
