@@ -29,6 +29,8 @@ class Mysql2psql
     
     @options = Config.new( yaml )
     
+    $stderr.puts @options.inspect
+    
   end
 
   def send_file_to_postgres(path)
