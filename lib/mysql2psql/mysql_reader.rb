@@ -179,6 +179,9 @@ class Mysql2psql
     end
   
     def initialize(options)
+      
+      $stderr.puts options.inspect
+      
       @host, @user, @passwd, @db, @port, @sock, @flag = 
         options.host('localhost'), options.mysqlusername, 
         options.mysqlpassword, options.mysqldatabase, 
