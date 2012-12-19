@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'mysql2psql/config_base'
+require 'mysqltopostgres'
 
 #
 #

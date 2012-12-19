@@ -8,29 +8,14 @@ class Mysql2psql
     attr_reader :connection, :filename
   
     def initialize(filename, options)
-
+      # note that the superclass opens and truncates filename for writing
       super(filename)
-    
       @filename = filename
-    
       @connection = Connection.new(options)
-    
     end
     
-    def inload
-  
-      File.open(filename, 'r') do |file|
-          
-        file.each_line do |line|
-          
-          connection.execute(line)
-          
-        end
-        
-        connection.flush
-        
-      end
-    
+    def inload(path = filename)
+      connection.load_file(path)    
     end
 
   end

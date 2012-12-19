@@ -30,6 +30,12 @@ class Mysql2psql
     @options = Config.new( yaml )
     
   end
+
+  def send_file_to_postgres(path)
+    connection = Connection.new(options)
+    connection.load_file(path)
+  end
+
   
   def convert
     
