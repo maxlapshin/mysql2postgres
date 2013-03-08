@@ -19,7 +19,7 @@ class Mysql2psql
     
     def inload
   
-      File.open(filename, 'r') do |file|
+      File.open(filename, 'r:UTF-8') do |file|
           
         file.each_line do |line|
           

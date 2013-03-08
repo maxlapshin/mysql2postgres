@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
      "lib/mysql2psql/config.rb",
      "lib/mysql2psql/config_base.rb",
      "lib/mysql2psql/converter.rb",
+     "lib/mysql2psql/connection.rb",
      "lib/mysql2psql/errors.rb",
      "lib/mysql2psql/mysql_reader.rb",
      "lib/mysql2psql/postgres_db_writer.rb",
