@@ -4,7 +4,7 @@ class Mysql2psql
 
 class PostgresFileWriter < PostgresWriter
   def initialize(file)
-    @f = File.open(file, "w+")
+    @f = File.open(file, "w+:UTF-8")
     @f << <<-EOF
 -- MySQL 2 PostgreSQL dump\n
 SET client_encoding = 'UTF8';
