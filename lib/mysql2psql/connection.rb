@@ -157,7 +157,7 @@ class Mysql2psql
     # given a file containing psql syntax at path, pipe it down to the database.
     def load_file(path)
       if @conn
-        File.open(path, 'r') do |file|
+        File.open(path, 'r:UTF-8') do |file|
           file.each_line do |line|
             execute(line)
           end

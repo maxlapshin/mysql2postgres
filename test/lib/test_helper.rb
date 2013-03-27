@@ -60,7 +60,7 @@ def get_new_test_config(to_file = true, include_tables = [], exclude_tables = []
   to_filename = to_file ? get_temp_file('mysql2psql_tmp_output') : nil
   configtext = Mysql2psql::Config.template(to_filename, include_tables, exclude_tables, suppress_data, suppress_ddl, force_truncate)
   configfile=get_temp_file('mysql2psql_tmp_config')
-  File.open(configfile, 'w') {|f| f.write(configtext) }
+  File.open(configfile, 'w:UTF-8') {|f| f.write(configtext) }
   Mysql2psql::ConfigBase.new( configfile )
 rescue
   raise StandardError.new("Failed to initialize options from #{configfile}. See README for setup requirements.")
