@@ -4,7 +4,7 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rubygems'
 require 'bundler/setup'
 
-require 'mysql-to-postgres'
+require 'mysqltopostgres'
 
 CONFIG_FILE = File.expand_path(File.expand_path(File.dirname(__FILE__)) + "/../config/database.yml")
 

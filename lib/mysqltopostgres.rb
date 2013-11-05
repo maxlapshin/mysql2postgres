@@ -3,12 +3,12 @@ if RUBY_PLATFORM == 'java'
   require 'active_record'
   require 'postgres-pr/postgres-compat'
 else
+  require 'pg'
   require 'pg_ext'
   require 'pg/exceptions'
   require 'pg/constants'
   require 'pg/connection'
   require 'pg/result'
-  require 'pg'
 end
 
 require 'mysql2psql/errors'
@@ -30,14 +30,26 @@ class Mysql2psql
     @options = Config.new( yaml )
     
   end
+
+  def send_file_to_postgres(path)
+    connection = Connection.new(options)
+    connection.load_file(path)
+  end
+
   
   def convert
     
     @reader = MysqlReader.new( options )
     
     tag = Time.new.to_s.gsub(/((\-)|( )|(:))+/, '')
+
+    path = './'
     
-    filename = File.expand_path('./' + tag + '_output.sql')
+    unless options.config['dump_file_directory'].nil?
+      path = options.config['dump_file_directory']
+    end
+        
+    filename = File.expand_path( File.join( path, tag + '_output.sql'))
 
     @writer = PostgresDbWriter.new(filename, options)
 

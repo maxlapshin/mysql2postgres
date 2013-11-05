@@ -8,12 +8,13 @@ class Mysql2psql
     def initialize(options)
       
       # Rails-centric stuffs
+      
       @environment = ENV['RAILS_ENV'].nil? ? 'development' : ENV['RAILS_ENV']
 
       if options.has_key?('config') and options['config'].has_key?('destination') and options['config']['destination'].has_key?(environment)
       
         pg_options = Config.new(YAML::load(options['config']['destination'][environment].to_yaml))
-        @hostname, @login, @password, @database, @port = pg_options.hostname('localhost'), pg_options.username, pg_options.password, pg_options.database, pg_options.port(5432).to_s  
+        @hostname, @login, @password, @database, @port = pg_options.host('localhost'), pg_options.username, pg_options.password, pg_options.database, pg_options.port(5432).to_s  
         @database, @schema = database.split(":")
       
         @adapter = pg_options.adapter("jdbcpostgresql")
@@ -59,11 +60,26 @@ class Mysql2psql
       
     end
     
+    # ensure that the copy is completed, in case we hadn't seen a '\.' in the data stream.
+    def flush
+      begin
+        if jruby
+          stream.end_copy if @is_copying
+        else
+          conn.put_copy_end
+        end
+      rescue Exception => e
+        $stderr.puts e
+      ensure
+        @is_copying = false
+      end
+    end
+    
     def execute(sql)
       
       if sql.match(/^COPY /) and ! is_copying
-        sql.chomp!   # cHomp! cHomp!
-        
+        # sql.chomp!   # cHomp! cHomp!
+
         if jruby
           @stream = copy_manager.copy_in(sql)
         else
@@ -75,54 +91,84 @@ class Mysql2psql
       elsif sql.match(/^TRUNCATE /) and ! is_copying
 
         $stderr.puts "===> ERR: TRUNCATE is not implemented!"
+        @is_copying = false
         
       elsif sql.match(/^ALTER /) and ! is_copying
         
         $stderr.puts "===> ERR: ALTER is not implemented!"
-        
-      elsif is_copying
-        
-        if sql.match(/^\\\./)
+        @is_copying = false
+
+      else
+
+        if is_copying
           
-          @is_copying = false
+          if sql.chomp == '\.' or sql.chomp.match(/^$/)
+
+            flush
           
-          if jruby
-            stream.end_copy
           else
-            conn.put_copy_end
-          end
           
-        else
-          
-          if jruby
-            begin
-              row = sql.to_java_bytes
-              stream.write_to_copy(row, 0, row.length)
-            rescue Exception => e
-              stream.cancel_copy
-              raise e
-            end
-          else
+            if jruby
             
-            begin
+              begin
+                row = sql.to_java_bytes
+                stream.write_to_copy(row, 0, row.length)
+                
+              rescue Exception => e
               
-              until conn.put_copy_data( sql )
-                $stderr.puts "  waiting for connection to be writable..."
-                sleep 0.1
+                stream.cancel_copy
+                @is_copying = false
+                $stderr.puts e
+              
+                raise e
               end
-              
-            rescue Exception => e
-              $stderr.puts e
-              raise e
-            end
             
+            else
+            
+              begin
+              
+                until conn.put_copy_data( sql )
+                  $stderr.puts "  waiting for connection to be writable..."
+                  sleep 0.1
+                end
+              
+              rescue Exception => e
+                @is_copying = false
+                $stderr.puts e
+                raise e
+              end
+            end
           end
-          
+        else
+          # not copying
         end
-        
       end
-      
     end
+
+    # we're done talking to the database, so close the connection cleanly.
+    def finish
+      if jruby
+        ActiveRecord::Base.connection_pool.checkin(@conn) if @conn
+      else
+        @conn.finish if @conn
+      end
+    end
+
+    # given a file containing psql syntax at path, pipe it down to the database.
+    def load_file(path)
+      if @conn
+        File.open(path, 'r:UTF-8') do |file|
+          file.each_line do |line|
+            execute(line)
+          end
+          flush
+        end
+        finish
+      else
+        raise_nil_connection
+      end
+    end
+
     
     def raise_nil_connection
       raise "No Connection"
