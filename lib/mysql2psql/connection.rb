@@ -55,7 +55,7 @@ class Mysql2psql
       end
       
       @is_copying = false
-      @current_statement = nil
+      @current_statement = ""
       
     end
     
@@ -132,20 +132,17 @@ class Mysql2psql
               end
             end
           end
-        elsif !@current_statement.nil?
+        elsif @current_statement.length > 0
           @current_statement << " "
           @current_statement << sql
-          if sql.match(/;$/)
-            if jruby
-              @conn.execute(@current_statement)
-            else
-              @conn.exec(@current_statement)
-            end
-            @current_statement = nil
-          end
         else
           # maybe a comment line?
         end
+      end
+
+      if @current_statement.match(/;$/)
+        run_statement(@current_statement)
+        @current_statement = ""
       end
     end
 
@@ -173,9 +170,22 @@ class Mysql2psql
       end
     end
 
+    def clear_schema
+      statements = ["DROP SCHEMA PUBLIC CASCADE", "CREATE SCHEMA PUBLIC"]
+      statements.each do |statement|
+        run_statement(statement)
+      end
+    end
     
     def raise_nil_connection
       raise "No Connection"
+    end
+
+    private
+
+    def run_statement(statement)
+      method = jruby ? :execute : :exec
+      @conn.send(method, statement)
     end
     
   end
