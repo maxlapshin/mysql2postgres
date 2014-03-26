@@ -54,8 +54,6 @@ class Mysql2psql
           writer.write_contents(table, reader)
         end
         
-        writer.inload
-        
       end
  
       tables.each do |table|
@@ -66,6 +64,8 @@ class Mysql2psql
       end unless @suppress_ddl
  
       writer.close
+
+      writer.inload
 
       return 0
       

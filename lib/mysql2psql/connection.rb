@@ -48,15 +48,14 @@ class Mysql2psql
         
         @conn = PG.connect( dbname: database, user: login, password: password, host: hostname, port: port )
         
-        unless conn.nil?
-          
-        else
+        if conn.nil?
           raise_nil_connection
         end
         
       end
       
       @is_copying = false
+      @current_statement = nil
       
     end
     
@@ -88,15 +87,9 @@ class Mysql2psql
         
         @is_copying = true
         
-      elsif sql.match(/^TRUNCATE /) and ! is_copying
+      elsif sql.match(/^(ALTER|CREATE|DROP|SELECT|SET|TRUNCATE) /) and ! is_copying
 
-        $stderr.puts "===> ERR: TRUNCATE is not implemented!"
-        @is_copying = false
-        
-      elsif sql.match(/^ALTER /) and ! is_copying
-        
-        $stderr.puts "===> ERR: ALTER is not implemented!"
-        @is_copying = false
+        @current_statement = sql
 
       else
 
@@ -139,8 +132,19 @@ class Mysql2psql
               end
             end
           end
+        elsif !@current_statement.nil?
+          @current_statement << " "
+          @current_statement << sql
+          if sql.match(/;$/)
+            if jruby
+              @conn.execute(@current_statement)
+            else
+              @conn.exec(@current_statement)
+            end
+            @current_statement = nil
+          end
         else
-          # not copying
+          # maybe a comment line?
         end
       end
     end
