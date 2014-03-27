@@ -18,6 +18,10 @@ class Mysql2psql
       connection.load_file(path)    
     end
 
+    def clear_schema
+      connection.clear_schema
+    end
+
   end
 
 end

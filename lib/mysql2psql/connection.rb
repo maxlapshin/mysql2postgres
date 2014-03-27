@@ -48,15 +48,14 @@ class Mysql2psql
         
         @conn = PG.connect( dbname: database, user: login, password: password, host: hostname, port: port )
         
-        unless conn.nil?
-          
-        else
+        if conn.nil?
           raise_nil_connection
         end
         
       end
       
       @is_copying = false
+      @current_statement = ""
       
     end
     
@@ -88,15 +87,9 @@ class Mysql2psql
         
         @is_copying = true
         
-      elsif sql.match(/^TRUNCATE /) and ! is_copying
+      elsif sql.match(/^(ALTER|CREATE|DROP|SELECT|SET|TRUNCATE) /) and ! is_copying
 
-        $stderr.puts "===> ERR: TRUNCATE is not implemented!"
-        @is_copying = false
-        
-      elsif sql.match(/^ALTER /) and ! is_copying
-        
-        $stderr.puts "===> ERR: ALTER is not implemented!"
-        @is_copying = false
+        @current_statement = sql
 
       else
 
@@ -139,9 +132,17 @@ class Mysql2psql
               end
             end
           end
+        elsif @current_statement.length > 0
+          @current_statement << " "
+          @current_statement << sql
         else
-          # not copying
+          # maybe a comment line?
         end
+      end
+
+      if @current_statement.match(/;$/)
+        run_statement(@current_statement)
+        @current_statement = ""
       end
     end
 
@@ -169,9 +170,22 @@ class Mysql2psql
       end
     end
 
+    def clear_schema
+      statements = ["DROP SCHEMA PUBLIC CASCADE", "CREATE SCHEMA PUBLIC"]
+      statements.each do |statement|
+        run_statement(statement)
+      end
+    end
     
     def raise_nil_connection
       raise "No Connection"
+    end
+
+    private
+
+    def run_statement(statement)
+      method = jruby ? :execute : :exec
+      @conn.send(method, statement)
     end
     
   end

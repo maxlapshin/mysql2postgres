@@ -13,7 +13,7 @@ Sample Configuration file:
       username: terrapotamus
       password: default
       host: 127.0.0.1
-  
+
     development: &development
       <<: *default
       database: default_development
@@ -36,7 +36,7 @@ Sample Configuration file:
     mysql2psql:
       mysql:
         <<: *pii
-    
+
       destination:
         production:
           <<: *production
@@ -44,7 +44,7 @@ Sample Configuration file:
           <<: *test
         development:
           <<: *development
-      
+
       tables:
       - countries
       - samples
@@ -53,18 +53,23 @@ Sample Configuration file:
       - variables
       - sample_variables
 
-      # if suppress_data is true, only the schema definition will be exported/migrated, and not the data
+      # If suppress_data is true, only the schema definition will be exported/migrated, and not the data
       suppress_data: false
 
-      # if suppress_ddl is true, only the data will be exported/imported, and not the schema
+      # If suppress_ddl is true, only the data will be exported/imported, and not the schema
       suppress_ddl: true
 
-      # if force_truncate is true, forces a table truncate before table loading
+      # If force_truncate is true, forces a table truncate before table loading
       force_truncate: false
 
       preserve_order: true
 
       remove_dump_file: true
-  
+
+      dump_file_directory: /tmp
+
       report_status:  json    # false, json, xml
 
+      # If clear_schema is true, the public schema will be recreated before conversion
+      # The import will fail if both clear_schema and suppress_ddl are true.
+      clear_schema: false
