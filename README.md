@@ -73,3 +73,5 @@ Sample Configuration file:
       # If clear_schema is true, the public schema will be recreated before conversion
       # The import will fail if both clear_schema and suppress_ddl are true.
       clear_schema: false
+
+Please note that the MySQL connection will be using socket in case the host is not defined (`nil`) or it is `'localhost'`.
