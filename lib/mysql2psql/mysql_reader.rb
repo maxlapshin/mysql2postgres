@@ -168,7 +168,7 @@ class Mysql2psql
     end
   
     def connect
-      @mysql = ::MysqlPR.connect(@host, @user, @passwd, @db, @port)
+      @mysql = ::MysqlPR.connect(@host, @user, @passwd, @db, @port, @sock)
       @mysql.charset = ::MysqlPR::Charset.by_number 192 # utf8_unicode_ci :: http://rubydoc.info/gems/mysql-pr/MysqlPR/Charset
       @mysql.query("SET NAMES utf8")
       @mysql.query("SET SESSION query_cache_type = OFF")
