@@ -1,9 +1,8 @@
 class Mysql2psql
-
   class Converter
     attr_reader :reader, :writer, :options
     attr_reader :exclude_tables, :only_tables, :suppress_data, :suppress_ddl, :force_truncate, :preserve_order, :clear_schema
-  
+
     def initialize(reader, writer, options)
       @reader = reader
       @writer = writer
@@ -16,19 +15,18 @@ class Mysql2psql
       @preserve_order = options.preserve_order(false)
       @clear_schema = options.clear_schema(false)
     end
-  
+
     def convert
-      
-      tables = reader.tables.
-        reject {|table| @exclude_tables.include?(table.name)}.
-        select {|table| @only_tables ? @only_tables.include?(table.name) : true}
+      tables = reader.tables
+        .reject { |table| @exclude_tables.include?(table.name) }
+        .select { |table| @only_tables ? @only_tables.include?(table.name) : true }
 
       if @preserve_order
 
         reordered_tables = []
 
         @only_tables.each do |only_table|
-          idx = tables.index {|table| table.name == only_table}
+          idx = tables.index { |table| table.name == only_table }
           reordered_tables << tables[idx]
         end
 
@@ -48,7 +46,7 @@ class Mysql2psql
       unless @suppress_data
 
         tables.each do |table|
-          writer.truncate(table) if force_truncate and suppress_ddl
+          writer.truncate(table) if force_truncate && suppress_ddl
         end
 
         tables.each do |table|
@@ -72,10 +70,7 @@ class Mysql2psql
 
       writer.inload
 
-      return 0
-      
+      0
     end
-        
   end
-
 end

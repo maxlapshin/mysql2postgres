@@ -1,5 +1,5 @@
 if RUBY_VERSION.match(/^1.8/)
-  raise Gem::VerificationError, "mysql-to-postgresql requires ruby flavor of version 1.9.x"
+  fail Gem::VerificationError, 'mysql-to-postgresql requires ruby flavor of version 1.9.x'
 end
 
 source :rubygems
@@ -20,5 +20,3 @@ platforms :mri_19 do
 end
 
 gem 'test-unit'
-
-
