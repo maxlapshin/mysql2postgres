@@ -4,74 +4,98 @@ MRI or jruby supported.
 
 With a bit of a modified rails database.yml configuration, you can integrate mysql-to-postgres into a project.
 
-Sample Configuration file:
+## Installation
 
-    default: &default
-      adapter: jdbcpostgresql
-      encoding: unicode
-      pool: 4
-      username: terrapotamus
-      password: default
-      host: 127.0.0.1
+### Via RubyGems
 
-    development: &development
-      <<: *default
-      database: default_development
+```sh
+gem install mysqltopostgres
+```
 
-    test: &test
-      <<: *default
-      database: default_test
+### From source
 
-    production: &production
-      <<: *default
-      database: default_production
+```sh
+git clone https://github.com/maxlapshin/mysql2postgres.git
+cd mysql2postgres
+bundle install
+gem build mysqltopostgres.gemspec
+sudo gem install mysqltopostgres-0.2.19.gem
+```
 
-    mysql_data_source: &pii
-      hostname: localhost
-      port: 3306
-      username: username
-      password: default
-      database: awesome_possum
+## Sample Configuration
 
-    mysql2psql:
-      mysql:
-        <<: *pii
+Configuration is written in [YAML format](http://www.yaml.org/ "YAML Ain't Markup Language")
+and passed as the first argument on the command line.
 
-      destination:
-        production:
-          <<: *production
-        test: 
-          <<: *test
-        development:
-          <<: *development
+```yaml
+default: &default
+  adapter: jdbcpostgresql
+  encoding: unicode
+  pool: 4
+  username: terrapotamus
+  password: default
+  host: 127.0.0.1
 
-      tables:
-      - countries
-      - samples
-      - universes
-      - variable_groups
-      - variables
-      - sample_variables
+development: &development
+  <<: *default
+  database: default_development
 
-      # If suppress_data is true, only the schema definition will be exported/migrated, and not the data
-      suppress_data: false
+test: &test
+  <<: *default
+  database: default_test
 
-      # If suppress_ddl is true, only the data will be exported/imported, and not the schema
-      suppress_ddl: true
+production: &production
+  <<: *default
+  database: default_production
 
-      # If force_truncate is true, forces a table truncate before table loading
-      force_truncate: false
+mysql_data_source: &pii
+  hostname: localhost
+  port: 3306
+  socket: /tmp/mysqld.sock
+  username: username
+  password: default
+  database: awesome_possum
 
-      preserve_order: true
+mysql2psql:
+  mysql:
+    <<: *pii
 
-      remove_dump_file: true
+  destination:
+    production:
+      <<: *production
+    test: 
+      <<: *test
+    development:
+      <<: *development
 
-      dump_file_directory: /tmp
+  tables:
+  - countries
+  - samples
+  - universes
+  - variable_groups
+  - variables
+  - sample_variables
 
-      report_status:  json    # false, json, xml
+  # If suppress_data is true, only the schema definition will be exported/migrated, and not the data
+  suppress_data: false
 
-      # If clear_schema is true, the public schema will be recreated before conversion
-      # The import will fail if both clear_schema and suppress_ddl are true.
-      clear_schema: false
+  # If suppress_ddl is true, only the data will be exported/imported, and not the schema
+  suppress_ddl: true
+
+  # If force_truncate is true, forces a table truncate before table loading
+  force_truncate: false
+
+  preserve_order: true
+
+  remove_dump_file: true
+
+  dump_file_directory: /tmp
+
+  report_status: json    # false, json, xml
+
+  # If clear_schema is true, the public schema will be recreated before conversion
+  # The import will fail if both clear_schema and suppress_ddl are true.
+  clear_schema: false
+```
 
 Please note that the MySQL connection will be using socket in case the host is not defined (`nil`) or it is `'localhost'`.
