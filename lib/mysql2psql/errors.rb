@@ -1,16 +1,14 @@
 
 class Mysql2psql
-  
   class GeneralError < StandardError
-	end
+  end
 
   class ConfigurationError < StandardError
-	end
+  end
   class UninitializedValueError < ConfigurationError
-	end
+  end
   class ConfigurationFileNotFound < ConfigurationError
-	end
+  end
   class ConfigurationFileInitialized < ConfigurationError
-	end	
-	
+  end
 end
