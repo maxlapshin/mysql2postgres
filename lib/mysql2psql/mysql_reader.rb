@@ -180,7 +180,8 @@ class Mysql2psql
       @host, @user, @passwd, @db, @port, @sock, @flag =
         options.mysqlhost('localhost'), options.mysqlusername,
         options.mysqlpassword, options.mysqldatabase,
-        options.mysqlport(3306), options.mysqlsocket
+        options.mysqlport(3306), options.mysqlsocket,
+        options.mysqlflag
       @sock = nil if @sock == ''
       @flag = nil if @flag == ''
       connect
