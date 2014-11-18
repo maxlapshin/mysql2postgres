@@ -1,12 +1,9 @@
-if RUBY_VERSION.match(/^1.8/)
-  raise Gem::VerificationError, "mysql-to-postgresql requires ruby flavor of version 1.9.x"
-end
+ruby '1.9.3'
+source 'https://rubygems.org'
 
-source :rubygems
-
-gem 'rake', '~> 10.0'
-gem 'mysql-pr'
-gem 'postgres-pr'
+gem 'rake', '~> 10.3'
+gem 'mysql-pr', '~> 2.9'
+gem 'postgres-pr', '~> 0.6'
 
 platforms :jruby do
   gem 'activerecord'
@@ -16,9 +13,11 @@ platforms :jruby do
 end
 
 platforms :mri_19 do
-  gem 'pg'
+  gem 'pg', '~> 0.17'
 end
 
 gem 'test-unit'
 
-
+group :test do
+  gem 'jeweler', '~> 2.0'
+end
