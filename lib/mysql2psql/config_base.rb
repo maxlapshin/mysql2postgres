@@ -30,7 +30,7 @@ class Mysql2psql
       else
         value = config[token]
       end
-      value.nil? ? ( must_be_defined ? (fail Mysql2psql::UninitializedValueError.new("no value and no default for #{name}")) : default) : value
+      value.nil? ? (must_be_defined ? (fail Mysql2psql::UninitializedValueError.new("no value and no default for #{name}")) : default) : value
     end
   end
 end

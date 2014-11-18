@@ -18,8 +18,8 @@ class Mysql2psql
 
     def convert
       tables = reader.tables
-        .reject { |table| @exclude_tables.include?(table.name) }
-        .select { |table| @only_tables ? @only_tables.include?(table.name) : true }
+               .reject { |table| @exclude_tables.include?(table.name) }
+               .select { |table| @only_tables ? @only_tables.include?(table.name) : true }
 
       if @preserve_order
 
