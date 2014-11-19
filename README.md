@@ -1,5 +1,8 @@
 # mysql-to-postgres - MySQL to PostgreSQL Data Translation
 
+[![Build Status](https://travis-ci.org/maxlapshin/mysql2postgres.svg)](https://travis-ci.org/maxlapshin/mysql2postgres)
+[![Dependency Status](https://gemnasium.com/maxlapshin/mysql2postgres.svg)](https://gemnasium.com/maxlapshin/mysql2postgres)
+
 MRI or jruby supported.
 
 With a bit of a modified rails database.yml configuration, you can integrate mysql-to-postgres into a project.
