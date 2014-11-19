@@ -3,11 +3,10 @@ require 'mysql2psql/errors'
 
 class Mysql2psql
   class ConfigBase
-    attr_reader :config, :filepath
+    attr_reader :config
 
     def initialize(yaml)
-      @filepath = nil
-      @config = yaml # YAML::load(File.read(filepath))
+      @config = yaml
     end
 
     def [](key)

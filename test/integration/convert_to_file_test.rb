@@ -12,9 +12,6 @@ class ConvertToFileTest < Test::Unit::TestCase
       @@content = IO.read(@@mysql2psql.options.destfile)
     end
 
-    def shutdown
-      delete_files_for_test_config(@@options)
-    end
   end
   def setup
   end

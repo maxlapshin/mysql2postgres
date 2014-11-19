@@ -9,9 +9,6 @@ class ConverterTest < Test::Unit::TestCase
       @@options = get_test_config_by_label(:localmysql_to_file_convert_nothing)
     end
 
-    def shutdown
-      delete_files_for_test_config(@@options)
-    end
   end
   def setup
   end

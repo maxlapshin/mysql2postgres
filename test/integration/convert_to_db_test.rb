@@ -14,7 +14,6 @@ class ConvertToDbTest < Test::Unit::TestCase
 
     def shutdown
       @@mysql2psql.writer.close
-      delete_files_for_test_config(@@options)
     end
   end
   def setup

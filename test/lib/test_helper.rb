@@ -17,8 +17,6 @@ def seed_test_database
   return true
 rescue
   raise StandardError.new('Failed to seed integration test db. See README for setup requirements.')
-ensure
-  delete_files_for_test_config(options)
 end
 
 def get_test_reader(options)
@@ -60,7 +58,8 @@ def get_new_test_config(to_file = true, include_tables = [], exclude_tables = []
   configtext = Mysql2psql::Config.template(to_filename, include_tables, exclude_tables, suppress_data, suppress_ddl, force_truncate)
   configfile = get_temp_file('mysql2psql_tmp_config')
   File.open(configfile, 'w:UTF-8') { |f| f.write(configtext) }
-  Mysql2psql::ConfigBase.new(configfile)
+  yaml = YAML.load_file configfile
+  Mysql2psql::ConfigBase.new(yaml)
 rescue
   raise StandardError.new("Failed to initialize options from #{configfile}. See README for setup requirements.")
 end
@@ -80,8 +79,3 @@ def get_test_config_by_label(name)
   end
 end
 
-def delete_files_for_test_config(config)
-  File.delete(config.destfile) if File.exist?(config.destfile)
-  File.delete(config.filepath) if File.exist?(config.filepath)
-rescue
-end

@@ -57,7 +57,7 @@ end
 desc 'Run all tests'
 task :test do
   Rake::Task['test:units'].invoke
-  Rake::Task['test:integration'].invoke
+  #Rake::Task['test:integration'].invoke
 end
 
 begin
