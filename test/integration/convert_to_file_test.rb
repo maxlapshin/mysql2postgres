@@ -7,14 +7,11 @@ class ConvertToFileTest < Test::Unit::TestCase
     def startup
       seed_test_database
       @@options = get_test_config_by_label(:localmysql_to_file_convert_all)
-      @@mysql2psql = Mysql2psql.new([@@options.filepath])
+      @@mysql2psql = Mysql2psql.new(@@options)
       @@mysql2psql.convert
       @@content = IO.read(@@mysql2psql.options.destfile)
     end
 
-    def shutdown
-      delete_files_for_test_config(@@options)
-    end
   end
   def setup
   end

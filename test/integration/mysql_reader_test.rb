@@ -8,9 +8,6 @@ class MysqlReaderTest < Test::Unit::TestCase
       @@reader = get_test_reader(@@options)
     end
 
-    def shutdown
-      delete_files_for_test_config(@@options)
-    end
   end
   def setup
   end

@@ -22,7 +22,7 @@ git clone https://github.com/maxlapshin/mysql2postgres.git
 cd mysql2postgres
 bundle install
 gem build mysqltopostgres.gemspec
-sudo gem install mysqltopostgres-0.2.19.gem
+sudo gem install mysqltopostgres-0.2.20.gem
 ```
 
 ## Sample Configuration
@@ -66,7 +66,7 @@ mysql2psql:
   destination:
     production:
       <<: *production
-    test: 
+    test:
       <<: *test
     development:
       <<: *development

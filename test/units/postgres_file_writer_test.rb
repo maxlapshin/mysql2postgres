@@ -5,9 +5,7 @@ require 'mysqltopostgres'
 class PostgresFileWriterTest < Test::Unit::TestCase
   attr_accessor :destfile
   def setup
-    f = Tempfile.new('mysql2psql_test_destfile')
-    @destfile = f.path
-    f.close!
+    @destfile = get_temp_file('mysql2psql_test_destfile')
   rescue => e
     raise StandardError.new('Failed to initialize integration test db. See README for setup requirements.')
   end

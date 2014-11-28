@@ -1,11 +1,28 @@
 
 Gem::Specification.new do |s|
   s.name = 'mysqltopostgres'
-  s.version = '0.2.19'
+  s.version = '0.2.20'
   s.licenses = ['MIT']
 
-  s.authors = ['Max Lapshin <max@maxidoors.ru>', 'Anton Ageev <anton@ageev.name>', 'Samuel Tribehou <cracoucax@gmail.com>', 'Marco Nenciarini <marco.nenciarini@devise.it>', 'James Nobis <jnobis@jnobis.controldocs.com>', 'quel <github@quelrod.net>', 'Holger Amann <keeney@fehu.org>', 'Maxim Dobriakov <closer.main@gmail.com>', 'Michael Kimsal <mgkimsal@gmail.com>', 'Jacob Coby <jcoby@portallabs.com>', 'Neszt Tibor <neszt@tvnetwork.hu>', 'Miroslav Kratochvil <exa.exa@gmail.com>', 'Paul Gallagher <gallagher.paul@gmail.com>', 'Alex C Jokela <ajokela@umn.edu>', 'Peter Clark <pclark@umn.edu>']
-  s.date = '2012-09-21'
+  s.authors = [
+    'Max Lapshin <max@maxidoors.ru>',
+    'Anton Ageev <anton@ageev.name>',
+    'Samuel Tribehou <cracoucax@gmail.com>',
+    'Marco Nenciarini <marco.nenciarini@devise.it>',
+    'James Nobis <jnobis@jnobis.controldocs.com>',
+    'quel <github@quelrod.net>',
+    'Holger Amann <keeney@fehu.org>',
+    'Maxim Dobriakov <closer.main@gmail.com>',
+    'Michael Kimsal <mgkimsal@gmail.com>',
+    'Jacob Coby <jcoby@portallabs.com>',
+    'Neszt Tibor <neszt@tvnetwork.hu>',
+    'Miroslav Kratochvil <exa.exa@gmail.com>',
+    'Paul Gallagher <gallagher.paul@gmail.com>',
+    'Alex C Jokela <ajokela@umn.edu>',
+    'Peter Clark <pclark@umn.edu>',
+    'Juga Paazmaya <olavic@gmail.com>'
+  ]
+  s.date = '2014-11-19'
   s.default_executable = 'mysqltopostgres'
   s.description = 'Translates MySQL -> PostgreSQL'
   s.email = 'ajokela@umn.edu'
@@ -45,7 +62,7 @@ Gem::Specification.new do |s|
     'test/units/config_test.rb',
     'test/units/postgres_file_writer_test.rb'
   ]
-  s.homepage = 'https://github.com/ajokela/mysqltopostgres'
+  s.homepage = 'https://github.com/maxlapshin/mysql2postgres'
   s.rdoc_options = ['--charset=UTF-8']
   s.require_paths = ['lib']
   s.rubygems_version = '1.3.7'
