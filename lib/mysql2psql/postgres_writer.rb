@@ -110,7 +110,7 @@ class Mysql2psql
       table.columns.each_with_index do |column, index|
 
         if column[:type] == 'time'
-          row[index] = '%02d:%02d:%02d' % [row[index].hour, row[index].minute, row[index].second]
+          row[index] = '%02d:%02d:%02d' % [row[index].hour, row[index].minute, row[index].second] unless row[index].nil?
         end
 
         if row[index].is_a?(MysqlPR::Time)
