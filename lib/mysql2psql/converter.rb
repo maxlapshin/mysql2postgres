@@ -71,6 +71,11 @@ class Mysql2psql
       writer.inload
 
       0
+    rescue => e
+      $stderr.puts "Mysql2psql: Conversion failed: #{e.to_s}"
+      $stderr.puts e
+      $stderr.puts e.backtrace[0,3].join("\n")
+      return -1
     end
   end
 end
