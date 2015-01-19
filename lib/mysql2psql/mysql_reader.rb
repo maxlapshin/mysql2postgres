@@ -21,7 +21,6 @@ class Mysql2psql
         list[eval("::MysqlPR::Field::TYPE_#{type.upcase}")] = type
         list
       end
-
       @@types[246] = 'decimal'
 
       def columns
@@ -60,7 +59,7 @@ class Mysql2psql
         result = @reader.mysql.list_fields(name)
         mysql_flags = ::MysqlPR::Field.constants.select { |c| c =~ /FLAG/ }
         fields = []
-        @reader.mysql.query("EXPLAIN `#{name}`") do |res|
+        @reader.query("EXPLAIN `#{name}`") do |res|
           while field = res.fetch_row
             length = field[1][/\((\d+)\)/, 1] if field[1] =~ /\((\d+)\)/
             length = field[1][/\((\d+),(\d+)\)/, 1] if field[1] =~ /\((\d+),(\d+)\)/
@@ -80,13 +79,12 @@ class Mysql2psql
         end
 
         fields.select { |field| field[:auto_increment] }.each do |field|
-          @reader.mysql.query("SELECT max(`#{field[:name]}`) FROM `#{name}`") do |res|
+          @reader.query("SELECT max(`#{field[:name]}`) FROM `#{name}`") do |res|
             field[:maxval] = res.fetch_row[0].to_i
           end
         end
         fields
       end
-
       def indexes
         load_indexes unless @indexes
         @indexes
@@ -101,7 +99,7 @@ class Mysql2psql
         @indexes = []
         @foreign_keys = []
 
-        @reader.mysql.query("SHOW CREATE TABLE `#{name}`") do |result|
+        @reader.query("SHOW CREATE TABLE `#{name}`") do |result|
           explain = result.fetch_row[1]
           explain.split(/\n/).each do |line|
             next unless line =~ / KEY /
@@ -142,7 +140,7 @@ class Mysql2psql
       end
 
       def count_rows
-        @reader.mysql.query("SELECT COUNT(*) FROM `#{name}`")  do |res|
+        @reader.query("SELECT COUNT(*) FROM `#{name}`")  do |res|
           return res.fetch_row[0].to_i
         end
       end
@@ -153,7 +151,7 @@ class Mysql2psql
 
       def count_for_pager
         query = has_id? ? 'MAX(id)' : 'COUNT(*)'
-        @reader.mysql.query("SELECT #{query} FROM `#{name}`") do |res|
+        @reader.query("SELECT #{query} FROM `#{name}`") do |res|
           return res.fetch_row[0].to_i
         end
       end
@@ -183,6 +181,19 @@ class Mysql2psql
     def reconnect
       @mysql.close rescue false
       connect
+    end
+
+    def query(*args, &block)
+      self.mysql.query(*args, &block)
+    rescue Mysql::Error => e
+      if e.message =~ /gone away/i
+        self.reconnect
+        retry
+      else
+        puts "MySQL Query failed '#{args.inspect}' #{e.inspect}"
+        puts e.backtrace[0,5].join("\n")
+        return []
+      end
     end
 
     def initialize(options)
