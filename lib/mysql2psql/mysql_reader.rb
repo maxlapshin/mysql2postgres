@@ -160,7 +160,16 @@ class Mysql2psql
 
       def query_for_pager
         query = has_id? ? 'WHERE id >= ? AND id < ?' : 'LIMIT ?,?'
-        "SELECT #{columns.map { |c| '`' + c[:name] + '`' }.join(', ')} FROM `#{name}` #{query}"
+
+        cols = columns.map do |c|
+          if "multipolygon" == c[:type]
+            "AsWKT(`#{c[:name]}`) as `#{c[:name]}`"
+          else
+            "`#{c[:name]}`"
+          end
+        end
+
+        "SELECT #{cols.join(", ")} FROM `#{name}` #{query}"
       end
     end
 
