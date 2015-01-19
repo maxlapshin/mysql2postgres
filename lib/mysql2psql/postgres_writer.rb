@@ -95,7 +95,7 @@ class Mysql2psql
         default = default + '::character varying' if default
         enum = column[:type].gsub(/enum|\(|\)/, '')
         max_enum_size = enum.split(',').map { |check| check.size - 2 }.sort[-1]
-        "character varying(#{max_enum_size}) check( #{column[:name]} in (#{enum}))"
+        "character varying(#{max_enum_size}) check( \"#{column[:name]}\" in (#{enum}))"
       when 'multipolygon'
         'geometry'
       else
