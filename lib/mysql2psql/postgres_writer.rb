@@ -96,6 +96,8 @@ class Mysql2psql
         enum = column[:type].gsub(/enum|\(|\)/, '')
         max_enum_size = enum.split(',').map { |check| check.size - 2 }.sort[-1]
         "character varying(#{max_enum_size}) check( #{column[:name]} in (#{enum}))"
+      when 'multipolygon'
+        'geometry'
       else
         puts "Unknown #{column.inspect}"
         column[:type].inspect
