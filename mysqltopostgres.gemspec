@@ -66,7 +66,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ['--charset=UTF-8']
   s.require_paths = ['lib']
   s.rubygems_version = '1.3.7'
-  s.summary = 'Tool for converting mysql database to postgresql'
+  s.summary = 'MySQL to PostgreSQL Data Translation'
   s.test_files = [
     'test/integration/convert_to_db_test.rb',
     'test/integration/convert_to_file_test.rb',
@@ -82,7 +82,7 @@ Gem::Specification.new do |s|
   ]
 
   s.add_dependency('mysql-pr', ['>= 2.9.10'])
-  s.add_dependency('postgres-pr', ['= 0.6.3'])
+  s.add_dependency('postgres-pr', ['>= 0.6.3'])
   s.add_dependency('activerecord', ['>= 3.2.6'])
   s.add_dependency('test-unit', ['>= 2.1.1'])
 
