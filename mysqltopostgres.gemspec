@@ -81,10 +81,10 @@ Gem::Specification.new do |s|
     'test/units/postgres_file_writer_test.rb'
   ]
 
-  s.add_dependency('mysql-pr', ['>= 2.9.10'])
-  s.add_dependency('postgres-pr', ['>= 0.6.3'])
-  s.add_dependency('activerecord', ['>= 3.2.6'])
-  s.add_dependency('test-unit', ['>= 2.1.1'])
+  s.add_dependency('mysql-pr', ['~>  2.9'])
+  s.add_dependency('postgres-pr', ['~>  0.6'])
+  s.add_dependency('activerecord', ['~>  3.2'])
+  s.add_dependency('test-unit', ['~>  2.1'])
 
   if RUBY_PLATFORM == 'java'
     s.add_dependency('activerecord-jdbc-adapter', ['>= 1.2.2'])
