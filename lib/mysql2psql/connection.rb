@@ -43,7 +43,7 @@ class Mysql2psql
       else
         @jruby = false
 
-        @conn = PG.connect(dbname: database, user: login, password: password, host: hostname, port: port)
+        @conn = PG::Connection.open(dbname: database, user: login, password: password, host: hostname, port: port)
 
         if conn.nil?
           raise_nil_connection
