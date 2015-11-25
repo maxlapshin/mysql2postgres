@@ -27,11 +27,12 @@ begin
       'Jacob Coby <jcoby@portallabs.com>',
       'Neszt Tibor <neszt@tvnetwork.hu>',
       'Miroslav Kratochvil <exa.exa@gmail.com>',
-      'Paul Gallagher <gallagher.paul@gmail.com>'
+      'Paul Gallagher <gallagher.paul@gmail.com>',
+      'Juga Paazmaya <paazmaya@yahoo.com>'
     ]
-    gem.add_dependency 'mysql', '= 2.8.1'
-    gem.add_dependency 'pg', '= 0.9.0'
-    gem.add_development_dependency 'test-unit', '>= 2.1.1'
+    gem.add_dependency 'mysql-pr', '~> 2.9'
+    gem.add_dependency 'postgres-pr', '~> 0.6'
+    gem.add_development_dependency 'test-unit', '~> 2.1'
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new

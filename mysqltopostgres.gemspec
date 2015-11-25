@@ -1,7 +1,7 @@
 
 Gem::Specification.new do |s|
   s.name = 'mysqltopostgres'
-  s.version = '0.2.20'
+  s.version = '0.3.0'
   s.licenses = ['MIT']
 
   s.authors = [
@@ -22,10 +22,10 @@ Gem::Specification.new do |s|
     'Peter Clark <pclark@umn.edu>',
     'Juga Paazmaya <olavic@gmail.com>'
   ]
-  s.date = '2014-11-19'
+  s.date = '2015-11-26'
   s.default_executable = 'mysqltopostgres'
   s.description = 'Translates MySQL -> PostgreSQL'
-  s.email = 'ajokela@umn.edu'
+  s.email = 'paazmaya@yahoo.com'
   s.executables = ['mysqltopostgres']
 
   s.files = [
@@ -65,7 +65,7 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/maxlapshin/mysql2postgres'
   s.rdoc_options = ['--charset=UTF-8']
   s.require_paths = ['lib']
-  s.rubygems_version = '1.3.7'
+  s.rubygems_version = '2.4.0'
   s.summary = 'MySQL to PostgreSQL Data Translation'
   s.test_files = [
     'test/integration/convert_to_db_test.rb',
@@ -81,15 +81,15 @@ Gem::Specification.new do |s|
     'test/units/postgres_file_writer_test.rb'
   ]
 
-  s.add_dependency('mysql-pr', ['~>  2.9'])
-  s.add_dependency('postgres-pr', ['~>  0.6'])
-  s.add_dependency('activerecord', ['~>  3.2'])
-  s.add_dependency('test-unit', ['~>  2.1'])
+  s.add_dependency('mysql-pr', ['~> 2.9'])
+  s.add_dependency('postgres-pr', ['~> 0.6'])
+  s.add_dependency('test-unit', ['~> 2.1'])
 
   if RUBY_PLATFORM == 'java'
-    s.add_dependency('activerecord-jdbc-adapter', ['>= 1.2.2'])
-    s.add_dependency('activerecord-jdbcpostgresql-adapter', ['>= 1.2.2'])
-    s.add_dependency('activerecord-jdbcsqlite3-adapter', ['>= 1.2.2'])
+    s.add_dependency('activerecord', ['~> 3.2'])
+    s.add_dependency('jdbc-postgres', ['~> 9.4'])
+    s.add_dependency('activerecord-jdbc-adapter', ['~> 1.2'])
+    s.add_dependency('activerecord-jdbcpostgresql-adapter', ['~> 1.2'])
   end
 
 end

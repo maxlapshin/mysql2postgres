@@ -3,11 +3,14 @@
 [![Build Status](https://travis-ci.org/maxlapshin/mysql2postgres.svg)](https://travis-ci.org/maxlapshin/mysql2postgres)
 [![Dependency Status](https://gemnasium.com/maxlapshin/mysql2postgres.svg)](https://gemnasium.com/maxlapshin/mysql2postgres)
 
-MRI or jruby supported.
+MRI or jruby supported. The minimum Ruby version supported in `master` branch is `2.1.7`,
+and the next release will have the same requirement.
 
-With a bit of a modified rails database.yml configuration, you can integrate mysql-to-postgres into a project.
+With a bit of a modified rails `database.yml` configuration, you can integrate `mysql-to-postgres`into a project.
 
 ## Installation
+
+**Currently failing, see #81...**
 
 ### Via RubyGems
 
@@ -22,7 +25,7 @@ git clone https://github.com/maxlapshin/mysql2postgres.git
 cd mysql2postgres
 bundle install
 gem build mysqltopostgres.gemspec
-sudo gem install mysqltopostgres-0.2.20.gem
+sudo gem install mysqltopostgres-0.3.0.gem
 ```
 
 ## Sample Configuration
@@ -102,3 +105,10 @@ mysql2psql:
 ```
 
 Please note that the MySQL connection will be using socket in case the host is not defined (`nil`) or it is `'localhost'`.
+
+## Testing
+
+
+## License
+
+Licensed under [the MIT license](MIT-LICENSE).

@@ -6,8 +6,8 @@ default: &default
   password: default
   host: 127.0.0.1
   template: template_gis
-  gis_schema_name: gis_tmp 
-  
+  gis_schema_name: gis_tmp
+
 development: &development
   <<: *default
   database: default_development
@@ -30,15 +30,15 @@ mysql_data_source: &pii
 mysql2psql:
   mysql:
     <<: *pii
-    
+
   destination:
     production:
       <<: *production
-    test: 
+    test:
       <<: *test
     development:
       <<: *development
-      
+
   tables:
   - countries
   - samples
@@ -59,11 +59,11 @@ mysql2psql:
   preserve_order: true
 
   remove_dump_file: true
-  
+
   dump_file_directory: /tmp
-  
+
   report_status:  json    # false, json, xml
-  
+
   # If clear_schema is true, the public schema will be recreated before conversion
   # The import will fail if both clear_schema and suppress_ddl are true.
   clear_schema: false

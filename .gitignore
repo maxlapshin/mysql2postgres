@@ -1,7 +1,8 @@
-test/fixtures/test*.sql
-config/database.yml
-pkg
-.rvmrc
-.bundle
+*.gem
 *.sql
+.bundle
+.rvmrc
+config/database.yml
 Gemfile.lock
+pkg
+test/fixtures/test*.sql

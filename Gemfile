@@ -1,4 +1,4 @@
-ruby '1.9.3'
+ruby '2.1.7'
 source 'https://rubygems.org'
 
 gem 'rake', '~> 10.3'
@@ -13,7 +13,7 @@ platforms :jruby do
 end
 
 platforms :mri do
-  gem 'pg', '~> 0.17'
+  gem 'pg', '~> 0.18'
 end
 
 gem 'test-unit'
