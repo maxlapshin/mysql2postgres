@@ -98,6 +98,8 @@ class Mysql2psql
         "character varying(#{max_enum_size}) check( \"#{column[:name]}\" in (#{enum}))"
       when 'multipolygon'
         'geometry'
+      when 'geometry'
+        'geometry'
       else
         puts "Unknown #{column.inspect}"
         column[:type].inspect
