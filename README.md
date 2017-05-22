@@ -25,7 +25,7 @@ git clone https://github.com/maxlapshin/mysql2postgres.git
 cd mysql2postgres
 bundle install
 gem build mysqltopostgres.gemspec
-sudo gem install mysqltopostgres-0.3.0.gem
+sudo gem install mysqltopostgres-0.3.1.gem
 ```
 
 ## Sample Configuration

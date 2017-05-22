@@ -15,7 +15,7 @@ platforms :mri do
   gem 'pg', '~> 0.18'
 end
 
-gem 'test-unit'
+gem 'test-unit', '~> 2.1'
 
 group :test do
   gem 'jeweler', '~> 2.0'
