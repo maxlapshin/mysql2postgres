@@ -1,8 +1,7 @@
 require 'rubygems'
 require 'rake'
 
-$LOAD_PATH.unshift('lib')
-require 'mysql2psql/version'
+require_relative 'lib/mysql2psql/version'
 
 begin
   require 'jeweler'
