@@ -13,3 +13,7 @@ rvm:
   - 2.2.10
   - 2.1.10
   - ruby-head
+
+jobs:
+  allow_failures:
+    - rvm: ruby-head
