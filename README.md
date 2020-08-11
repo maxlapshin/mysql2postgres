@@ -55,7 +55,7 @@ production: &production
   database: default_production
 
 mysql_data_source: &pii
-  hostname: localhost
+  host: localhost
   port: 3306
   socket: /tmp/mysqld.sock
   username: username
