@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
 
   s.files = `git ls-files`.split("\n")
 
+  s.bindir      = 'exe'
   s.executables = ['mysqltopostgres']
 
   s.add_dependency 'mysql-pr',    '~> 2.9'
