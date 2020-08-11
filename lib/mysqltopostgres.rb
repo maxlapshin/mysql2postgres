@@ -1,4 +1,3 @@
-
 if RUBY_PLATFORM == 'java'
   require 'active_record'
   require 'postgres-pr/postgres-compat'
