@@ -46,5 +46,6 @@ Gem::Specification.new do |s|
   end
 
   s.add_development_dependency 'rake'
+  s.add_development_dependency 'rubocop'
   s.add_development_dependency 'test-unit'
 end
