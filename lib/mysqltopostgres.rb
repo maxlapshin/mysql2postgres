@@ -3,11 +3,6 @@ if RUBY_PLATFORM == 'java'
   require 'postgres-pr/postgres-compat'
 else
   require 'pg'
-  require 'pg_ext'
-  require 'pg/exceptions'
-  require 'pg/constants'
-  require 'pg/connection'
-  require 'pg/result'
 end
 
 require 'mysql2psql/errors'
