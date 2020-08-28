@@ -1,4 +1,3 @@
-
 class Mysql2psql
   class Connection
     attr_reader :conn, :adapter, :hostname, :login, :password, :database, :schema, :port, :environment, :jruby, :copy_manager, :stream, :is_copying
